@@ -6,5 +6,5 @@ RewriteCond %{SCRIPT_FILENAME} !-f
 
 RewriteCond %{SCRIPT_FILENAME} !-d
 
-RewriteRule (.*) index.php?--QueryUSS=$1 [B,L,QSA]
+RewriteRule (.*) index.php [B,L,QSA]
 

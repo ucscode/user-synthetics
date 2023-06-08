@@ -8,15 +8,10 @@
  *
  * @package uss
  * @author ucscode
+ * @version 2.5.0
  */
 
 class uss {
-	
-	/**
-	 * @ignore
-	 */
-	const VERSION = '2.4.1';
-	
 	
 	/**
 	 * @ignore
@@ -88,16 +83,6 @@ class uss {
 	 * @ignore
 	 */
 	private static array $engineTags = array();
-	
-	
-	/**
-	 * The QueryKey constant represents the key used in the query string to identify the User Synthetics query.
-	 * It is used to retrieve the query parameters from the URL and process them accordingly.
-	 *
-	 * @var string
-	 * @ignore
-	 */
-	const QueryKey = '--QueryUSS';
 	
 	
 	/**
@@ -324,14 +309,6 @@ class uss {
 	private static function __vars() {
 		
 		/**
-		 * All http request will be forwarded to the `index.php` file
-		 * Thus, URL paths are stored in $_GET variable
-		 * The indexes can be easily accessible using the `uss::query()` method;
-		*/
-		$_GET[ self::QueryKey ] = ($_GET[ self::QueryKey ] ?? null);
-		
-		
-		/**
 		 * Get Default Content
 		 * All of the settings below can be easily modified by any module
 		*/
@@ -511,31 +488,18 @@ class uss {
 		 * });
 		 *```	
 		*/
-		
-		$simplify = function($request) {
-			// convert to a simple & valid path;
-			return implode("/", array_filter(array_map('trim', explode("/", $request))));
-		};
-		
-		
-		// simplify the focus path & url string;
-		
-		$focus = $simplify($path);
-		$query = $simplify($_GET[ self::QueryKey ]);
-		
+		$focus = implode("/", array_filter(array_map('trim', explode("/", $path))));
+		$query = implode("/", self::query());
 		
 		/**
 		 * Check if they match;
 		 * Test for regular expression of the Path
 		*/
-		
 		$expression = '~^' . $focus . '$~';
 
-		
 		/**
 		 * Compare the focus path to the current URL
-		*/
-		
+		 */
 		if( preg_match( $expression, $query, $match ) ) {
 		
 			/**
@@ -598,8 +562,16 @@ class uss {
 	 * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the query string is not set.
 	 */
 	public static function query( ?int $index = null ) {
-		$query = array_map('trim', explode("/", $_GET[ self::QueryKey ]));
-		return is_numeric($index) ? ($query[$index] ?? null) : $query;
+		
+		$DOCUMENT_ROOT = core::rslash($_SERVER['DOCUMENT_ROOT']);
+		$PROJECT_ROOT = core::rslash(ROOT_DIR);
+		$REQUEST_URI = $_SERVER['REQUEST_URI'];
+		
+		$PATH = str_replace($PROJECT_ROOT, '', $DOCUMENT_ROOT . $REQUEST_URI);
+		$QUERY = array_filter( array_map('trim', explode("/", $PATH)) );
+		
+		return is_numeric($index) ? ($QUERY[$index] ?? null) : $QUERY;
+		
 	}
 	
 	
