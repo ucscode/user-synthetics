@@ -14,6 +14,7 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [Demo](#demo)
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
@@ -27,6 +28,22 @@
 User Synthetics is a powerful and versatile PHP framework designed to simplify the development of customizable and extensible web applications. With User Synthetics, you can create robust platforms tailored to your specific requirements, thanks to its modular architecture and user-friendly interface.
 
 The framework provides a solid foundation, incorporating essential third-party libraries like Bootstrap, Toastr.js, and Bootbox, to empower developers with a comprehensive set of tools for building modern and interactive web applications.
+
+## Demo
+
+Check out the video showcase of User Synthetics in action:
+
+[![User Synthetics Video Showcase](https://i.ibb.co/5FM9jZR/Apex-1686428197174.png)](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s)
+
+Click the image above or [here](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s) to watch the video.
+
+---
+
+A live demo of User Synthetics has been prepared for you to explore and experience its capabilities. The demo showcases various features and modules of the framework, giving you a glimpse of its flexibility and functionality.
+
+**[Access the User Synthetics Live Demo](https://example.com/demo)**
+
+> Please note that the demo is for exploration purposes only, and any changes or data entered in the demo environment will not be saved.
 
 ## Features
 
@@ -52,14 +69,6 @@ Follow these steps to get started with User Synthetics:
 ## Documentation
 
 Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](https://example.com/docs) to explore the resources.
-
-## Demo
-
-A live demo of User Synthetics has been prepared for you to explore and experience its capabilities. The demo showcases various features and modules of the framework, giving you a glimpse of its flexibility and functionality.
-
-**[Access the User Synthetics Demo](https://example.com/demo)**
-
-> Please note that the demo is for exploration purposes only, and any changes or data entered in the demo environment will not be saved.
 
 ## Contributing
 
