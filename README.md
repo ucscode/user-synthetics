@@ -33,7 +33,7 @@ The framework provides a solid foundation, incorporating essential third-party l
 
 Check out the video showcase of User Synthetics in action:
 
-[![User Synthetics Video Showcase](https://i.ibb.co/5FM9jZR/Apex-1686428197174.png)](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s)
+[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s)
 
 Click the image above or [here](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s) to watch the video.
 
