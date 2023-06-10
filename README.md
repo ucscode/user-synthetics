@@ -3,7 +3,7 @@
 ---
 
 <div align="center">
-	<img src="uss-assets/images/origin.png" alt="User Synthetics Logo" width="200">
+	<img src="uss-assets/images/origin.png" alt="User Synthetics Logo" width="140">
 	<h1>User Synthetics</h1>
 	<p>Modular PHP Framework for Customizable and Extensible Web Applications</p>
 	<a href="https://example.com/docs"><strong>Explore the User Synthetics docs »</strong></a>
