@@ -35,7 +35,7 @@ Check out the video showcase of User Synthetics in action:
 
 [![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s)
 
-Click the image above or [here](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s) to watch the video.
+Click the image above or <a href='https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s' target='_blank'>**click here**</a> to watch the video.
 
 ---
 
