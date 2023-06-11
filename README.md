@@ -1,4 +1,4 @@
-### Please note that redirection links on this read me file are not entirely correct. However, once all link are updated, this notice will be removed.
+> Please note that redirection links on this `README.md` file are not entirely correct. However, once all links are updated, this notice will be removed.
 
 ---
 
@@ -85,5 +85,5 @@ User Synthetics is released under the GNU General Public License (GPL) version 3
 
 ## Acknowledgements
 
-User Synthetics is developed and maintained by [ucscode](https://ucscode.me). If you have any questions, suggestions, or need assistance, please feel free to reach out to me. I'll be happy to support you on your journey with User Synthetics.
+User Synthetics is developed and maintained by [ucscode](https://ucscode.me). If you have any questions, suggestions, or need assistance, please feel free to reach out.
 
