@@ -568,7 +568,7 @@ class uss {
 		$REQUEST_URI = $_SERVER['REQUEST_URI'];
 		
 		$PATH = str_replace($PROJECT_ROOT, '', $DOCUMENT_ROOT . $REQUEST_URI);
-		$QUERY = array_filter( array_map('trim', explode("/", $PATH)) );
+		$QUERY = array_values( array_filter( array_map('trim', explode("/", $PATH)) ) );
 		
 		return is_numeric($index) ? ($QUERY[$index] ?? null) : $QUERY;
 		
