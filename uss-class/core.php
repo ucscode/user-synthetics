@@ -269,7 +269,7 @@ class core {
 				unset($string[$k]);
 		};
 		
-		if( $full ) {
+		if( !$full ) {
 			$string = array_slice( $string, 0, 1 );
 			if( $full === false && $string ) {
 				$string = array_values($string);
