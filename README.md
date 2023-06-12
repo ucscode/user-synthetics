@@ -6,7 +6,7 @@
 	<img src="uss-assets/images/origin.png" alt="User Synthetics Logo" width="140">
 	<h1>User Synthetics</h1>
 	<p>Modular PHP Framework for Customizable and Extensible Web Applications</p>
-	<a href="https://example.com/docs"><strong>Explore the User Synthetics docs »</strong></a>
+	<a href="https://uss.ucscode.me/docs"><strong>Explore the User Synthetics docs »</strong></a>
 	<br>
 	<br>
 </div>
@@ -41,7 +41,7 @@ Click the image above or <a href='https://www.youtube.com/watch?v=9MFrD9nCRrc&t=
 
 A live demo of User Synthetics has been prepared for you to explore and experience its capabilities. The demo showcases various features and modules of the framework, giving you a glimpse of its flexibility and functionality.
 
-**[Access the User Synthetics Live Demo](https://example.com/demo)**
+**[Access the User Synthetics Live Demo](https://uss.ucscode.me/demo)**
 
 > Please note that the demo is for exploration purposes only, and any changes or data entered in the demo environment will not be saved.
 
@@ -64,11 +64,11 @@ Follow these steps to get started with User Synthetics:
 1. Clone the repository: `git clone https://github.com/ucscode/user-synthetics.git`.
 2. Set up your web server to serve the cloned directory as the document root.
 3. Customize the framework and modules to suit your project's requirements.
-4. Refer to the [User Synthetics documentation](https://example.com/docs) for detailed usage instructions and guides.
+4. Refer to the [User Synthetics documentation](https://uss.ucscode.me/docs) for detailed usage instructions and guides.
 
 ## Documentation
 
-Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](https://example.com/docs) to explore the resources.
+Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](https://uss.ucscode.me/docs) to explore the resources.
 
 ## Contributing
 
