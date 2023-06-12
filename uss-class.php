@@ -18,7 +18,7 @@ class uss {
 	/**
 	 * @ignore
 	 */
-	private static $project_url = 'https://github.com/ucscode/uss-v2';
+	private static $project_url = 'https://github.com/ucscode/user-synthetics';
 	
 	
 	/**
