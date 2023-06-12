@@ -567,9 +567,11 @@ class uss {
 		
 		$DOCUMENT_ROOT = core::rslash($_SERVER['DOCUMENT_ROOT']);
 		$PROJECT_ROOT = core::rslash(ROOT_DIR);
-		$REQUEST_URI = $_SERVER['REQUEST_URI'];
 		
-		$PATH = str_replace($PROJECT_ROOT, '', $DOCUMENT_ROOT . $REQUEST_URI);
+		$REQUEST_URI = explode("?", $_SERVER['REQUEST_URI']);
+		$PATH = $REQUEST_URI[0] ?? '';
+		
+		$PATH = str_replace($PROJECT_ROOT, '', $DOCUMENT_ROOT . $PATH);
 		$QUERY = array_values( array_filter( array_map('trim', explode("/", $PATH)) ) );
 		
 		return is_numeric($index) ? ($QUERY[$index] ?? null) : $QUERY;
