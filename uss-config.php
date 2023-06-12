@@ -94,9 +94,9 @@ $class = array(
 	"events.php",
 	"sQuery.php",
 	"pairs.php",
-	"menufy.php",
+	"Menufy.php",
 	"DOMTable.php",
-	"datamemo.php",
+	"DataMemo.php",
 	"X2Client/X2Client.php",
 	"vendors/Parsedown.php",
 	"vendors/ParsedownExtra.php"
