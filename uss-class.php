@@ -496,8 +496,9 @@ class uss {
 		/**
 		 * Check if they match;
 		 * Test for regular expression of the Path
-		*/
-		$expression = '~^' . $focus . '$~';
+		 * The request is automatically made case insensitive
+		 */
+		$expression = '~^' . $focus . '$~i';
 
 		/**
 		 * Compare the focus path to the current URL
