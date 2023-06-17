@@ -1,7 +1,3 @@
-> Please note that redirection links on this `README.md` file are not entirely correct. However, once all links are updated, this notice will be removed.
-
----
-
 <div align="center">
 	<img src="uss-assets/images/origin.png" alt="User Synthetics Logo" width="140">
 	<h1>User Synthetics</h1>
@@ -33,9 +29,9 @@ The framework provides a solid foundation, incorporating essential third-party l
 
 Check out the video showcase of User Synthetics in action:
 
-[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s)
+[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://uss.ucscode.me/videos/2c22f9a9dbac6547d269d5bf9ebf9fcf55def4e6)
 
-Click the image above or <a href='https://www.youtube.com/watch?v=9MFrD9nCRrc&t=268s' target='_blank'>**click here**</a> to watch the video.
+Click the image above or <a href='https://uss.ucscode.me/videos/2c22f9a9dbac6547d269d5bf9ebf9fcf55def4e6' target='_blank'>**click here**</a> to watch the video.
 
 ---
 
