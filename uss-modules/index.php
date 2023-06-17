@@ -9,7 +9,14 @@ defined( "ROOT_DIR" ) OR DIE('GREAT! &mdash; GLAD TO SEE YOU ACCESS THIS PAGE IL
  * Load Modules
  * Iterate over the contents of this directory and include the `index.php` file for each module
  */
-foreach( (new FileSystemIterator( __DIR__ )) as $sysIter ) {
+$directories = iterator_to_array( new FileSystemIterator( __DIR__ ) );
+
+/** sort ascending */
+usort($directories, function($a, $b) {
+	return strnatcasecmp($a->getFilename(), $b->getFilename());
+});
+
+foreach( $directories as $sysIter ) {
 	
 	/**
 	 * Prevent conflicts with module variables
@@ -33,7 +40,7 @@ foreach( (new FileSystemIterator( __DIR__ )) as $sysIter ) {
 		// Require the index.php file only if it exists;
 		
 		if( file_exists($modIndex) ) require_once $modIndex;
-	
+		
 	});
 	
 };
