@@ -29,9 +29,9 @@ The framework provides a solid foundation, incorporating essential third-party l
 
 Check out the video showcase of User Synthetics in action:
 
-[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://uss.ucscode.me/videos/2c22f9a9dbac6547d269d5bf9ebf9fcf55def4e6)
+[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://uss.ucscode.me/videos)
 
-Click the image above or <a href='https://uss.ucscode.me/videos/2c22f9a9dbac6547d269d5bf9ebf9fcf55def4e6' target='_blank'>**click here**</a> to watch the video.
+Click the image above or <a href='https://uss.ucscode.me/videos' target='_blank'>**click here**</a> to watch the video.
 
 ---
 
