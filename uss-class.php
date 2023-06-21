@@ -775,7 +775,7 @@ class Uss {
 	/**
 	 * Assign and update template tag values in user synthetics.
 	 *
-	 * The `Uss::eTag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\\{tagName}` and can be replaced with corresponding values.
+	 * The `Uss::eTag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
 	 *
 	 * When encountering a tag, the method checks the `engineTags` list to find a matching key. If a match is found, the tag is replaced with the corresponding string value. Otherwise, the tag is replaced with an empty string.
 	 *
