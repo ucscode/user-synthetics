@@ -353,6 +353,9 @@ class Uss {
 		
 	}
 	
+	/**
+	 * @ignore
+	 */
 	private static function include_libraries( string $position, array $exclude ) {
 		
 		$libraries = array(
