@@ -90,10 +90,10 @@ if( (float)PHP_VERSION < MIN_PHP_VERSION ) {
  */
 
 $class = array(
-	"core.php",
-	"events.php",
+	"Core.php",
+	"Events.php",
 	"sQuery.php",
-	"pairs.php",
+	"Pairs.php",
 	"Menufy.php",
 	"DOMTable.php",
 	"DataMemo.php",
