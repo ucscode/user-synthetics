@@ -11,7 +11,7 @@
  * @version 2.5.0
  */
 
-class uss {
+class Uss {
 	
 	const VERSION = "2.5.0";
 	
@@ -184,16 +184,16 @@ class uss {
 		if( DB_CONNECT ) {
 			
 			/**
-			 * Save MYSQLI Instance into `uss::$global` property.
+			 * Save MYSQLI Instance into `Uss::$global` property.
 			 *
-			 * This proccess assigns the MYSQLI instance to the `uss::$global` property, allowing easy access to the database connection throughout the User Synthetics system.
+			 * This proccess assigns the MYSQLI instance to the `Uss::$global` property, allowing easy access to the database connection throughout the User Synthetics system.
 			 *
 			 * Please note that if you are using **PHP Data Object** (PDO) connection instead of MYSQLI, you will need to declare your own connection inside your module using the appropriate syntax.
 			 *
 			 * Example for PDO connection:
 			 *
 			 * ```php
-			 * uss::$global['pdo'] = new PDO('mysql:host=localhost;dbname=test', $user, $pass);
+			 * Uss::$global['pdo'] = new PDO('mysql:host=localhost;dbname=test', $user, $pass);
 			 * ```
 			 */
 			
@@ -303,7 +303,7 @@ class uss {
 	 *
 	 * This method is responsible for handling system-defined variables
 	 * The method stores values which can be accessed across different parts
-	 * of the system through the `uss::$global` variable.
+	 * of the system through the `Uss::$global` variable.
 	 *
 	 * @return void
 	 * @ignore
@@ -333,7 +333,7 @@ class uss {
 		 * Example usage:
 		 *
 		 * ```php
-		 * uss::$global['body.attrs'] = [
+		 * Uss::$global['body.attrs'] = [
 		 *     'data-name' => 'ucscode',
 		 *     'style' => 'color:green;background:red',
 		 *     'class' => 'uss-v2'
@@ -437,7 +437,7 @@ class uss {
 		
 		/**
 		 * Check the view status before printing to prevent duplicate rendering.
-		 * The `uss::view()` method will not reprint the user interface onto the browser if it has already been rendered.
+		 * The `Uss::view()` method will not reprint the user interface onto the browser if it has already been rendered.
 		 */
 		
 		if( is_null($content) || self::$viewing ) return self::$viewing;
@@ -545,7 +545,7 @@ class uss {
 		/**
 		 * Further Example:
 		 * ```php
-		 * uss::focus( "users/profile", function() {
+		 * Uss::focus( "users/profile", function() {
 		 * 	/* 
 		 * 		This closure will work only if domain name is directly followed by `users/profile` 
 		 * 		# domain.com/users/profile - [ will work ]
@@ -607,7 +607,7 @@ class uss {
 	/**
 	 * Get the current focus expression or list of focus expressions.
 	 *
-	 * This method retrieves the current focus expression that has been set using the `uss::focus()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
+	 * This method retrieves the current focus expression that has been set using the `Uss::focus()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
 	 *
 	 * @param bool $expr Optional: Whether to return the list of focus expressions or just the current focus expression. Default is `false`.
 	 * @return string|array|null The current focus expression, an array of focus expressions and their corresponding URLs, or `null` if no focus expressions are set
@@ -648,7 +648,7 @@ class uss {
 	/**
 	 * Generate a one-time security token.
 	 *
-	 * The `uss::nonce()` method generates a one-time security token based on a secret input and the current session ID. This token can be used for secure operations, such as verifying the authenticity of requests. To verify a token, simply provide it as the second argument when invoking the method.
+	 * The `Uss::nonce()` method generates a one-time security token based on a secret input and the current session ID. This token can be used for secure operations, such as verifying the authenticity of requests. To verify a token, simply provide it as the second argument when invoking the method.
 	 *
 	 * @param string $input The secret input used to generate the token. Defaults to '1' if not provided.
 	 * @param string|null $token The token to verify. If not provided, a new token is generated.
@@ -699,14 +699,14 @@ class uss {
 	 * I Love JSO... 
 	 * I mean, uss platform works great with JSON!
 	 * 
-	 * `uss::stop()` method is the platform way of calling `die()` or `exit()`
+	 * `Uss::stop()` method is the platform way of calling `die()` or `exit()`
 	 * It exits the script and print a json response
 	 */
 	
 	/**
 	 * Exit the script and print a JSON response.
 	 *
-	 * The `uss::stop()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
+	 * The `Uss::stop()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
 	 *
 	 * @param bool|null   $status  The status of the response. Set to `true` for a successful response, or `false` for an error response.
 	 * @param string|null $message A message accompanying the response. It can provide additional information about the status or error.
@@ -728,7 +728,7 @@ class uss {
 	/**
 	 * Pass a variable from PHP to JavaScript.
 	 *
-	 * The `uss::console()` method facilitates the transfer of data from PHP to JavaScript in a convenient manner.
+	 * The `Uss::console()` method facilitates the transfer of data from PHP to JavaScript in a convenient manner.
 	 * It provides different functionalities based on the arguments passed:
 	 *
 	 * - If the first argument is `NULL`, it returns an array containing the list of data that will be forwarded to the browser.
@@ -755,7 +755,7 @@ class uss {
 	/**
 	 * Remove a value from the list of console data.
 	 *
-	 * The `uss::remove_console()` method allows you to remove a specific value from the console data list.
+	 * The `Uss::remove_console()` method allows you to remove a specific value from the console data list.
 	 *
 	 * @param string $key The key or identifier of the value to be removed from the console data.
 	 *
@@ -772,7 +772,7 @@ class uss {
 	/**
 	 * Assign and update template tag values in user synthetics.
 	 *
-	 * The `uss::eTag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\\{tagName}` and can be replaced with corresponding values.
+	 * The `Uss::eTag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\\{tagName}` and can be replaced with corresponding values.
 	 *
 	 * When encountering a tag, the method checks the `engineTags` list to find a matching key. If a match is found, the tag is replaced with the corresponding string value. Otherwise, the tag is replaced with an empty string.
 	 *
@@ -811,5 +811,5 @@ class uss {
 	NOW! LET'S INITIALIZE IT!
 */
 
-uss::__init();
+Uss::__init();
 

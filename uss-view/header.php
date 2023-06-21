@@ -28,6 +28,6 @@ defined( 'ROOT_DIR' ) OR DIE;
 	
 </head>
 
-<body <?php if( is_array(uss::$global['body.attrs'] ?? null) ) echo core::array_to_html_attrs( uss::$global['body.attrs'] ); ?>>
+<body <?php if( is_array(Uss::$global['body.attrs'] ?? null) ) echo core::array_to_html_attrs( Uss::$global['body.attrs'] ); ?>>
 	
 <?php events::exec("@body::before"); ?>
