@@ -9,7 +9,7 @@
  * @package core
  **/
 
-class core {
+class Core {
 
 	/**
 	 * Replaces backslashes with forward slashes in a given string.

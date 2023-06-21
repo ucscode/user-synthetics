@@ -227,7 +227,7 @@ class Uss {
 					 * It provides a centralized location to manage site-specific options and preferences.
 					 */
 					
-					$__options = new pairs( self::$global['mysqli'], DB_TABLE_PREFIX . "_options" );
+					$__options = new Pairs( self::$global['mysqli'], DB_TABLE_PREFIX . "_options" );
 					
 					self::$global['options'] = $__options;
 					
@@ -282,7 +282,7 @@ class Uss {
 		/* Create a unique visitor session ID */
 		
 		if( empty($_SESSION['uss_session_id']) || strlen($_SESSION['uss_session_id']) < 50 ) {
-			$_SESSION['uss_session_id'] = core::keygen(mt_rand(50, 80), true);
+			$_SESSION['uss_session_id'] = Core::keygen(mt_rand(50, 80), true);
 		};
 		
 		
@@ -290,7 +290,7 @@ class Uss {
 		
 		if( empty($_COOKIE['ussid']) ) {
 			$time = (new DateTime())->add( (new DateInterval("P6M")) );
-			$_COOKIE['ussid'] = uniqid(core::keygen(7));
+			$_COOKIE['ussid'] = uniqid(Core::keygen(7));
 			setrawcookie( 'ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/' );
 		};
 		
@@ -315,7 +315,7 @@ class Uss {
 		 * All of the settings below can be easily modified by any module
 		*/
 		
-		self::$global['icon'] = core::url( ASSETS_DIR . '/images/origin.png' );
+		self::$global['icon'] = Core::url( ASSETS_DIR . '/images/origin.png' );
 		self::$global['title'] = PROJECT_NAME;
 		self::$global['tagline'] = "The excellent development tool for future oriented programmers";
 		self::$global['copyright'] = ((new DateTime())->format('Y'));
@@ -357,20 +357,20 @@ class Uss {
 		
 		$libraries = array(
 			'head' => array(
-				'bootstrap' => core::url( ASSETS_DIR . '/css/bootstrap.min.css' ),
-				'bs-icon' => core::url( ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css' ),
-				'animate' => core::url( ASSETS_DIR . '/css/animate.min.css' ),
-				'toastr' => core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.css' )
+				'bootstrap' => Core::url( ASSETS_DIR . '/css/bootstrap.min.css' ),
+				'bs-icon' => Core::url( ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css' ),
+				'animate' => Core::url( ASSETS_DIR . '/css/animate.min.css' ),
+				'toastr' => Core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.css' )
 			),
 			'body' => array(
 				'bootstrap' => [
-					core::url( ASSETS_DIR . '/js/bootstrap.bundle.min.js' ),
-					core::url( ASSETS_DIR . '/js/bootbox.all.min.js' )
+					Core::url( ASSETS_DIR . '/js/bootstrap.bundle.min.js' ),
+					Core::url( ASSETS_DIR . '/js/bootbox.all.min.js' )
 				],
-				'toastr' => core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.js' ),
+				'toastr' => Core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.js' ),
 				'notiflix' => [
-					core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js' ),
-					core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-block-aio-3.2.6.min.js' )
+					Core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js' ),
+					Core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-block-aio-3.2.6.min.js' )
 				]
 			)
 		);
@@ -506,7 +506,7 @@ class Uss {
 		 *
 		 */
 		
-		$output = core::replace_var( ob_get_clean(), self::$engineTags );
+		$output = Core::replace_var( ob_get_clean(), self::$engineTags );
 		
 		
 		# OUTPUT THE CONTENT!
@@ -590,7 +590,7 @@ class Uss {
 			/**
 			 * The :{focused} event can be used to trap a focus to modify the output
 			 */
-			events::exec(':{focused}', end(self::$focusURLs));
+			Events::exec(':{focused}', end(self::$focusURLs));
 			
 			if( empty($func) || !is_callable($func) ) return;
 			
@@ -631,8 +631,8 @@ class Uss {
 	 */
 	public static function query( ?int $index = null ) {
 		
-		$DOCUMENT_ROOT = core::rslash($_SERVER['DOCUMENT_ROOT']);
-		$PROJECT_ROOT = core::rslash(ROOT_DIR);
+		$DOCUMENT_ROOT = Core::rslash($_SERVER['DOCUMENT_ROOT']);
+		$PROJECT_ROOT = Core::rslash(ROOT_DIR);
 		
 		$REQUEST_URI = explode("?", $_SERVER['REQUEST_URI']);
 		$PATH = $REQUEST_URI[0] ?? '';

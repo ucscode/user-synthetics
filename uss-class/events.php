@@ -13,15 +13,15 @@
  * #### Example
  *
  * ```php
- * events::addListener("user.created", function($data) {
+ * Events::addListener("user.created", function($data) {
  *     // Handle user created event
  * }, 'listener-id-1');
  *
- * events::addListener("user.created", function($data) {
+ * Events::addListener("user.created", function($data) {
  *     // Handle another user created event
  * }, 'listener-id-2');
  * 
- * events::exec('user.created', ["id" => 3, "name" => "ucscode"]);
+ * Events::exec('user.created', ["id" => 3, "name" => "ucscode"]);
  * ```
  *
  * ***
@@ -34,7 +34,7 @@
  * @version 2.1.3
  * @link https://github.com/ucscode/events
  */
-class events {
+class Events {
 
 	protected static $events = array();
     
@@ -228,8 +228,8 @@ class events {
 	 * the listener for a specific event.
 	 * 
 	 * **Note:** Existing events will not be overwritten. 
-	 * - To check for an existing event and event ID, use the `events::hasListener()` method. 
-	 * - To remove an event, use the `events::removeEvent()` method.
+	 * - To check for an existing event and event ID, use the `Events::hasListener()` method. 
+	 * - To remove an event, use the `Events::removeEvent()` method.
 	 *
 	 * @param string          $eventNames  The name or names of the event(s) to listen to (comma-separated)
 	 * @param callable|null   $callback    The callback function to be executed when the event is triggered

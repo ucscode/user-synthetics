@@ -24,7 +24,7 @@
  * @see sQuery https://github.com/ucscode/sQuery
  * @link https://github.com/ucscode/pairs
  */
-class pairs {
+class Pairs {
 	
 	/**
 	 * @var string $tablename

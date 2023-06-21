@@ -17,17 +17,17 @@ defined( 'ROOT_DIR' ) OR DIE;
 		echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
 	?>
 	
-<?php events::exec('@head::before'); ?>
+<?php Events::exec('@head::before'); ?>
 	
 	<!-- << defaults >> -->
 	<?php echo self::include_libraries( 'head', $exclude_libraries ) . "\n"; ?>
-	<link rel='stylesheet' href='<?php echo core::url( ASSETS_DIR . '/css/main.css' ); ?>'>
+	<link rel='stylesheet' href='<?php echo Core::url( ASSETS_DIR . '/css/main.css' ); ?>'>
 	<!-- << defaults />> -->
 	
-<?php events::exec('@head::after'); ?>
+<?php Events::exec('@head::after'); ?>
 	
 </head>
 
-<body <?php if( is_array(Uss::$global['body.attrs'] ?? null) ) echo core::array_to_html_attrs( Uss::$global['body.attrs'] ); ?>>
+<body <?php if( is_array(Uss::$global['body.attrs'] ?? null) ) echo Core::array_to_html_attrs( Uss::$global['body.attrs'] ); ?>>
 	
-<?php events::exec("@body::before"); ?>
+<?php Events::exec("@body::before"); ?>

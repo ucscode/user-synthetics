@@ -295,9 +295,9 @@ class X2Client {
 	/**
 	 * Convert unrecognized HTML entities to their numeric equivalence
 	 * 
-	 * Although this method was first created here, a better version was later cloned from `core::xmlentities`
+	 * Although this method was first created here, a better version was later cloned from `Core::xmlentities`
 	 * 
-	 * @see core::xmlentities
+	 * @see Core::xmlentities
 	 *
 	 * @param string $string
 	 * 
