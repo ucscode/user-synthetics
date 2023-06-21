@@ -13,7 +13,11 @@
 	
 new class {
 	
+	#bs = null;
+	
 	constructor($) {
+		
+		this.bs = (typeof bootstrap != 'undefined') && (typeof bootstrap.Tooltip != 'undefined');
 		
 		$(function() {
 			
@@ -33,14 +37,24 @@ new class {
 	}
 	
 	toolTip() {
+		
+		//! Ignore if bootstrap 5 is not includesd
+		if( !this.#bs ) return console.log('No Bootstrap');
+		
 		//! Initialize Bootstrap Tooltip
-		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+		
 		var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
 			return new bootstrap.Tooltip(tooltipTriggerEl);
 		});
+		
 	}
 	
 	bootboxCheat() {
+		
+		//! Ignore if bootstrap 5 is not included 
+		if( !this.#bs ) return console.log('No Bootbox');
+		
 		//! Console Cheat: Display Bootstrap Modal Box
 		if( (typeof uss['@alert'] === 'string') && uss['@alert'].trim() != '' ) {
 			bootbox.alert({
@@ -48,6 +62,7 @@ new class {
 				message: uss['@alert']
 			});
 		};
+		
 	}
 	
 	toastrCheat() {
@@ -119,6 +134,9 @@ new class {
 			*/
 			
 			"a[data-uss-confirm]": function(anchor, e) {
+				
+				if( !this.#bs ) return console.warning("Cannot display modal in absence of bootstrap & bootbox");
+				
 				e.preventDefault();
 				let message = anchor.dataset.ussConfirm;
 				if( !message || message.trim() == '' ) message = 'You are about to leave this page';
@@ -216,6 +234,9 @@ new class {
 		*/
 		
 		$('body').on('submit', "form[data-uss-confirm]", function(e) {
+			
+			if( !this.#bs ) return console.log( "Cannot display modal in absence of Bootstrap & Bootbox" );
+			
 			e.preventDefault();
 			let form = this;
 			let message = this.dataset.ussConfirm;

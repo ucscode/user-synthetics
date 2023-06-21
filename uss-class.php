@@ -353,6 +353,71 @@ class uss {
 		
 	}
 	
+	private static function include_libraries( string $position, array $exclude ) {
+		
+		$libraries = array(
+			'head' => array(
+				'bootstrap' => core::url( ASSETS_DIR . '/css/bootstrap.min.css' ),
+				'bs-icon' => core::url( ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css' ),
+				'animate' => core::url( ASSETS_DIR . '/css/animate.min.css' ),
+				'toastr' => core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.css' )
+			),
+			'body' => array(
+				'bootstrap' => [
+					core::url( ASSETS_DIR . '/js/bootstrap.bundle.min.js' ),
+					core::url( ASSETS_DIR . '/js/bootbox.all.min.js' )
+				],
+				'toastr' => core::url( ASSETS_DIR . '/vendor/toastr/toastr.min.js' ),
+				'notiflix' => [
+					core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js' ),
+					core::url( ASSETS_DIR . '/vendor/notiflix/notiflix-block-aio-3.2.6.min.js' )
+				]
+			)
+		);
+		
+		$exclude = array_map(function($value) {
+			if( is_scalar($value) ) $value = trim($value);
+			return $value;
+		}, array_values($exclude));
+		
+		$res_center = "data-rc"; // resource center
+		$include = [];
+		
+		if( $position == 'head' && !in_array('viewport', $exclude) ) {
+			/** include viewport meta tag **/
+			$include[] = "<meta name='viewport' content='width=device-width, initial-scale=1.0' {$res_center}='viewport'>";
+		};
+		
+		$build_script = function($position, $library, $source) use($res_center) {
+			if( $position == 'head' ) {
+				$script = "<link rel='stylesheet' href='{$source}' {$res_center}='{$library}'>";
+			} else {
+				$script = "<script src='{$source}' {$res_center}='{$library}'></script>";
+			};
+			return $script;
+		};
+		
+		foreach( $libraries[$position] as $library => $source ) {
+			
+			// exclude unwanted script;
+			if( in_array($library, $exclude ) ) continue;
+			
+			// include single script
+			if( !is_array($source) ) 
+				$include[] = $build_script( $position, $library, $source );
+			else {
+				// include multiple scripts
+				foreach( $source as $script ) {
+					$include[] = $build_script( $position, $library, $script );
+				}
+			};
+			
+		};
+		
+		return implode("\n\t", $include);
+		
+	}
+	
 	/**
 	 * Public Methods:
 	 * The methods listed below are accessible and can be called from external code.
@@ -368,7 +433,7 @@ class uss {
 	 *
 	 * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
 	 */
-	public static function view( ?callable $content = null ) {
+	public static function view( ?callable $content = null, array $exclude_libraries = [] ) {
 		
 		/**
 		 * Check the view status before printing to prevent duplicate rendering.
