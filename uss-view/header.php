@@ -14,7 +14,7 @@ defined( 'ROOT_DIR' ) OR DIE;
 		 * Pass variables from PHP to JavaScript environment
 		 */
 		$console = base64_encode( json_encode( (object)self::$console ) );
-		echo "<script>const uss = JSON.parse(atob('{$console}'));</script>\n";
+		echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
 	?>
 	
 <?php events::exec('@head::before'); ?>
