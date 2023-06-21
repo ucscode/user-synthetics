@@ -56,10 +56,10 @@ new class {
 		if( !this.#bs ) return console.log('No Bootbox');
 		
 		//! Console Cheat: Display Bootstrap Modal Box
-		if( (typeof uss['@alert'] === 'string') && uss['@alert'].trim() != '' ) {
+		if( (typeof Uss['@alert'] === 'string') && Uss['@alert'].trim() != '' ) {
 			bootbox.alert({
-				title: uss.platform,
-				message: uss['@alert']
+				title: Uss.platform,
+				message: Uss['@alert']
 			});
 		};
 		
@@ -71,17 +71,17 @@ new class {
 			------------------------------------------
 			Backend Sample:
 			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			uss::console( '@toastr.error[name]', "Error Text" );
-			uss::console( '@toastr.error[name2]', "Error Text 2" );
-			uss::console( '@toastr.success[name]', "Success Text" );
+			Uss::console( '@toastr.error[name]', "Error Text" );
+			Uss::console( '@toastr.error[name2]', "Error Text 2" );
+			Uss::console( '@toastr.success[name]', "Success Text" );
 		*/
 		let timeout = 0;
-		Object.keys(uss).forEach(function(key) {
+		Object.keys(Uss).forEach(function(key) {
 			let match = key.match(/^@toastr\.(error|info|warning|success)(?:\[([a-z0-9_\-]*)\])$/i);
 			if( !match ) return;
 			let type = match[1];
 			setTimeout(function() {
-				toastr[ type ]( uss[key], null, {
+				toastr[ type ]( Uss[key], null, {
 					progressBar: true,
 					newestOnTop: false
 				});
@@ -92,7 +92,7 @@ new class {
 	
 	otherCheat() {
 		// Prevent form from re-submitting _POST request
-		if( uss['@RE-POST'] === false ) {
+		if( Uss['@RE-POST'] === false ) {
 			if ( window.history.replaceState ) {
 				window.history.replaceState( null, null, window.location.href );
 			};
