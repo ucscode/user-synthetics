@@ -17,7 +17,7 @@ new class {
 	
 	constructor($) {
 		
-		this.bs = (typeof bootstrap != 'undefined') && (typeof bootstrap.Tooltip != 'undefined');
+		this.#bs = (typeof bootstrap != 'undefined') && (typeof bootstrap.Tooltip != 'undefined');
 		
 		$(function() {
 			
