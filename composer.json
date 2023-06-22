@@ -28,6 +28,7 @@
         "docs": "https://uss.ucscode.me/docs"
     },
     "require": {
-        "php": ">=7.4"
+        "php": ">=7.4",
+		"ucscode/ucscode/user-synthetics": "@dev"
     }
 }
