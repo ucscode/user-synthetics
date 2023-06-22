@@ -1,0 +1,33 @@
+{
+    "name": "ucscode/user-synthetics",
+    "description": "A light-weight PHP framework that facilitates the development of innovative projects.",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Uchenna Ajah",
+            "email": "uche23mail@gmail.com",
+            "homepage": "https://ucscode.me",
+            "role": "Developer"
+        }
+    ],
+    "keywords": [
+        "PHP framework",
+        "web development",
+        "user management",
+        "modular platform",
+        "lightweight framework",
+        "API-driven framework",
+        "rapid development",
+        "customizable",
+        "responsive interface",
+        "innovative projects"
+    ],
+    "homepage": "https://uss.ucscode.me",
+    "support": {
+        "docs": "https://uss.ucscode.me/docs"
+    },
+    "require": {
+        "php": "^7.4"
+    }
+}
