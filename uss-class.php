@@ -13,7 +13,7 @@
 
 class Uss {
 	
-	const VERSION = "2.5.0";
+	const VERSION = "2.6.0";
 	
 	/**
 	 * @ignore
@@ -541,14 +541,14 @@ class Uss {
 	 * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
 	 * @return null
 	 */
-	public static function focus( string $path, callable $func, ?string $request = "get" ) {
+	public static function route( string $path, callable $func, ?string $request = 'get' ) {
 		
 		if( !is_null($request) && $_SERVER['REQUEST_METHOD'] !== strtoupper($request) ) return;
 		
 		/**
 		 * Further Example:
 		 * ```php
-		 * Uss::focus( "users/profile", function() {
+		 * Uss::route( "users/profile", function() {
 		 * 	/* 
 		 * 		This closure will work only if domain name is directly followed by `users/profile` 
 		 * 		# domain.com/users/profile - [ will work ]
@@ -605,17 +605,26 @@ class Uss {
 		};
 		
 	}
+	
+	/**
+	 * This method has been deprecated and should be replace with `route` for future compactibility
+	 * @deprecated 
+	 * @ignore
+	 */
+	public static function focus( string $path, callable $func, ?string $request = 'get' ) {
+		self::route( $path, $func, $request );
+	}
 
 	
 	/**
 	 * Get the current focus expression or list of focus expressions.
 	 *
-	 * This method retrieves the current focus expression that has been set using the `Uss::focus()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
+	 * This method retrieves the current focus expression that has been set using the `Uss::route()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
 	 *
 	 * @param bool $expr Optional: Whether to return the list of focus expressions or just the current focus expression. Default is `false`.
 	 * @return string|array|null The current focus expression, an array of focus expressions and their corresponding URLs, or `null` if no focus expressions are set
 	*/
-	public static function getFocus( bool $expr = false ) {
+	public static function getRoute( bool $expr = false ) {
 		if( $expr ) return self::$focusURLs;
 		if( !empty(self::$focusURLs) ) {
 			$focus = end(self::$focusURLs);
@@ -775,7 +784,7 @@ class Uss {
 	/**
 	 * Assign and update template tag values in user synthetics.
 	 *
-	 * The `Uss::eTag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
+	 * The `Uss::tag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
 	 *
 	 * When encountering a tag, the method checks the `engineTags` list to find a matching key. If a match is found, the tag is replaced with the corresponding string value. Otherwise, the tag is replaced with an empty string.
 	 *
@@ -785,7 +794,7 @@ class Uss {
 	 *
 	 * @return string|null If $key is set to `null`, an array containing a list of all tags. Otherwise, returns the value of the specified tag or `null` if the tag doesn't exist.
 	 */
-	public static function eTag( ?string $key, ?string $value = null, bool $overwrite = true) {
+	public static function tag( ?string $key, ?string $value = null, bool $overwrite = true ) {
 		
 		if( is_null($key) ) return self::$engineTags;
 		
@@ -804,6 +813,15 @@ class Uss {
 		
 		// Assign a new tag
 		self::$engineTags[$key] = $value;
+	}
+	
+	/**
+	 * Method deprecated. use tag() Instead
+	 * @ignore
+	 * @deprecated
+	 */
+	public static function eTag( ?string $key, ?string $value = null, bool $overwrite = true ) {
+		self::eTag($key, $value, $overwrite);
 	}
 	
 };
