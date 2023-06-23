@@ -821,7 +821,7 @@ class Uss {
 	 * @deprecated
 	 */
 	public static function eTag( ?string $key, ?string $value = null, bool $overwrite = true ) {
-		self::eTag($key, $value, $overwrite);
+		self::tag($key, $value, $overwrite);
 	}
 	
 };
