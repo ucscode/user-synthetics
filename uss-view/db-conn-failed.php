@@ -1,4 +1,4 @@
-<?php defined( 'ROOT_DIR' ) OR DIE; ?>
+<?php defined('ROOT_DIR') or die; ?>
 
 <div class='px-3 py-2 my-2 text-center'>
 

@@ -1,4 +1,4 @@
-<?php defined( 'ROOT_DIR' ) OR DIE; ?>
+<?php defined('ROOT_DIR') or die; ?>
 <!doctype html>
 <html>
 	<head>

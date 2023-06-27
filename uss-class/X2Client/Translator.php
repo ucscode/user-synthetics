@@ -1,334 +1,341 @@
-<?php /** @noinspection HtmlDeprecatedTag */
+<?php
+
+/** @noinspection HtmlDeprecatedTag */
+
 namespace Gt\CssXPath;
 
-class Translator {
-	const cssRegex =
-		'/'
-		. '(?P<star>\*)'
-		. '|(:(?P<pseudo>[\w-]*))'
-		. '|\(*(?P<pseudospecifier>["\']*[\w\h-]*["\']*)\)'
-		. '|(?P<element>[\w-]*)'
-		. '|(?P<child>\s*>\s*)'
-		. '|(#(?P<id>[\w-]*))'
-		. '|(\.(?P<class>[\w-]*))'
-		. '|(?P<sibling>\s*\+\s*)'
-		. "|(\[(?P<attribute>[\w-]*)((?P<attribute_equals>[=~$*]+)(?P<attribute_value>(.+\[\]'?)|[^\]]+))*\])+"
-		. '|(?P<descendant>\s+)'
-		. '/';
+class Translator
+{
+    public const cssRegex =
+        '/'
+        . '(?P<star>\*)'
+        . '|(:(?P<pseudo>[\w-]*))'
+        . '|\(*(?P<pseudospecifier>["\']*[\w\h-]*["\']*)\)'
+        . '|(?P<element>[\w-]*)'
+        . '|(?P<child>\s*>\s*)'
+        . '|(#(?P<id>[\w-]*))'
+        . '|(\.(?P<class>[\w-]*))'
+        . '|(?P<sibling>\s*\+\s*)'
+        . "|(\[(?P<attribute>[\w-]*)((?P<attribute_equals>[=~$*]+)(?P<attribute_value>(.+\[\]'?)|[^\]]+))*\])+"
+        . '|(?P<descendant>\s+)'
+        . '/';
 
-	const EQUALS_EXACT = "=";
-	const EQUALS_CONTAINS_WORD = "~=";
-	const EQUALS_ENDS_WITH = "$=";
-	const EQUALS_CONTAINS = "*=";
-	const EQUALS_STARTS_WITH_OR_STARTS_WITH_HYPHENATED = "|=";
-	const EQUALS_STARTS_WITH = "^=";
+    public const EQUALS_EXACT = "=";
+    public const EQUALS_CONTAINS_WORD = "~=";
+    public const EQUALS_ENDS_WITH = "$=";
+    public const EQUALS_CONTAINS = "*=";
+    public const EQUALS_STARTS_WITH_OR_STARTS_WITH_HYPHENATED = "|=";
+    public const EQUALS_STARTS_WITH = "^=";
 
-	/** @var string */
-	protected $cssSelector;
-	/** @var string */
-	protected $prefix;
+    /** @var string */
+    protected $cssSelector;
+    /** @var string */
+    protected $prefix;
 
-	public function __construct(string $cssSelector, string $prefix = ".//") {
-		$this->cssSelector = $cssSelector;
-		$this->prefix = $prefix;
-	}
+    public function __construct(string $cssSelector, string $prefix = ".//")
+    {
+        $this->cssSelector = $cssSelector;
+        $this->prefix = $prefix;
+    }
 
-	public function __toString():string {
-		return $this->asXPath();
-	}
+    public function __toString(): string
+    {
+        return $this->asXPath();
+    }
 
-	public function asXPath():string {
-		return $this->convert($this->cssSelector);
-	}
+    public function asXPath(): string
+    {
+        return $this->convert($this->cssSelector);
+    }
 
-	protected function convert(string $css):string {
-		$cssArray = preg_split(
-			'/(["\']).*?\1(*SKIP)(*F)|,/',
-			$css
-		);
-		$xPathArray = [];
+    protected function convert(string $css): string
+    {
+        $cssArray = preg_split(
+            '/(["\']).*?\1(*SKIP)(*F)|,/',
+            $css
+        );
+        $xPathArray = [];
 
-		foreach($cssArray as $input) {
-			$output = $this->convertSingleSelector(trim($input));
-			$xPathArray []= $output;
-		}
+        foreach($cssArray as $input) {
+            $output = $this->convertSingleSelector(trim($input));
+            $xPathArray []= $output;
+        }
 
-		return implode(" | ", $xPathArray);
-	}
+        return implode(" | ", $xPathArray);
+    }
 
-	protected function convertSingleSelector(string $css):string {
-		$thread = $this->preg_match_collated(self::cssRegex, $css);
-		$thread = array_values($thread);
+    protected function convertSingleSelector(string $css): string
+    {
+        $thread = $this->preg_match_collated(self::cssRegex, $css);
+        $thread = array_values($thread);
 
-		$xpath = [$this->prefix];
-		$hasElement = false;
-		foreach($thread as $threadKey => $currentThreadItem) {
-			$next = isset($thread[$threadKey + 1])
-				? $thread[$threadKey + 1]
-				: false;
-			
-			if( empty($currentThreadItem) ) continue;
-			
-			switch ($currentThreadItem["type"]) {
-			case "star":
-			case "element":
-				$xpath []= $currentThreadItem['content'];
-				$hasElement = true;
-				break;
+        $xpath = [$this->prefix];
+        $hasElement = false;
+        foreach($thread as $threadKey => $currentThreadItem) {
+            $next = isset($thread[$threadKey + 1])
+                ? $thread[$threadKey + 1]
+                : false;
 
-			case "pseudo":
-				$specifier = "";
-				if ($next && $next["type"] == "pseudospecifier") {
-					$specifier = "{$next['content']}";
-				}
+            if(empty($currentThreadItem)) {
+                continue;
+            }
 
-				switch ($currentThreadItem["content"]) {
-				case "disabled":
-				case "checked":
-				case "selected":
-					array_push(
-						$xpath,
-						"[@{$currentThreadItem['content']}]"
-					);
-					break;
+            switch ($currentThreadItem["type"]) {
+                case "star":
+                case "element":
+                    $xpath []= $currentThreadItem['content'];
+                    $hasElement = true;
+                    break;
 
-				case "text":
-					array_push(
-						$xpath,
-						'[@type="text"]'
-					);
-					break;
+                case "pseudo":
+                    $specifier = "";
+                    if ($next && $next["type"] == "pseudospecifier") {
+                        $specifier = "{$next['content']}";
+                    }
 
-				case "contains":
-					if(empty($specifier)) {
-						continue 3;
-					}
+                    switch ($currentThreadItem["content"]) {
+                        case "disabled":
+                        case "checked":
+                        case "selected":
+                            array_push(
+                                $xpath,
+                                "[@{$currentThreadItem['content']}]"
+                            );
+                            break;
 
-					array_push(
-						$xpath,
-						"[contains(text(),$specifier)]"
-					);
-					break;
+                        case "text":
+                            array_push(
+                                $xpath,
+                                '[@type="text"]'
+                            );
+                            break;
 
-				case "first-child":
-					$prev = count($xpath) - 1;
-					$xpath[$prev] = '*[1]/self::' . $xpath[$prev];
-					break;
+                        case "contains":
+                            if(empty($specifier)) {
+                                continue 3;
+                            }
 
-				case "nth-child":
-					if (empty($specifier)) {
-						continue 3;
-					}
+                            array_push(
+                                $xpath,
+                                "[contains(text(),$specifier)]"
+                            );
+                            break;
 
-					$prev = count($xpath) - 1;
-					$previous = $xpath[$prev];
+                        case "first-child":
+                            $prev = count($xpath) - 1;
+                            $xpath[$prev] = '*[1]/self::' . $xpath[$prev];
+                            break;
 
-					if (substr($previous, -1, 1) === "]") {
-						$xpath[$prev] = str_replace(
-							"]",
-							" and position() = $specifier]",
-							$xpath[$prev]
-						);
-					}
-					else {
-						array_push(
-							$xpath,
-							"[$specifier]"
-						);
-					}
-					break;
-				case "nth-of-type":
-					if (empty($specifier)) {
-						continue 3;
-					}
+                        case "nth-child":
+                            if (empty($specifier)) {
+                                continue 3;
+                            }
 
-					$prev = count($xpath) - 1;
-					$previous = $xpath[$prev];
+                            $prev = count($xpath) - 1;
+                            $previous = $xpath[$prev];
 
-					if(substr($previous, -1, 1) === "]") {
-						array_push(
-							$xpath,
-							"[$specifier]"
-						);
-					}
-					else {
-						array_push(
-							$xpath,
-							"[$specifier]"
-						);
-					}
-					break;
-				}
-				break;
+                            if (substr($previous, -1, 1) === "]") {
+                                $xpath[$prev] = str_replace(
+                                    "]",
+                                    " and position() = $specifier]",
+                                    $xpath[$prev]
+                                );
+                            } else {
+                                array_push(
+                                    $xpath,
+                                    "[$specifier]"
+                                );
+                            }
+                            break;
+                        case "nth-of-type":
+                            if (empty($specifier)) {
+                                continue 3;
+                            }
 
-			case "child":
-				array_push($xpath, "/");
-				$hasElement = false;
-				break;
+                            $prev = count($xpath) - 1;
+                            $previous = $xpath[$prev];
 
-			case "id":
-				array_push(
-					$xpath,
-					($hasElement ? '' : '*')
-					. "[@id='{$currentThreadItem['content']}']"
-				);
-				$hasElement = true;
-				break;
+                            if(substr($previous, -1, 1) === "]") {
+                                array_push(
+                                    $xpath,
+                                    "[$specifier]"
+                                );
+                            } else {
+                                array_push(
+                                    $xpath,
+                                    "[$specifier]"
+                                );
+                            }
+                            break;
+                    }
+                    break;
 
-			case "class":
-				// https://devhints.io/xpath#class-check
-				array_push(
-					$xpath,
-					($hasElement ? '' : '*')
-					. "[contains(concat(' ',normalize-space(@class),' '),' {$currentThreadItem['content']} ')]"
-				);
-				$hasElement = true;
-				break;
+                case "child":
+                    array_push($xpath, "/");
+                    $hasElement = false;
+                    break;
 
-			case "sibling":
-				array_push(
-					$xpath,
-					"/following-sibling::*[1]/self::"
-				);
-				$hasElement = false;
-				break;
+                case "id":
+                    array_push(
+                        $xpath,
+                        ($hasElement ? '' : '*')
+                        . "[@id='{$currentThreadItem['content']}']"
+                    );
+                    $hasElement = true;
+                    break;
 
-			case "attribute":
-				if(!$hasElement) {
-					array_push($xpath, "*");
-					$hasElement = true;
-				}
+                case "class":
+                    // https://devhints.io/xpath#class-check
+                    array_push(
+                        $xpath,
+                        ($hasElement ? '' : '*')
+                        . "[contains(concat(' ',normalize-space(@class),' '),' {$currentThreadItem['content']} ')]"
+                    );
+                    $hasElement = true;
+                    break;
 
-				/** @var null|array<int, array<string, string>> $detail */
-				$detail = $currentThreadItem["detail"] ?? null;
-				$detailType = $detail[0] ?? null;
-				$detailValue = $detail[1] ?? null;
+                case "sibling":
+                    array_push(
+                        $xpath,
+                        "/following-sibling::*[1]/self::"
+                    );
+                    $hasElement = false;
+                    break;
 
-				if(!$detailType
-				|| $detailType["type"] !== "attribute_equals") {
-					array_push(
-						$xpath,
-						"[@{$currentThreadItem['content']}]"
-					);
-					continue 2;
-				}
+                case "attribute":
+                    if(!$hasElement) {
+                        array_push($xpath, "*");
+                        $hasElement = true;
+                    }
 
-				$valueString = trim(
-					$detailValue["content"],
-					" '\""
-				);
+                    /** @var null|array<int, array<string, string>> $detail */
+                    $detail = $currentThreadItem["detail"] ?? null;
+                    $detailType = $detail[0] ?? null;
+                    $detailValue = $detail[1] ?? null;
 
-				$equalsType = $detailType["content"];
-				switch ($equalsType) {
-				case self::EQUALS_EXACT:
-					array_push(
-						$xpath,
-						"[@{$currentThreadItem['content']}=\"{$valueString}\"]"
-					);
-					break;
+                    if(!$detailType
+                    || $detailType["type"] !== "attribute_equals") {
+                        array_push(
+                            $xpath,
+                            "[@{$currentThreadItem['content']}]"
+                        );
+                        continue 2;
+                    }
 
-				case self::EQUALS_CONTAINS:
-					array_push(
-						$xpath,
-						"[contains(@{$currentThreadItem['content']},\"{$valueString}\")]"
-					);
-					break;
+                    $valueString = trim(
+                        $detailValue["content"],
+                        " '\""
+                    );
 
-				case self::EQUALS_CONTAINS_WORD:
-					array_push(
-						$xpath,
-						"["
-						. "contains("
-						. "concat(\" \",@{$currentThreadItem['content']},\" \"),"
-						. "concat(\" \",\"{$valueString}\",\" \")"
-						. ")"
-						. "]"
-					);
-					break;
+                    $equalsType = $detailType["content"];
+                    switch ($equalsType) {
+                        case self::EQUALS_EXACT:
+                            array_push(
+                                $xpath,
+                                "[@{$currentThreadItem['content']}=\"{$valueString}\"]"
+                            );
+                            break;
 
-				case self::EQUALS_STARTS_WITH_OR_STARTS_WITH_HYPHENATED:
-					throw new NotYetImplementedException();
+                        case self::EQUALS_CONTAINS:
+                            array_push(
+                                $xpath,
+                                "[contains(@{$currentThreadItem['content']},\"{$valueString}\")]"
+                            );
+                            break;
 
-				case self::EQUALS_STARTS_WITH:
-					throw new NotYetImplementedException();
+                        case self::EQUALS_CONTAINS_WORD:
+                            array_push(
+                                $xpath,
+                                "["
+                                . "contains("
+                                . "concat(\" \",@{$currentThreadItem['content']},\" \"),"
+                                . "concat(\" \",\"{$valueString}\",\" \")"
+                                . ")"
+                                . "]"
+                            );
+                            break;
 
-				case self::EQUALS_ENDS_WITH:
-					array_push(
-						$xpath,
-						"["
-						. "substring("
-						. "@{$currentThreadItem['content']},"
-						. "string-length(@{$currentThreadItem['content']}) - "
-						. "string-length(\"{$valueString}\") + 1)"
-						. "=\"{$valueString}\""
-						. "]"
-					);
-					break;
-				}
-				break;
+                        case self::EQUALS_STARTS_WITH_OR_STARTS_WITH_HYPHENATED:
+                            throw new NotYetImplementedException();
 
-			case "descendant":
-				array_push($xpath, "//");
-				$hasElement = false;
-				break;
-			}
-		}
+                        case self::EQUALS_STARTS_WITH:
+                            throw new NotYetImplementedException();
 
-		return implode("", $xpath);
-	}
+                        case self::EQUALS_ENDS_WITH:
+                            array_push(
+                                $xpath,
+                                "["
+                                . "substring("
+                                . "@{$currentThreadItem['content']},"
+                                . "string-length(@{$currentThreadItem['content']}) - "
+                                . "string-length(\"{$valueString}\") + 1)"
+                                . "=\"{$valueString}\""
+                                . "]"
+                            );
+                            break;
+                    }
+                    break;
 
-	/** @return array<int, array<string, string>> */
-	protected function preg_match_collated(
-		string $regex,
-		string $string,
-		callable $transform = null
-	):array {
-		preg_match_all(
-			$regex,
-			$string,
-			$matches,
-			PREG_PATTERN_ORDER
-		);
+                case "descendant":
+                    array_push($xpath, "//");
+                    $hasElement = false;
+                    break;
+            }
+        }
 
-		$set = [];
-		foreach($matches[0] as $k => $v) {
-			if(!empty($v)) {
-				$set[$k] = null;
-			}
-		}
+        return implode("", $xpath);
+    }
 
-		foreach($matches as $k => $m) {
-			if(is_numeric($k)) {
-				continue;
-			}
+    /** @return array<int, array<string, string>> */
+    protected function preg_match_collated(
+        string $regex,
+        string $string,
+        callable $transform = null
+    ): array {
+        preg_match_all(
+            $regex,
+            $string,
+            $matches,
+            PREG_PATTERN_ORDER
+        );
 
-			foreach($m as $i => $match) {
-				if($match === "") {
-					continue;
-				}
+        $set = [];
+        foreach($matches[0] as $k => $v) {
+            if(!empty($v)) {
+                $set[$k] = null;
+            }
+        }
 
-				$toSet = null;
+        foreach($matches as $k => $m) {
+            if(is_numeric($k)) {
+                continue;
+            }
 
-				if($transform) {
-					$toSet = $transform($k, $match);
-				}
-				else {
-					$toSet = ["type" => $k, "content" => $match];
-				}
+            foreach($m as $i => $match) {
+                if($match === "") {
+                    continue;
+                }
 
-				if(!isset($set[$i])) {
-					$set[$i] = $toSet;
-				}
-				else {
-					if(!isset($set[$i]["detail"])) {
-						$set[$i]["detail"] = [];
-					}
+                $toSet = null;
 
-					array_push($set[$i]["detail"], $toSet);
-				}
-			}
-		}
+                if($transform) {
+                    $toSet = $transform($k, $match);
+                } else {
+                    $toSet = ["type" => $k, "content" => $match];
+                }
 
-		return $set;
-	}
+                if(!isset($set[$i])) {
+                    $set[$i] = $toSet;
+                } else {
+                    if(!isset($set[$i]["detail"])) {
+                        $set[$i]["detail"] = [];
+                    }
+
+                    array_push($set[$i]["detail"], $toSet);
+                }
+            }
+        }
+
+        return $set;
+    }
 }
