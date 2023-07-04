@@ -1,5 +1,5 @@
 <div align="center">
-	<img src="uss-assets/images/origin.png" alt="User Synthetics Logo" width="140">
+	<img src="uss-core/assets/images/origin.png" alt="User Synthetics Logo" width="140">
 	<h1>User Synthetics</h1>
 	<p>Modular PHP Framework for Customizable and Extensible Web Applications</p>
 	<a href="https://uss.ucscode.me/docs"><strong>Explore the User Synthetics docs »</strong></a>
