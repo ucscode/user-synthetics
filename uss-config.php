@@ -3,9 +3,8 @@
  * User Synthetics Configuration file
  *
  * @author ucscode <uche23mail@gmail.com>
- * @version 2.0
+ * @version 2
  * @license GNU-v3
- * @package uss
  */
 
 /**
