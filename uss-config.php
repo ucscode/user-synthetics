@@ -76,8 +76,8 @@ $class = array(
     "DOMTable.php",
     "DataMemo.php",
     "X2Client/X2Client.php",
-    "vendors/Parsedown.php",
-    "vendors/ParsedownExtra.php"
+    "vendor/Parsedown.php",
+    "vendor/ParsedownExtra.php"
 );
 
 foreach($class as $filename) {
