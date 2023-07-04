@@ -2,7 +2,7 @@
 
 defined('ROOT_DIR') or die;
 
-Events::exec("@body::beforeAfter");
+Events::exec("@body:beforeAfter");
 
 ?>
 	
@@ -12,7 +12,7 @@ Events::exec("@body::beforeAfter");
 	<script src='<?php echo Core::url(ASSETS_DIR . '/js/main.js'); ?>'></script>
 	<!-- << default />> -->
 	
-<?php Events::exec('@body::after'); ?>
+<?php Events::exec('@body:after'); ?>
 		
 </body>
 </html>

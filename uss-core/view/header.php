@@ -17,14 +17,14 @@ defined('ROOT_DIR') or die;
 echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
 ?>
 	
-<?php Events::exec('@head::before'); ?>
+<?php Events::exec('@head:before'); ?>
 	
 	<!-- << defaults >> -->
 	<?php echo self::include_libraries('head', $exclude_libraries) . "\n"; ?>
 	<link rel='stylesheet' href='<?php echo Core::url(ASSETS_DIR . '/css/main.css'); ?>'>
 	<!-- << defaults />> -->
 	
-<?php Events::exec('@head::after'); ?>
+<?php Events::exec('@head:after'); ?>
 	
 </head>
 
@@ -32,4 +32,4 @@ echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
     echo Core::array_to_html_attrs(Uss::$global['body.attrs']);
 } ?>>
 	
-<?php Events::exec("@body::before"); ?>
+<?php Events::exec("@body:before"); ?>
