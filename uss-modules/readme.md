@@ -16,14 +16,10 @@ Uss::route('', function() {
     // Render HTML Document
 
     Uss::view(function() {
-        
-        // Create a template tag
-
-        Uss::tag('template', "Bootstrap");
 
         // Print your HTML Content
 
-        echo "<h1>%{template} is enabled</h1>";
+        echo "<h1>Bootstrap is enabled</h1>";
 
     });
 
@@ -36,4 +32,4 @@ Please refer to the [Documentation](http://uss.ucscode.me) for more information
 
 ## Author
 
-Uchenna Ajah &mdash; &lt;Ucscode&gt;
+Uchenna Ajah &mdash; &lt;[Ucscode](http://ucscode.me)&gt;
