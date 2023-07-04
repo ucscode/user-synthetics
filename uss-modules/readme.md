@@ -1,4 +1,4 @@
-# How to Make Modules
+# How to Create a Modules
 
 - Create a new folder in the `uss-modules` directory
 
