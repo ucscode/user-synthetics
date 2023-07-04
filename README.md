@@ -82,20 +82,24 @@ User Synthetics is released under the GNU General Public License (GPL) version 3
 
 ## Events Naming Convention
 
-This is not a recommendation but can be helpful to define or get event names used across user synthetics
+While this is not a formal recommendation, it can be useful for defining or identifying event names used in user synthetics. 
+
+Consider the following code snippet in PHP:
 
 ```php
 Events::addListener('uss:pages/users@nav.dropdown', ...);
 ```
 
-The above event name `uss:pages/users@nav.dropdown` can be broken down to:
+The event name `uss:pages/users@nav.dropdown` can be broken down as follows:
 
--  `uss:`  &mdash; The identity / source of the event
--  `pages/users`  &mdash;  The event name or possible point of execution
--  `@nav`  &mdash;  An element in which the event can be found or referenced. In this case `<nav>`
--  `.dropdown`
-	- May signify action spanning the event. Other examples may include `.click`, `.submit` etc. 
-	- It may also be used to reference element position of an event such as `.top`, `.left`, `.right`, or `.bottom` 
+- `uss:`: Represents the identity or source of the event.
+- `pages/users`: Refers to the event name or a possible point of execution.
+- `@nav`: Indicates an element, in this case `<nav>`, where the event can be found or referenced.
+- `.dropdown`:
+  - It might signify an action related to the event. Other example can be `.click`, `.submit`, etc.
+  - It might also be used to indicate the position of an element associated with the event, such as `.top`, `.left`, `.right`, or `.bottom`.
+
+These breakdowns can help provide a clearer understanding of the event name and its components within user synthetics.
 
 ## Acknowledgements
 
