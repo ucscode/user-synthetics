@@ -8,41 +8,9 @@
  */
 
 /**
- * The project name
- * @ignore
+ * Get Global Constants
  */
-define("PROJECT_NAME", 'User Synthetics');
-
-/**
- * The installation directory
- * Defines the directory where the user synthetics project is installed
- */
-define("ROOT_DIR", __DIR__);
-
-/**
- * The display directory
- * Defines the directory that contain files responsible for output in user synthetics
- */
-define("VIEW_DIR", ROOT_DIR . '/uss-view');
-
-/**
- * The resource & third party directory
- * Defines the directory which contains front-end scripts and libraries used by user synthetics
- */
-define("ASSETS_DIR", ROOT_DIR . '/uss-assets');
-
-/**
- * The Modules Directory
- * Defines the directory that contain modules created by developers to modify functionalities and appearance in user synthetics
- */
-define("MOD_DIR", ROOT_DIR . '/uss-modules');
-
-/**
- * The class directory
- * Defines the directory that contain class files which empowers user synthetics
- */
-define("CLASS_DIR", ROOT_DIR . '/uss-class');
-
+require_once __DIR__ . "/constants.php";
 
 /**
  * Verify PHP Version!
@@ -59,7 +27,6 @@ if((float)PHP_VERSION < MIN_PHP_VERSION) {
     require VIEW_DIR . '/PHP-Version.php';
     exit;
 };
-
 
 /**
  * The Main Classes
@@ -110,10 +77,21 @@ if( is_file( CLASS_DIR . "/vendor/autoload.php") ) {
 }
 
 /**
- * - Config Database
- * - Include Uss Class
- * - Load Modules
+ * Declare Project Files
  */
-require ROOT_DIR . '/uss-conn.php';
-require ROOT_DIR . '/uss-class.php';
-require MOD_DIR . '/index.php';
+$projectFiles = array(
+    "conn.php",
+    "uss.php",
+    "modules.php"
+);
+
+/**
+ * Load Project Files
+ */
+foreach( $projectFiles as $filename ) {
+
+    # Welcome to user synthetics
+
+    require_once CORE_DIR . "/{$filename}";
+
+};

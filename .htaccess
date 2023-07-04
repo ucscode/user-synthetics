@@ -1,10 +1,15 @@
-RewriteEngine ON
+<IfModule mod_rewrite.c>
 
-Options -Indexes
+    # Configuration directives related to mod_rewrite
 
-RewriteCond %{SCRIPT_FILENAME} !-f
+    RewriteEngine On
 
-RewriteCond %{SCRIPT_FILENAME} !-d
+    Options -Indexes
 
-RewriteRule (.*) index.php [B,L,QSA]
+    RewriteCond %{SCRIPT_FILENAME} !-f
+    RewriteCond %{SCRIPT_FILENAME} !-d
+    
+    RewriteRule (.*) index.php [B,L,QSA]
+
+</IfModule>
 

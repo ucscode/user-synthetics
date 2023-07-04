@@ -5,7 +5,7 @@
  * @package Uss
  */
 
-require __DIR__ . '/uss-config.php';
+require __DIR__ . '/uss-core/config.php';
 
 /**
  * In the absence of routing, a 404 error page will be rendered
