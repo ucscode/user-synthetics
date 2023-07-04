@@ -1,3 +1,5 @@
+# The structure of user synthetics has been updated. This notice will be removed once the documentation has been updated
+
 <div align="center">
 	<img src="uss-core/assets/images/origin.png" alt="User Synthetics Logo" width="140">
 	<h1>User Synthetics</h1>
