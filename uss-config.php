@@ -67,23 +67,47 @@ if((float)PHP_VERSION < MIN_PHP_VERSION) {
  * User Synthetics requires a list of "independent" light-weight classes which are stored in the `CLASS_DIR`
  * In order words, any of the class file can be copied to another project outside user synthetics and work just fine
  */
-$class = array(
-    "Core.php",
-    "Events.php",
-    "SQuery.php",
-    "Pairs.php",
-    "Menufy.php",
-    "DOMTable.php",
-    "DataMemo.php",
-    "X2Client/X2Client.php",
-    "vendor/Parsedown.php",
-    "vendor/ParsedownExtra.php"
-);
+$class = [
 
-foreach($class as $filename) {
-    require CLASS_DIR . "/{$filename}";
+    "internal" => [
+        "Core.php",
+        "Events.php",
+        "SQuery.php",
+        "Pairs.php",
+        "Menufy.php",
+        "DOMTable.php",
+        "DataMemo.php",
+        "X2Client/X2Client.php"
+    ],
+
+    "external" => [
+        "Parsedown.php",
+        "ParsedownExtra.php"
+    ]
+
+];
+
+foreach($class as $directory => $filelist ) {
+
+    # Require internal & external classes
+
+    foreach( $filelist as $filename ) {
+
+        require CLASS_DIR . "/{$directory}/{$filename}";
+
+    };
+
+};
+
+/**
+ * Incase of libraries that were required using composer, 
+ * The vendor/autoload.php file will be loaded
+ */
+if( is_file( CLASS_DIR . "/vendor/autoload.php") ) {
+
+    require_once CLASS_DIR . "/vendor/autoload.php";
+
 }
-
 
 /**
  * - Config Database
