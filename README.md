@@ -91,9 +91,9 @@ Events::addListener('uss:pages/users@nav.dropdown', ...);
 The above event name `uss:pages/users@nav.dropdown` can be broken down to:
 
 -  `uss:`  &mdash; The identity / source of the event
--  `pages/users`  &mdash;  Event name or possible point of execution
+-  `pages/users`  &mdash;  The event name or possible point of execution
 -  `@nav`  &mdash;  An element in which the event can be found or referenced. In this case `<nav>`
--  `.dropdown`:
+-  `.dropdown`
 	- May signify action spanning the event. Other examples may include `.click`, `.submit` etc. 
 	- It may also be used to reference element position of an event such as `.top`, `.left`, `.right`, or `.bottom` 
 
