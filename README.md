@@ -80,6 +80,22 @@ If you have ideas for new features, bug fixes, or improvements, you can submit a
 
 User Synthetics is released under the GNU General Public License (GPL) version 3 or later. For more information about, please refer to the [LICENSE](https://www.gnu.org/licenses/gpl-3.0.html) file.
 
+## Events Naming Convention
+
+This is not a recommendation but can be helpful to define or get event names used across user synthetics
+
+```php
+Events::addListener('uss:pages/users@nav.dropdown', ...);
+```
+
+The above event name `uss:pages/users@nav.dropdown` can be broken down to:
+
+-  `uss:`  &mdash; The identity / source of the event
+-  `pages/users`  &mdash;  Event name or possible point of execution
+-  `@nav`  &mdash;  An element in which the event can be found or referenced. In this case `<nav>`
+-  `.dropdown`:
+	- May signify action spanning the event. Other examples may include `.click`, `.submit` etc. 
+	- It may also be used to reference element position of an event such as `.top`, `.left`, `.right`, or `.bottom` 
 
 ## Acknowledgements
 
