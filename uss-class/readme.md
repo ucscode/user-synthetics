@@ -1,5 +1,5 @@
 
-# Working with Composer in `uss-class` Directory
+# Working with Composer in the `uss-class` Directory
 
 To add dependencies to your project, you have a couple of options:
 
