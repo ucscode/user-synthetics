@@ -103,12 +103,12 @@ new class {
 	
 	delegate( event, parent, closure ) {
 		let root = $(parent).get(0);
-		let self = this;
+		let _class = this;
 		let recycle = function(node, e) {
 			if( !node ) return;
 			for( let x in closure ) {
 				if( node.matches(x) ) {
-					let func = closure[x].bind(self)
+					let func = closure[x].bind(_class)
 					return func( node, e );
 				};
 			};
@@ -123,6 +123,8 @@ new class {
 		
 		//! Document Delegation
 		
+		let _class = this;
+
 		this.delegate( 'click', 'body', {
 			
 			/*!
@@ -135,17 +137,26 @@ new class {
 			
 			"a[data-uss-confirm]": function(anchor, e) {
 				
-				if( !this.#bs ) return console.warning("Cannot display modal in absence of bootstrap & bootbox");
+				if( !_class.#bs ) return console.warning("Cannot display modal in absence of bootstrap & bootbox");
 				
 				e.preventDefault();
+
 				let message = anchor.dataset.ussConfirm;
+
 				if( !message || message.trim() == '' ) message = 'You are about to leave this page';
+
 				bootbox.confirm({
+
 					message: message,
+
 					size: 'small',
+
 					className: 'text-center animate__animated animate__faster animate__bounceIn',
+
 					centerVertical: true,
+
 					closeButton: false,
+					
 					callback: function(choice) {
 						if( !choice ) return;
 						let target = anchor.target;
@@ -160,10 +171,13 @@ new class {
 							window.open( anchor.href, target, anchor.dataset.ussFeatures );
 						}
 					},
+
 					onShow: function(e) {
 						$(e.currentTarget).removeClass('fade');
 					}
+
 				});
+
 			},
 			
 	
@@ -233,18 +247,27 @@ new class {
 			
 		*/
 		
+		let _class = this;
+
 		$('body').on('submit', "form[data-uss-confirm]", function(e) {
 			
-			if( !this.#bs ) return console.log( "Cannot display modal in absence of Bootstrap & Bootbox" );
+			if( !_class.#bs ) return console.log( "Cannot display modal in absence of Bootstrap & Bootbox" );
 			
 			e.preventDefault();
+
 			let form = this;
 			let message = this.dataset.ussConfirm;
+
 			if( !message || message.trim() == '' ) message = 'Please confirm this process to continue';
+
 			bootbox.confirm({
+
 				message: `<div class='px-4'>${message}</div>`,
+
 				className: 'text-center animate__animated animate__faster animate__bounceIn',
+
 				size: 'small',
+
 				callback: function(yea) {
 					if( !yea ) return;
 					let node = e.originalEvent.submitter;
@@ -265,12 +288,17 @@ new class {
 					};
 					form.submit();
 				},
+
 				onShow: function(e) {
 					$(e.currentTarget).removeClass('fade');
 				},
+
 				closeButton: false,
+
 				centerVertical: true
+
 			});
+
 		});
 	
 	}
