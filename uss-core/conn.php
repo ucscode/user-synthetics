@@ -14,7 +14,7 @@ if($_SERVER['SERVER_NAME'] == 'localhost'):
     define("DB_HOST", "localhost");
     define("DB_USER", 'root');
     define("DB_PASSWORD", '');
-    define("DB_NAME", 'uss_v2');
+    define("DB_NAME", 'uss_v2c');
 
 else:
 
