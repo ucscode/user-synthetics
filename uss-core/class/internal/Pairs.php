@@ -294,7 +294,7 @@ class Pairs
         $result = $this->mysqli->query($Query);
 
         if($result->num_rows) {
-
+            
             while($pair = $result->fetch_assoc()) {
 
                 $refId = $pair['_ref'];
