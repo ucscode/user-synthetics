@@ -215,7 +215,7 @@ class Events
             # Find the right method to call
             $caller = $action['callable'];
 
-            call_user_func_array($action['callable'], [$data, $eventName]);
+            call_user_func_array($action['callable'], [&$data, &$eventName]);
 
         };
 
