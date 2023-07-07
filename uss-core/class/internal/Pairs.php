@@ -74,30 +74,6 @@ class Pairs
     }
 
     /**
-     * Create a meta table
-     *
-     * Creates a meta table in the database if it doesn't already exist.
-     *
-     * @return bool Returns `true` if the table creation query is successful, `false` otherwise.
-     */
-    protected function createTable()
-    {
-
-        $SQL = "
-			CREATE TABLE IF NOT EXISTS `{$this->tablename}` (
-				`id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-				`_ref` INT,
-				`_key` VARCHAR(255) NOT NULL,
-				`_value` TEXT,
-				`epoch` BIGINT NOT NULL DEFAULT UNIX_TIMESTAMP()
-			);
-		";
-
-        return $this->mysqli->query($SQL);
-
-    }
-
-    /**
      * Link to parent table
      *
      * Applies a foreign key constraint to the `_ref` column of the meta table. Thus, referencing the parent table.
@@ -133,25 +109,6 @@ class Pairs
 
         return $this->mysqli->query($SQL);
 
-    }
-
-    /**
-     * Check comparism type
-     *
-     * Determines the comparison type based on the provided reference ID.
-     *
-     * @param int|null $ref The reference ID to check.
-     * @return string Returns the comparison string for the reference ID. If the reference ID is null, it returns 'IS NULL', otherwise ' = [reference ID]'.
-     * @ignore
-     */
-    private function test(?int $ref = null)
-    {
-        if(is_null($ref)) {
-            $test = " IS " . sQuery::val($ref);
-        } else {
-            $test = " = " . sQuery::val($ref);
-        }
-        return trim($test);
     }
 
     /**
@@ -282,32 +239,125 @@ class Pairs
      * @return array An associative array containing the retrieved reference data. The keys of the array represent the reference data keys,
      * and the values can be of mixed types including strings, numbers, or arrays.
      */
-    public function all(?int $ref = null, ?string $regex = null)
+    public function all($ref = null, ?string $regex = null)
     {
 
-        $data = array();
+        # Check if argument 1 is given;
+
+        if( !empty(func_get_args()) ) {
+
+            $ref = func_get_arg(0);
+            
+            if( !is_null($ref) ) {
+
+                if( is_numeric($ref) ) {
+
+                    $ref = (int)$ref;
+
+                } else {
+
+                    $type = gettype($ref);
+                    $backtrace = debug_backtrace();
+
+                    $callerPath = $backtrace[0]['file'];
+                    $errorLine = $backtrace[0]['line'];
+
+                    $error = __METHOD__ . "(): Argument #1 (\$ref) must be of type ?int, {$type} given, called in {$callerPath} on line {$errorLine}";
+
+                    throw new TypeError( $error );
+
+                };
+
+            };
+
+        } else $ref = false;
+
+        # Prepare Reference;
+
+        $reference = ($ref === false) ? 1 : "_ref " . $this->test($ref);
+
+        # Prepare Regular Expression;
 
         if(empty($regex)) {
-            $xpr = null;
+            $expression = null;
         } else {
             $regex = str_replace("\\", "\\\\", $regex);
-            $xpr = " AND _key REGEXP '{$regex}'";
+            $expression = " AND _key REGEXP '{$regex}'";
         };
 
-        $Query = sQuery::select($this->tablename, "_ref " . $this->test($ref) . $xpr);
+        # Prepare Query;
+
+        $Query = sQuery::select( $this->tablename, $reference . $expression . " ORDER BY _ref");
+
+        # Execute Query;
 
         $result = $this->mysqli->query($Query);
 
         if($result->num_rows) {
+
             while($pair = $result->fetch_assoc()) {
+
+                $refId = $pair['_ref'];
+                $refId = is_numeric($refId ) ? (int)$refId : null;
+                
+                if( !isset($group[$refId]) ) {
+                    $group[$refId] = array();
+                };
+                
                 $key = $pair['_key'];
                 $value = json_decode($pair['_value'], true);
-                $data[$key] = $value;
-            }
+
+                $group[$refId][$key] = $value;
+
+            };
+
         };
+        
+        return ($ref === false) ? $group : $group[$ref];
 
-        return $data;
+    }
 
+    /**
+     * Create a meta table
+     *
+     * Creates a meta table in the database if it doesn't already exist.
+     *
+     * @return bool Returns `true` if the table creation query is successful, `false` otherwise.
+     */
+    protected function createTable()
+    {
+
+        $SQL = "
+			CREATE TABLE IF NOT EXISTS `{$this->tablename}` (
+				`id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+				`_ref` INT,
+				`_key` VARCHAR(255) NOT NULL,
+				`_value` TEXT,
+				`epoch` BIGINT NOT NULL DEFAULT UNIX_TIMESTAMP()
+			);
+		";
+
+        return $this->mysqli->query($SQL);
+
+    }
+
+    /**
+     * Check comparism type
+     *
+     * Determines the comparison type based on the provided reference ID.
+     *
+     * @param int|null $ref The reference ID to check.
+     * @return string Returns the comparison string for the reference ID. If the reference ID is null, it returns 'IS NULL', otherwise ' = [reference ID]'.
+     * @ignore
+     */
+    private function test(?int $ref = null)
+    {
+        if(is_null($ref)) {
+            $test = " IS " . sQuery::val($ref);
+        } else {
+            $test = " = " . sQuery::val($ref);
+        }
+        return trim($test);
     }
 
 }
