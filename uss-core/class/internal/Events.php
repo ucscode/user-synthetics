@@ -167,7 +167,7 @@ class Events
      *        The closure should return `false` (not `null`) to cancel an event.
      * @return void
      */
-    public static function exec(string $eventName, ?array $data = null, ?bool $sort = true, ?closure $master = null)
+    public static function exec(string $eventName, ?array $data = null, ?bool $sort = true)
     {
 
         // get the event type to execute;
@@ -218,19 +218,10 @@ class Events
             // define the event offset
 
             $action['debugger']['offset'] = $key;
-
-            /**
-             * The `$master` callable tracks or enforce conditions on other events
-             *
-             * it can be used to determine which event is running and set conditions for the event to run!
-             * The master event should return a `false` (that is not `NULL`) to cancel an event;
-            */
-
-            $run = $master ? $master($action['debugger']) : true;
-
-            if($run || is_null($run)) {
-                call_user_func($action['callable'], $data ?? [], $eventName);
-            }
+            
+            # Call User Function;
+            
+            call_user_func($action['callable'], $data ?? [], $eventName);
 
         };
 
