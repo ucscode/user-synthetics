@@ -146,7 +146,7 @@ class Events
                 $b = $convertType($b);
                 return self::compare($a, $b, $sort);
             });
-
+            
         };
 
     }
@@ -195,33 +195,27 @@ class Events
          * - `FALSE` ==  Sort descending
         */
 
-        $eventList = self::$events[ $eventName ];
+        $eventList = &self::$events[ $eventName ];
 
+        
         self::sortEvents($eventList, $sort);
-
+        
         /**
          * Loop and execute each individual event
          */
-
+        
         foreach($eventList as $key => $action) {
 
             /**
              * Skip empty callable
-             *
              * A callable may be passed as null if you want to override an event and cancle its effect
              */
-            if(is_null($action['callable'])) {
-                continue;
-            }
-
-
-            // define the event offset
-
-            $action['debugger']['offset'] = $key;
+            if(is_null($action['callable'])) continue;
             
-            # Call User Function;
-            
-            call_user_func($action['callable'], $data ?? [], $eventName);
+            # Find the right method to call
+            $caller = $action['callable'];
+
+            call_user_func_array($action['callable'], [$data, $eventName]);
 
         };
 
@@ -248,24 +242,21 @@ class Events
      */
     public static function addListener(string $eventNames, ?callable $callback, ?string $eid = null)
     {
-        /**
-         * Get 3 level debugger
-         * Thi will be passed to the master executor
-         */
-        $debug = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 3);
 
         /** eid = Event ID */
 
         /**
          * Split Multiple Events
          */
-        self::splitEvents($eventNames, function ($event) use ($callback, $eid, $debug) {
+        self::splitEvents($eventNames, function ($event) use ($callback, $eid) {
+            
             /**
              * If the event name doesn't already exist, create
              */
             if(!array_key_exists($event, self::$events)) {
                 self::$events[ $event ] = array();
-            }
+            };
+            
             /**
              * Get the eventlist
              */
@@ -274,8 +265,7 @@ class Events
              * Create the event data
              */
             $action = array(
-                "callable" => $callback,
-                "debugger" => $debug,
+                "callable" => $callback
             );
             /**
              * If no eventID is given,
@@ -475,7 +465,6 @@ class Events
         array_walk(self::$events, function ($data, $key) use (&$list) {
             $list[ $key ] = $list[ $key ] ?? [];
             foreach($data as $id => $value) {
-                unset($value['debugger']);
                 $list[ $key ][ $id ] = $value['callable'];
             };
         });
