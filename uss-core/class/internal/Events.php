@@ -162,9 +162,7 @@ class Events
      *        - `null` indicates no sorting.
      *        - `true` indicates sorting in ascending order.
      *        - `false` indicates sorting in descending order.
-     * @param Closure|null $master Optional: master closure to enforce conditions on other events.
-     *        The master closure can determine which event is running and set conditions for it to run.
-     *        The closure should return `false` (not `null`) to cancel an event.
+     * 
      * @return void
      */
     public static function exec(string $eventName, ?array $data = null, ?bool $sort = true)
@@ -268,12 +266,12 @@ class Events
     /**
      * Remove Event Listener
      *
-     * This method is used to remove event listeners for one or more event names. It takes the event names
-     * as a string and an optional event ID, and removes the corresponding event listeners from the internal
+     * This method is used to remove event listeners for an event names. It takes the event names
+     * as a string and an event ID, and removes the corresponding event listeners from the internal
      * event registry.
      *
-     * @param string    $eventNames  The comma-separated string of event names
-     * @param string    $eid         (Optional) The event ID to identify a specific event listener
+     * @param string    $eventName  The event names
+     * @param string    $eid         The event ID to identify a specific event listener
      *
      * @return void
      */
@@ -342,11 +340,11 @@ class Events
     /**
      * Get Listener
      *
-     * This method is used to retrieve a specific listener for the given event name and optional event ID.
+     * This method is used to retrieve a specific listener for the given event name and event ID.
      * It returns the `callable` associated with the event and event ID, or `null` if no listener is found.
      *
      * @param string    $eventName  The name of the event
-     * @param string|null    $eid    The optional event ID
+     * @param string|null    $eid    The event ID
      *
      * @return array|callable|null The list of associated events. If event ID is given, returns the `callable` associated with the event ID, or `null` if neither the event nor event ID is found
      */
@@ -387,7 +385,7 @@ class Events
      * @param bool      $verbose       Whether to include priority information in the list (default: `false`)
      * @param string|null    $eventName  The optional event name to filter the list
      *
-     * @return array    An array containing a list of listeners. If `$priority` is `false`, an array of event names. If `$priority` is true, an associative array with event names as keys and their corresponding listeners as values. If `$eventName` is provided, an array of listeners for the specific event name.
+     * @return array    An array containing a list of listeners. If `$verbose` is `false`, an array of event names. If `$verbose` is true, an associative array with event names as keys and their corresponding listeners as values. If `$eventName` is provided, an array of listeners for the specific event name.
      */
     public static function list($verbose = false, ?string $eventName = null)
     {

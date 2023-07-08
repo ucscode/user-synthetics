@@ -562,10 +562,38 @@ class Uss
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public static function route(string $path, callable $func, ?string $request = 'get')
+    public static function route(string $path, callable $func, $request = 'get')
     {
 
-        if(!is_null($request) && $_SERVER['REQUEST_METHOD'] !== strtoupper($request)) {
+        if( is_string($request) || is_null($request) ) {
+
+            # Convert to array;
+            $request = [$request];
+
+        } else if( !is_array($request) ) {
+
+            $type = gettype($request);
+            throw new TypeError( __METHOD__ . "(): Argument #3 (\$request) must be a type string or array, {$type} given" );
+
+        };
+
+        # Trim & Capitalize
+
+        array_walk_recursive($request, function(&$value) {
+            if( !is_null($value) && is_scalar($value) ) {
+                $value = strtoupper( trim($value) );
+            };
+        });
+
+        # Get only valid request like "GET", "POST", "PUT", ...
+
+        $request = array_filter($request, function($value) {
+            return is_string($value) || is_null($value);
+        });
+
+        # Validate Request Method
+        
+        if(!(in_array($_SERVER['REQUEST_METHOD'], $request) || in_array(NULL, $request))) {
             return;
         }
 
@@ -631,17 +659,6 @@ class Uss
         };
 
     }
-
-    /**
-     * This method has been deprecated and should be replace with `route` for future compactibility
-     * @deprecated
-     * @ignore
-     */
-    public static function focus(string $path, callable $func, ?string $request = 'get')
-    {
-        self::route($path, $func, $request);
-    }
-
 
     /**
      * Get the current focus expression or list of focus expressions.
@@ -861,16 +878,6 @@ class Uss
 
         // Assign a new tag
         self::$engineTags[$key] = $value;
-    }
-
-    /**
-     * Method deprecated. use tag() Instead
-     * @ignore
-     * @deprecated
-     */
-    public static function eTag(?string $key, ?string $value = null, bool $overwrite = true)
-    {
-        self::tag($key, $value, $overwrite);
     }
 
 };
