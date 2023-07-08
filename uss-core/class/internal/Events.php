@@ -204,6 +204,8 @@ class Events
 
             # Call all associated event
 
+            if( is_null($callback) ) continue;
+            
             call_user_func_array($callback, [&$data, &$eventName]);
 
         };
