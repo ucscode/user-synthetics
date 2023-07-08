@@ -179,16 +179,15 @@ class Events
         }
 
         /**
-         * SORTING ORDER
-         * ---------------------
-         *
+         * # Order Of Sorting
+         * 
          * 1. Negative Number
          * 2. Uppercase Letters
          * 3. Symbols
          * 4. Lowercase Letters
          * 5. Positive Numbers
          *
-         * ------------------------
+         * # Sorting values
          *
          * - `NULL` == No sorting
          * - `TRUE` == Sort ascending
@@ -197,25 +196,15 @@ class Events
 
         $eventList = &self::$events[ $eventName ];
 
-        
         self::sortEvents($eventList, $sort);
         
-        /**
-         * Loop and execute each individual event
-         */
+        # Loop and execute each individual event
         
-        foreach($eventList as $key => $action) {
+        foreach($eventList as $key => $callback) {
 
-            /**
-             * Skip empty callable
-             * A callable may be passed as null if you want to override an event and cancle its effect
-             */
-            if(is_null($action['callable'])) continue;
-            
-            # Find the right method to call
-            $caller = $action['callable'];
+            # Call all associated event
 
-            call_user_func_array($action['callable'], [&$data, &$eventName]);
+            call_user_func_array($callback, [&$data, &$eventName]);
 
         };
 
@@ -243,42 +232,32 @@ class Events
     public static function addListener(string $eventNames, ?callable $callback, ?string $eid = null)
     {
 
-        /** eid = Event ID */
+        # split the events by comma
 
-        /**
-         * Split Multiple Events
-         */
         self::splitEvents($eventNames, function ($event) use ($callback, $eid) {
             
-            /**
-             * If the event name doesn't already exist, create
-             */
+            # If the event name doesn't already exist, create
+            
             if(!array_key_exists($event, self::$events)) {
                 self::$events[ $event ] = array();
             };
             
-            /**
-             * Get the eventlist
-             */
+            # Get reference to the eventlist
+            
             $eventList = &self::$events[ $event ];
-            /**
-             * Create the event data
-             */
-            $action = array(
-                "callable" => $callback
-            );
-            /**
-             * If no eventID is given,
-             * Add the event using PHP Array incrementing index as the eventID
-             */
+            
+            # If no event ID is given, add the event using PHP Array incrementing index
+            
             if(is_null($eid)) {
-                $eventList[] = $action;
-            }
-            /**
-             * Else, if the eventID does not exist, add the event.
-             */
-            elseif(!array_key_exists($eid, $eventList)) {
-                $eventList[ $eid ] = $action;
+
+                $eventList[] = $callback;
+
+            } elseif(!array_key_exists($eid, $eventList)) {
+
+                # Else, if the eventID does not exist, add the event.
+
+                $eventList[ $eid ] = $callback;
+
             }
 
         });
@@ -296,47 +275,43 @@ class Events
      *
      * @return void
      */
-    public static function removeListener(string $eventNames, ?string $eid = null)
+    public static function removeListener(string $eventName, ?string $eid)
     {
-        /**
-         * Split Multiple Events
-         */
-        self::splitEvents($eventNames, function ($event) use ($eid) {
-            /**
-             * Handle Individual Event
-             * If the eventname does not exist, ignore
-             */
-            if(!array_key_exists($event, self::$events)) {
-                return;
-            }
 
-            /**
-             * Get the event by reference
-             */
-            $eventList = &self::$events[ $event ];
+        $status = false;
 
-            /**
-             * If no eventID is given,
-             * Remove the last add event
-             */
-            if(is_null($eid) && !empty($eventList)) {
-                array_pop($eventList);
-            }
+        # Get the event by reference
+        $eventList = &self::$events[ $eventName ] ?? null;
+        
+        # If the eventname does not exist, ignore
+        if( empty($eventList) ) {
 
-            /**
-             * Else, remove the specified event
-             */
-            elseif(array_key_exists($eid, $eventList)) {
+            $status = true;
+
+        } else {
+
+            # Remove the specified event
+            if( is_null($eid) ) {
+
+                unset( self::$events[ $eventName ] );
+                $status = true;
+
+            } else if(array_key_exists($eid, $eventList)) {
+
                 unset($eventList[ $eid ]);
+                $status = true;
+
             }
 
-            /**
-             * Finally: Trash empty event;
-             */
+            # Finally: Trash empty event;
             if(empty($eventList)) {
                 self::clear($event);
-            }
-        });
+            };
+
+        };
+
+        return $status;
+
     }
 
 
@@ -352,17 +327,13 @@ class Events
      */
     public static function clear(string $eventNames)
     {
-        /**
-         * Split Multiple Events
-         */
         self::splitEvents($eventNames, function ($event) {
-            /**
-             * If the event exists, delete it
-             */
+            # If the event exists, delete it
             if(array_key_exists($event, self::$events)) {
                 unset(self::$events[ $event ]);
-            }
+            };
         });
+        return true;
     }
 
 
@@ -375,35 +346,18 @@ class Events
      * @param string    $eventName  The name of the event
      * @param string|null    $eid    The optional event ID
      *
-     * @return callable|null The `callable` associated with the event and event ID, or `null` if not found
+     * @return array|callable|null The list of associated events. If event ID is given, returns the `callable` associated with the event ID, or `null` if neither the event nor event ID is found
      */
     public static function getListener(string $eventName, ?string $eid = null)
     {
-        /**
-         * Get the eventList
-         * Or return null
-         */
+        # Get the eventList, or return null
         $eventList = self::$events[ trim($eventName) ] ?? null;
-        if(empty($eventList)) {
-            return;
-        }
 
-        /**
-         * If eventID is null, get the last added callable
-         */
-        if(is_null($eid)) {
-            /**
-             * Get the last event
-             */
-            $event = end($eventList);
-
-            if($event) {
-                return $event['callable'];
-            }
-
-        } elseif(array_key_exists($eid, $eventList)) {
-            return $eventList[$eid]['callable'];
-        }
+        if( is_null($eid) ) {
+            return $eventList;
+        } else if(!empty($eventList) && array_key_exists($eid, $eventList)) {
+            return $eventList[$eid];
+        };
 
     }
 
@@ -422,8 +376,25 @@ class Events
     {
         return !!self::getListener($eventName, $eid);
     }
-
-
+    
+    /**
+     * List Listeners
+     *
+     * This method is used to retrieve a list of registered listeners. It can return a list of all event names or a specific list of listeners for a given event name.
+     *
+     * @param bool      $verbose       Whether to include priority information in the list (default: `false`)
+     * @param string|null    $eventName  The optional event name to filter the list
+     *
+     * @return array    An array containing a list of listeners. If `$priority` is `false`, an array of event names. If `$priority` is true, an associative array with event names as keys and their corresponding listeners as values. If `$eventName` is provided, an array of listeners for the specific event name.
+     */
+    public static function list($verbose = false, ?string $eventName = null)
+    {
+        if(!$verbose) {
+            return array_keys(self::$events);
+        };
+        return is_null($eventName) ? self::$events : (self::$events[$eventName] ?? null);
+    }
+    
     /**
      * Split Events
      *
@@ -443,32 +414,6 @@ class Events
         foreach($eventNames as $eventName) {
             $func($eventName);
         }
-    }
-
-
-    /**
-     * List Listeners
-     *
-     * This method is used to retrieve a list of registered listeners. It can return a list of all event names or a specific list of listeners for a given event name.
-     *
-     * @param bool      $priority       Whether to include priority information in the list (default: `false`)
-     * @param string|null    $eventName  The optional event name to filter the list
-     *
-     * @return array    An array containing a list of listeners. If `$priority` is `false`, an array of event names. If `$priority` is true, an associative array with event names as keys and their corresponding listeners as values. If `$eventName` is provided, an array of listeners for the specific event name.
-     */
-    public static function list($priority = false, ?string $eventName = null)
-    {
-        if(!$priority) {
-            return array_keys(self::$events);
-        }
-        $list = array();
-        array_walk(self::$events, function ($data, $key) use (&$list) {
-            $list[ $key ] = $list[ $key ] ?? [];
-            foreach($data as $id => $value) {
-                $list[ $key ][ $id ] = $value['callable'];
-            };
-        });
-        return is_null($eventName) ? $list : ($list[$eventName] ?? null);
     }
 
 };
