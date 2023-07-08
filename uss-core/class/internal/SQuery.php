@@ -10,7 +10,7 @@
  * @author ucscode
  * @link https://github.com/ucscode/sQuery
  */
-class sQuery
+class SQuery
 {
     /**
      * Format the column name by applying backticks if needed.

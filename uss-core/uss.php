@@ -215,7 +215,7 @@ class Uss
                      * Applicable to PHP 7.4
                      */
 
-                    self::eTag('connect_error', self::$global['mysqli']->connect_error);
+                    self::tag('connect_error', self::$global['mysqli']->connect_error);
 
                     self::view(function () {
                         require_once VIEW_DIR . '/db-conn-failed.php';
@@ -245,7 +245,7 @@ class Uss
                  * Applicable to PHP 8
                  */
 
-                self::eTag('connect_error', $e->getMessage());
+                self::tag('connect_error', $e->getMessage());
 
                 self::view(function () {
                     require_once VIEW_DIR . "/db-conn-failed.php";
