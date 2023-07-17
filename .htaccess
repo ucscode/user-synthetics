@@ -1,15 +1,17 @@
 <IfModule mod_rewrite.c>
-
-    # Configuration directives related to mod_rewrite
-
     RewriteEngine On
-
     Options -Indexes
-
-    RewriteCond %{SCRIPT_FILENAME} !-f
-    RewriteCond %{SCRIPT_FILENAME} !-d
     
-    RewriteRule (.*) index.php [B,L,QSA]
-
+    # Dynamically set the RewriteBase
+    RewriteCond %{REQUEST_URI}::$1 ^(.*?/)(.*)::\2$
+    RewriteRule ^ - [E=BASE:%1]
+    
+    RewriteCond %{REQUEST_URI} !^%{ENV:BASE}uss-core/(index\.php)?$
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ %{ENV:BASE}uss-core/index.php [B,QSA,L]
+    
+    RewriteRule ^$ %{ENV:BASE}uss-core/index.php [B,QSA,L]
 </IfModule>
+
 
