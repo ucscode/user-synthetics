@@ -219,6 +219,23 @@
     font-family: monospace !important;
 }
 
+@keyframes ellipsis {
+    0% {
+        content: ".";
+    }
+    33% {
+        content:"..";
+    }
+    66% {
+        content:"...";
+    }
+}
+
+.uss-ellipsis-loading::after {
+    content: "";
+    animation: ellipsis 1s infinite;
+}
+  
 /* =================================*/
 
 /* ======= [ COL-SM ] ======= */

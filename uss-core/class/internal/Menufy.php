@@ -91,7 +91,7 @@ class Menufy
      *
      * @var null|Menufy
      */
-    private $parent_menu = null;
+    private $parentMenu = null;
 
     /**
      * The depth or level of the Menufy object
@@ -136,7 +136,7 @@ class Menufy
 
         /** Set Menu Attributes */
         foreach($attrs as $key => $value) {
-            $this->set_attr($key, $value);
+            $this->setAttr($key, $value);
         }
 
     }
@@ -167,7 +167,7 @@ class Menufy
 
         $child = new self($name, $attrs);
         $child->level = is_null($this->level) ? 0 : ($this->level + 1);
-        $child->parent_menu = $this;
+        $child->parentMenu = $this;
 
         return $this->child[ $name ] = $child;
 
@@ -213,7 +213,7 @@ class Menufy
      * @param mixed $value The value to assign to the attribute.
      * @return bool Returns `true` if the attribute was successfully set, `false` otherwise.
      */
-    public function set_attr(string $name, $value)
+    public function setAttr(string $name, $value)
     {
         $this->attrs[ $name ] = $value;
         return isset($this->attrs[ $name ]);
@@ -227,7 +227,7 @@ class Menufy
      * @param string $name The name of the attribute to retrieve.
      * @return mixed|null The value of the attribute, or `null` if the attribute does not exist.
      */
-    public function get_attr(string $name)
+    public function getAttr(string $name)
     {
         return $this->attrs[ $name ] ?? null;
     }
@@ -240,7 +240,7 @@ class Menufy
      * @param string $name The name of the attribute to remove.
      * @return bool `true` if the attribute was successfully removed, `false` otherwise.
      */
-    public function remove_attr(string $name)
+    public function removeAttr(string $name)
     {
         if(isset($this->attrs[ $name ])) {
             unset($this->attrs[ $name ]);
