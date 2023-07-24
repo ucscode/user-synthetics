@@ -164,7 +164,7 @@ class DOMTable
         //libxml_use_internal_errors(true);
 
         // Create a PHP DomDocument;
-        $this->doc = new DOMDocument('1.0', 'utf-8');
+        $this->doc = new DOMDocument('1.0', 'UTF-8');
 
         $this->doc->preserveWhiteSpace = false;
         $this->doc->formatOutput = true;
@@ -470,7 +470,7 @@ class DOMTable
      */
     public function innerHTML(&$el, ?string $innerHTML = null)
     {
-        $dom = new DOMDocument();
+        $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = true;
         $innerHTML = preg_replace("/&(?!\S+;)/", "&amp;", $innerHTML);
         $dom->loadHTML("<div>{$innerHTML}</div>");
