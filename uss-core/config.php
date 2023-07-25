@@ -70,10 +70,10 @@ foreach($class as $directory => $filelist ) {
  * Incase of libraries that were required using composer, 
  * The vendor/autoload.php file will be loaded
  */
-if( is_file( CLASS_DIR . "/vendor/autoload.php") ) {
+$autoloadFile = ROOT_DIR . "/vendor/autoload.php";
 
-    require_once CLASS_DIR . "/vendor/autoload.php";
-
+if( is_file($autoloadFile) ) {
+    require_once $autoloadFile;
 }
 
 /**
