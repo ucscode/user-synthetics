@@ -170,7 +170,7 @@ class DOMTable
         $this->doc->formatOutput = true;
 
         // Create a Table Element;
-        $HTML_TABLE = "
+        $HTML_TABLE = "<?xml encoding='utf-8' ?>
 			<div class='dt-container'>
 				<!-- a good spot add features like search box, checkbox options etc -->
 				<div class='table-responsive'>
@@ -473,7 +473,7 @@ class DOMTable
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = true;
         $innerHTML = preg_replace("/&(?!\S+;)/", "&amp;", $innerHTML);
-        $dom->loadHTML("<div>{$innerHTML}</div>");
+        $dom->loadHTML("<?xml encoding='utf-8' ?><div>{$innerHTML}</div>");
         $div = $this->doc->importNode($dom->getElementsByTagName('body')->item(0)->firstChild, true);
         while($el->firstChild) {
             $el->removeChild($el->firstChild);
