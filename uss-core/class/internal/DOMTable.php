@@ -447,7 +447,10 @@ class DOMTable
                 $this->innerHTML($tx, $value);
                 $tr->appendChild($tx);
             };
-            $this->table->getElementsByTagName($appendTo)->item(0)->appendChild($tr);
+            $element = $this->table->getElementsByTagName($appendTo)->item(0);
+            if( $element ) {
+                $element->appendChild($tr);
+            };
         };
         return $approved;
     }
