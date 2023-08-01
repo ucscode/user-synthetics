@@ -562,7 +562,7 @@ class Uss
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public static function route(string $path, callable $func, $request = 'get')
+    public static function route(string $path, callable $func, $request = null)
     {
 
         if( is_string($request) || is_null($request) ) {
