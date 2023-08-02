@@ -378,10 +378,8 @@ class Uss
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css')
             ),
             'body' => array(
-                'bootstrap' => [
-                    Core::url(ASSETS_DIR . '/js/bootstrap.bundle.min.js'),
-                    Core::url(ASSETS_DIR . '/js/bootbox.all.min.js')
-                ],
+                'bootstrap' => Core::url(ASSETS_DIR . '/js/bootstrap.bundle.min.js'),
+                'bootbox' => Core::url(ASSETS_DIR . '/js/bootbox.all.min.js'),
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.js'),
                 'notiflix' => [
                     Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js'),
