@@ -1,34 +1,36 @@
 <?php
-/*
- * Literally, we don't want this file printing error such as:
- * Uncaught Error: Class 'uss' not found in line ...
- */
-defined('ROOT_DIR') or die;
-
-?><!doctype html>
+    # Avoid Error Display
+    defined('ROOT_DIR') or die;
+?>
+<!doctype html>
 <html>
 <head>
 	
 	<?php
-        /*
-         * Pass variables from PHP to JavaScript environment
-         */
+
+        # Pass variables from PHP to JavaScript environment
         $console = base64_encode(json_encode((object)self::$console));
-echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
-?>
-	
-<?php Events::exec('@head:before'); ?>
-	
-	<!-- << defaults >> -->
-	<?php echo self::include_libraries('head', $exclude_libraries) . "\n"; ?>
-	<!-- << defaults />> -->
-	
-<?php Events::exec('@head:after'); ?>
-	
+        echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
+
+        # Before Default Scripts
+        Events::exec('@head:before');
+
+        # Print Default Scripts
+        echo self::include_libraries('head', $exclude_libraries) . "\n";
+
+        # After Default Scripts
+        Events::exec('@head:after');
+
+        # Set Body Attributes;
+        $bodyAttrs = Core::array_to_html_attrs( Uss::$global['body.attrs'] );
+
+    ?>
+
 </head>
 
-<body <?php if(is_array(Uss::$global['body.attrs'] ?? null)) {
-    echo Core::array_to_html_attrs(Uss::$global['body.attrs']);
-} ?>>
+<body <?php echo $bodyAttrs; ?>>
 	
-<?php Events::exec("@body:before"); ?>
+    <?php 
+        # Before Body Content
+        Events::exec("@body:before"); 
+    ?>

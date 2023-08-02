@@ -1,16 +1,18 @@
 <?php
 
-defined('ROOT_DIR') or die;
+	# Avoid Error Display
+	defined('ROOT_DIR') or die;
 
-Events::exec("@body:beforeAfter");
+	# Before Default Footer Scripts
+	Events::exec("@body:beforeAfter");
+
+	# The Footer Scripts
+	echo self::include_libraries('body', $exclude_libraries) . "\n"; 
+	
+	# After Default Footer Scripts
+	Events::exec('@body:after'); 
 
 ?>
-	
-	<!-- << default >> -->
-	<?php echo self::include_libraries('body', $exclude_libraries) . "\n"; ?>
-	<!-- << default />> -->
-	
-<?php Events::exec('@body:after'); ?>
 		
 </body>
 </html>

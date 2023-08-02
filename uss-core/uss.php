@@ -367,9 +367,11 @@ class Uss
     /**
      * @ignore
      */
-    private static function include_libraries(string $position, array $exclude)
+    private static function include_libraries(string $position, ?array $exclude)
     {
-
+        
+        if( is_null($exclude) ) return;
+        
         $libraries = array(
             'head' => array(
                 'bootstrap' => Core::url(ASSETS_DIR . '/css/bootstrap.min.css'),
@@ -453,7 +455,7 @@ class Uss
      *
      * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
      */
-    public static function view(?callable $content = null, array $exclude_libraries = [])
+    public static function view(?callable $content = null, ?array $exclude_libraries = [])
     {
 
         /**
