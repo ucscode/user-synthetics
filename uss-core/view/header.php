@@ -21,7 +21,6 @@ echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
 	
 	<!-- << defaults >> -->
 	<?php echo self::include_libraries('head', $exclude_libraries) . "\n"; ?>
-	<link rel='stylesheet' href='<?php echo Core::url(ASSETS_DIR . '/css/main.css'); ?>'>
 	<!-- << defaults />> -->
 	
 <?php Events::exec('@head:after'); ?>

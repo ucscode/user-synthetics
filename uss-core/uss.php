@@ -375,16 +375,19 @@ class Uss
                 'bootstrap' => Core::url(ASSETS_DIR . '/css/bootstrap.min.css'),
                 'bs-icon' => Core::url(ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css'),
                 'animate' => Core::url(ASSETS_DIR . '/css/animate.min.css'),
-                'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css')
+                'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css'),
+                'main-css' => Core::url(ASSETS_DIR . '/css/main.css')
             ),
             'body' => array(
+                'jquery' => Core::url(ASSETS_DIR . '/js/jquery-3.6.4.min.js'),
                 'bootstrap' => Core::url(ASSETS_DIR . '/js/bootstrap.bundle.min.js'),
                 'bootbox' => Core::url(ASSETS_DIR . '/js/bootbox.all.min.js'),
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.js'),
                 'notiflix' => [
                     Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js'),
                     Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-block-aio-3.2.6.min.js')
-                ]
+                ],
+                'main-js' => Core::url(ASSETS_DIR . '/js/main.js')
             )
         );
 
