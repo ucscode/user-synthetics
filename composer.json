@@ -1,3 +1,6 @@
 {
-    "require": {}
+    "require": {
+        "symfony/yaml": "^6.3",
+        "pedroborges/meta-tags": "^0.0.2"
+    }
 }
