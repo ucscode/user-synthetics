@@ -378,6 +378,7 @@ class Uss
                 'bs-icon' => Core::url(ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css'),
                 'animate' => Core::url(ASSETS_DIR . '/css/animate.min.css'),
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css'),
+                'font-size' => Core::url(ASSETS_DIR . "/css/font-size.min.css"),
                 'main-css' => Core::url(ASSETS_DIR . '/css/main.css')
             ),
             'body' => array(
