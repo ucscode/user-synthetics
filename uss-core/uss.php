@@ -375,6 +375,7 @@ class Uss
                 'bootstrap' => Core::url(ASSETS_DIR . '/css/bootstrap.min.css'),
                 'bs-icon' => Core::url(ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css'),
                 'animate' => Core::url(ASSETS_DIR . '/css/animate.min.css'),
+                'glightbox' => Core::url(ASSETS_DIR . "/vendor/glightbox/glightbox.min.css"),
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css'),
                 'font-size' => Core::url(ASSETS_DIR . "/css/font-size.min.css"),
                 'main-css' => Core::url(ASSETS_DIR . '/css/main.css')
@@ -383,6 +384,7 @@ class Uss
                 'jquery' => Core::url(ASSETS_DIR . '/js/jquery-3.6.4.min.js'),
                 'bootstrap' => Core::url(ASSETS_DIR . '/js/bootstrap.bundle.min.js'),
                 'bootbox' => Core::url(ASSETS_DIR . '/js/bootbox.all.min.js'),
+                'glightbox' => Core::url(ASSETS_DIR . "/vendor/glightbox/glightbox.min.js"),
                 'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.js'),
                 'notiflix' => [
                     Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js'),
