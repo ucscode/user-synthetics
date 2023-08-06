@@ -7,7 +7,7 @@
 		Events::exec("@body:beforeAfter");
 
 		# The Footer Scripts
-		echo self::include_libraries('body', $exclude_libraries) . "\n"; 
+		echo self::include_libraries('body', $exclib, $inclib) . "\n"; 
 		
 		# After Default Footer Scripts
 		Events::exec('@body:after'); 

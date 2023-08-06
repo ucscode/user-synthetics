@@ -367,10 +367,8 @@ class Uss
     /**
      * @ignore
      */
-    private static function include_libraries(string $position, ?array $exclude)
+    private static function include_libraries(string $position, ?array $exclib, ?array $inclib)
     {
-        
-        if( is_null($exclude) ) return;
         
         $libraries = array(
             'head' => array(
@@ -394,44 +392,59 @@ class Uss
             )
         );
 
-        $exclude = array_map(function ($value) {
-            if(is_scalar($value)) {
-                $value = trim($value);
-            }
-            return $value;
-        }, array_values($exclude));
+        if( is_null($exclib) ) {
+            # Exclude All;
+            $exclib = array_keys( $libraries[$position] );
+            $exclib[] = 'viewport';
+        } else {
+            # Validate;
+            $exclib = array_map(function ($value) {
+                if(is_scalar($value)) {
+                    $value = trim($value);
+                }
+                return $value;
+            }, array_values($exclib));
+        };
 
         $res_center = "data-rc"; // resource center
-        $include = [];
+        $include = []; // Libraries to include
 
-        if($position == 'head' && !in_array('viewport', $exclude)) {
-            /** include viewport meta tag **/
+        $let = function(string $key) use($exclib, $inclib) {
+            $stat = !in_array($key, $exclib) || in_array($key, $inclib);
+            return $stat;
+        };
+
+        if($position == 'head' && $let('viewport')) {
+            # include viewport meta tag
             $include[] = "<meta name='viewport' content='width=device-width, initial-scale=1.0' {$res_center}='viewport'>";
         };
 
-        $build_script = function ($position, $library, $source) use ($res_center) {
+        # Build Script Function
+        $buildScript = function ($position, $library, $source) use ($res_center) {
             if($position == 'head') {
+                # CSS on Head
                 $script = "<link rel='stylesheet' href='{$source}' {$res_center}='{$library}'>";
             } else {
+                # JS on Body
                 $script = "<script src='{$source}' {$res_center}='{$library}'></script>";
             };
             return $script;
         };
+        
+        foreach($libraries[$position] as $key => $source) {
 
-        foreach($libraries[$position] as $library => $source) {
-
-            // exclude unwanted script;
-            if(in_array($library, $exclude)) {
+            # Forfeit unwanted script;
+            if( !$let($key) ) {
                 continue;
-            }
+            };
 
-            // include single script
-            if(!is_array($source)) {
-                $include[] = $build_script($position, $library, $source);
+            if( !is_array($source) ) {
+                # Include single script
+                $include[] = $buildScript($position, $key, $source);
             } else {
-                // include multiple scripts
-                foreach($source as $script) {
-                    $include[] = $build_script($position, $library, $script);
+                # Include multiple scripts
+                foreach($source as $src) {
+                    $include[] = $buildScript($position, $key, $src);
                 }
             };
 
@@ -456,7 +469,7 @@ class Uss
      *
      * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
      */
-    public static function view(?callable $content = null, ?array $exclude_libraries = [])
+    public static function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
     {
 
         /**

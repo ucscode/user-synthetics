@@ -16,7 +16,7 @@
         Events::exec('@head:before');
 
         # Print Default Scripts
-        echo self::include_libraries('head', $exclude_libraries) . "\n";
+        echo self::include_libraries('head', $exclib, $inclib) . "\n";
 
         # After Default Scripts
         Events::exec('@head:after');
