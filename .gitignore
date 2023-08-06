@@ -1,5 +1,5 @@
 opt/
-uss-modules/*/
-vendor/
-composer.json
-composer.lock
+/uss-modules/*/
+/vendor/
+/composer.json
+/composer.lock
