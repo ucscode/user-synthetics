@@ -796,7 +796,7 @@ class Uss
      *
      * @return void
      */
-    public static function stop(?bool $status, ?string $message = null, ?array $data = [])
+    public static function stop(?bool $status = null, ?string $message = null, ?array $data = [])
     {
         $data = array(
             "status" => (bool)$status,
@@ -805,6 +805,14 @@ class Uss
         );
         $json = json_encode($data);
         exit($json);
+    }
+    
+    public static function die(?bool $status = null, ?string $message = null, ?array $data = []) {
+        self::stop( $status, $message, $data );
+    }
+
+    public static function exit(?bool $status = null, ?string $message = null, ?array $data = []) {
+        self::stop( $status, $message, $data );
     }
 
 
