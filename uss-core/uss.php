@@ -796,20 +796,30 @@ class Uss
      *
      * @return void
      */
-    public static function exit(?string $message = null, ?bool $status = null, ?array $data = [])
-    {
-        $json = '';
-        if( !is_null($status) || !empty($data) ) {
-            $data = array(
-                "status" => (bool)$status,
+    public static function exit(?string $message = null, ?bool $status = null, ?array $data = []) {
+        
+        $args = func_get_args();
+
+        if( empty($args) ) {
+
+            $output = '';
+
+        } else if( count($args) === 1 ) {
+
+            $output = $message;
+
+        } else {
+
+            $output = json_encode([
                 "message" => $message,
+                "status" => (bool)$status,
                 "data" => $data
-            );
-            $json = json_encode($data);
-        } elseif( !is_null($message) ) {
-            $json = $message;
-        }
-        exit($json);
+            ]);
+
+        };
+
+        exit($output);
+
     }
 
     public static function die(?bool $status = null, ?string $message = null, ?array $data = []) {
