@@ -781,14 +781,14 @@ class Uss
      * I Love JSO...
      * I mean, uss platform works great with JSON!
      *
-     * `Uss::stop()` method is the platform way of calling `die()` or `exit()`
+     * `Uss::exit()` method is the platform way of calling `die()` or `exit()`
      * It exits the script and print a json response
      */
 
     /**
      * Exit the script and print a JSON response.
      *
-     * The `Uss::stop()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
+     * The `Uss::exit()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
      *
      * @param bool|null   $status  The status of the response. Set to `true` for a successful response, or `false` for an error response.
      * @param string|null $message A message accompanying the response. It can provide additional information about the status or error.
@@ -798,20 +798,19 @@ class Uss
      */
     public static function exit(?bool $status = null, ?string $message = null, ?array $data = [])
     {
-        $data = array(
-            "status" => (bool)$status,
-            "message" => $message,
-            "data" => $data
-        );
-        $json = json_encode($data);
+        $json = '';
+        if( !is_null($status) ) {
+            $data = array(
+                "status" => (bool)$status,
+                "message" => $message,
+                "data" => $data
+            );
+            $json = json_encode($data);
+        };
         exit($json);
     }
 
     public static function die(?bool $status = null, ?string $message = null, ?array $data = []) {
-        self::exit( $status, $message, $data );
-    }
-
-    public static function stop(?bool $status = null, ?string $message = null, ?array $data = []) {
         self::exit( $status, $message, $data );
     }
 
