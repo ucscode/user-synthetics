@@ -221,7 +221,7 @@ class Uss
                         require_once VIEW_DIR . '/db-conn-failed.php';
                     });
 
-                    exit;
+                    Uss::exit();
 
                 } else {
 
@@ -251,7 +251,7 @@ class Uss
                     require_once VIEW_DIR . "/db-conn-failed.php";
                 });
 
-                exit;
+                Uss::exit();
 
             }
 
@@ -781,7 +781,7 @@ class Uss
      * I Love JSO...
      * I mean, uss platform works great with JSON!
      *
-     * `Uss::exit()` method is the platform way of calling `die()` or `exit()`
+     * `Uss::exit` method is the platform way of calling `die()` or `exit()`
      * It exits the script and print a json response
      */
 
@@ -796,17 +796,19 @@ class Uss
      *
      * @return void
      */
-    public static function exit(?bool $status = null, ?string $message = null, ?array $data = [])
+    public static function exit(?string $message = null, ?bool $status = null, ?array $data = [])
     {
         $json = '';
-        if( !is_null($status) ) {
+        if( !is_null($status) || !empty($data) ) {
             $data = array(
                 "status" => (bool)$status,
                 "message" => $message,
                 "data" => $data
             );
             $json = json_encode($data);
-        };
+        } elseif( !is_null($message) ) {
+            $json = $message;
+        }
         exit($json);
     }
 
