@@ -301,7 +301,7 @@ class Uss
         if(empty($_COOKIE['ussid'])) {
             $time = (new DateTime())->add((new DateInterval("P6M")));
             $_COOKIE['ussid'] = uniqid(Core::keygen(7));
-            setrawcookie('ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/');
+            $setCookie = setrawcookie('ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/');
         };
 
 
