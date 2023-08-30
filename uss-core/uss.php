@@ -675,6 +675,8 @@ class Uss
              */
             call_user_func($func, $match);
 
+            return true;
+
         };
 
     }
