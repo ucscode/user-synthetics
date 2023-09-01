@@ -13,9 +13,7 @@
 
 class Uss
 {
-    /**
-     * @ignore
-     */
+    /** @ignore */
     private static $project_url = 'https://github.com/ucscode/user-synthetics';
 
     /**
@@ -61,15 +59,6 @@ class Uss
     private static bool $viewing = false;
 
     /**
-     * The init property represents the initialization state of the User Synthetics application.
-     * It is a boolean value that indicates whether the application has been initialized.
-     *
-     * @var bool
-     * @ignore
-     */
-    private static bool $init = false;
-
-    /**
      * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
      * These tags can be used for various purposes, such as replacing placeholders in templates or storing additional information.
      *
@@ -77,6 +66,10 @@ class Uss
      * @ignore
      */
     private static array $engineTags = [];
+
+    /** @ignore **/
+    private static $twigLoader;
+    private static $defaultTwigNamespace;
 
     /**
      * Initializes the User Synthetics application.
@@ -91,33 +84,22 @@ class Uss
         define('EVENT_ID', "_");
         define('CONFIG_DIR', CORE_DIR . "/config");
 
-        require_once CONFIG_DIR . "/twig.php";
+        self::$twigLoader = new \Twig\Loader\FilesystemLoader();
+        self::$defaultTwigNamespace = basename(__CLASS__);
+        self::$twigLoader->addPath(VIEW_DIR, self::$defaultTwigNamespace);
+        self::$twigLoader->addPath(VIEW_DIR, '__main__');
+
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
     }
-
-    /*
-     * PRIVATE: [Methods below are not accessible]
-     *
-     * This comment indicates that the methods listed below are private and not intended for external access.
-     *
-     * @category Private
-     * @access private
-     */
-
-
-
-
-
-
 
     /**
      * @ignore
      */
     private static function include_libraries(string $position, ?array $exclib, ?array $inclib)
     {
-        
+
         $libraries = array(
             'head' => array(
                 'bootstrap' => Core::url(ASSETS_DIR . '/css/bootstrap.min.css'),
@@ -142,9 +124,9 @@ class Uss
             )
         );
 
-        if( is_null($exclib) ) {
+        if(is_null($exclib)) {
             # Exclude All;
-            $exclib = array_keys( $libraries[$position] );
+            $exclib = array_keys($libraries[$position]);
             $exclib[] = 'viewport';
         } else {
             # Validate;
@@ -159,7 +141,7 @@ class Uss
         $res_center = "data-rc"; // resource center
         $include = []; // Libraries to include
 
-        $let = function(string $key) use($exclib, $inclib) {
+        $let = function (string $key) use ($exclib, $inclib) {
             $stat = !in_array($key, $exclib) || in_array($key, $inclib);
             return $stat;
         };
@@ -180,15 +162,15 @@ class Uss
             };
             return $script;
         };
-        
+
         foreach($libraries[$position] as $key => $source) {
 
             # Forfeit unwanted script;
-            if( !$let($key) ) {
+            if(!$let($key)) {
                 continue;
             };
 
-            if( !is_array($source) ) {
+            if(!is_array($source)) {
                 # Include single script
                 $include[] = $buildScript($position, $key, $source);
             } else {
@@ -205,9 +187,66 @@ class Uss
     }
 
     /**
-     * Public Methods:
-     * The methods listed below are accessible and can be called from external code.
+     * Register a template directory with Uss
+     *
+     * Modules that intend to use twig template must specify a unique namespace and
+     * the directory that contains their twig template. Then they can render their template
+     * or work with template from other modules using the syntax
+     * ```php
+     *  Uss::render('@namespace/file.html.twig', []);
+     * ```
      */
+    public static function addTwigFilesystem(string $namespace, string $directory)
+    {
+        # Prepare Namespaces
+        $systemBase = strtolower(self::$defaultTwigNamespace);
+        $namespace = strtolower($namespace);
+
+        # Start Comparism
+        if(!preg_match("/\w+/i", $namespace)) {
+            throw new Exception(__METHOD__ . " #(Argument 1); Twig namespace may only contain letter, numbers and underscore");
+        } elseif($namespace === $systemBase) {
+            throw new Exception(__METHOD__ . " #(Argument 1); Use of `{$namespace}` as namespace is not allowed");
+        };
+
+        # Check Uniqueness
+        $namespace = ucfirst($namespace);
+        if(in_array($namespace, self::$twigLoader->getNamespaces())) {
+            throw new Exception(__METHOD__ . " #(Argument 1); `{$namespace}` namespace already exists");
+        };
+
+        # Add Namespace and Directory;
+        self::$twigLoader->addPath($directory, $namespace);
+    }
+
+    /**
+     * Render A Twig Template
+     */
+    public static function render(string $templateFile, array $variables = [])
+    {
+        # Make namespace case insensitive;
+        if(substr($templateFile, 0, 1) === '@') {
+            $split = explode("/", $templateFile);
+            $split[0] = strtolower($split[0]);
+            $split[0][1] = strtoupper($split[0][1]);
+            $templateFile = implode("/", $split);
+        };
+        
+        # Update Variables
+        $variables = array_merge($variables);
+
+        # Load Twig
+        $twig = new \Twig\Environment(self::$twigLoader, [
+            'debug' => true
+        ]);
+
+        # Add Extension
+        $twig->addExtension(new \Twig\Extension\DebugExtension());
+        $twig->addGlobal('Uss', \UssTwig::instance());
+
+        # Render Template
+        echo $twig->render($templateFile, $variables);
+    }
 
     /**
      * Display content on the browser using a fully featured header and footer.
@@ -216,27 +255,14 @@ class Uss
      * By using this method, you are creating a blank page with a doctype declaration, ensuring the availability of necessary resources.
      *
      * @param callable|null $content Optional: A callable that represents the content of the view template.
-     *
      * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
      */
     public static function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
     {
-
-        /**
-         * Check the view status before printing to prevent duplicate rendering.
-         * The `Uss::view()` method will not reprint the user interface onto the browser if it has already been rendered.
-         */
-
         if(is_null($content) || self::$viewing) {
             return self::$viewing;
         }
 
-
-        /**
-         * save platform name to javascript!
-         * accessible throught `uss.platform`
-         */
-        self::console('Platform', PROJECT_NAME);
 
         /**
          * Output Buffering
@@ -331,8 +357,7 @@ class Uss
      */
     public static function route(string $path, callable $controller, $methods = null)
     {
-        $router = new class($path, $controller, $methods) {
-
+        $router = new class ($path, $controller, $methods) {
             # public properties
             public $controller;
 
@@ -346,24 +371,27 @@ class Uss
             private $requestMatch;
             private $backtrace;
 
-            public function __construct($path, $controller, $methods) {
+            public function __construct($path, $controller, $methods)
+            {
                 $this->route = $path;
                 $this->controller = $controller;
                 $this->methods = $methods;
                 $this->configure();
             }
 
-            public function __get($key) {
+            public function __get($key)
+            {
                 return $this->{$key} ?? null;
             }
 
-            private function configure() {
+            private function configure()
+            {
                 $this->filterMethods();
                 $this->resolveRoute();
                 $this->authentic = !in_array(false, $this->authentic);
             }
 
-            protected function filterMethods() 
+            protected function filterMethods()
             {
                 # PHP Default Request Methods
                 $requestMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
@@ -376,14 +404,14 @@ class Uss
                         $this->methods = [$this->methods];
                     };
                 };
-                
+
                 # Map Methods
-                $this->methods = array_map(function($value) {
+                $this->methods = array_map(function ($value) {
                     return is_string($value) ? strtoupper($value) : $value;
                 }, $this->methods);
 
                 # Filter Methods
-                $this->methods = array_unique(array_filter($this->methods, function($value) use($requestMethods) {
+                $this->methods = array_unique(array_filter($this->methods, function ($value) use ($requestMethods) {
                     return in_array($value, $requestMethods);
                 }));
 
@@ -399,33 +427,35 @@ class Uss
             * 	# domain.com/users/profile2 = false
             * });
             */
-            protected function resolveRoute() 
+            protected function resolveRoute()
             {
                 $route = implode(
-                    "/", array_filter(
+                    "/",
+                    array_filter(
                         array_map(
-                            'trim', 
+                            'trim',
                             explode("/", $this->route)
                         )
                     )
                 );
-                
+
                 # The request
                 $this->request = implode("/", Uss::query());
 
                 # Compare the request path to the current URL
                 $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
-                
+
                 /** Execute routing event */
                 $this->debugRouter();
             }
 
-            protected function debugRouter() {
+            protected function debugRouter()
+            {
                 $debugBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                foreach( $debugBacktrace as $key => $currentTrace ) {
-                    if( $key > 255 ) {
+                foreach($debugBacktrace as $key => $currentTrace) {
+                    if($key > 255) {
                         break;
-                    } else if(($currentTrace['class'] ?? null) == Uss::class) {
+                    } elseif(($currentTrace['class'] ?? null) == Uss::class) {
                         if(strtolower($currentTrace['function']) == 'route') {
                             $this->backtrace = $currentTrace;
                         };
@@ -441,7 +471,7 @@ class Uss
         if($router->authentic) {
             # Execute the controller
             call_user_func($router->controller, $router->requestMatch);
-        }; 
+        };
 
         self::$routes[] = $router;
 
@@ -460,8 +490,8 @@ class Uss
     public static function getRouteInventory(bool $authentic = false)
     {
         $routes = self::$routes;
-        if( $authentic ) {
-            $routes = array_filter($routes, function($route) {
+        if($authentic) {
+            $routes = array_filter($routes, function ($route) {
                 return $route->authentic;
             });
         };
@@ -561,15 +591,16 @@ class Uss
      *
      * @return void
      */
-    public static function exit(?string $message = null, ?bool $status = null, ?array $data = []) {
-        
+    public static function exit(?string $message = null, ?bool $status = null, ?array $data = [])
+    {
+
         $args = func_get_args();
 
-        if( empty($args) ) {
+        if(empty($args)) {
 
             $output = '';
 
-        } else if( count($args) === 1 ) {
+        } elseif(count($args) === 1) {
 
             $output = $message;
 
@@ -587,8 +618,9 @@ class Uss
 
     }
 
-    public static function die(?bool $status = null, ?string $message = null, ?array $data = []) {
-        self::exit( $status, $message, $data );
+    public static function die(?bool $status = null, ?string $message = null, ?array $data = [])
+    {
+        self::exit($status, $message, $data);
     }
 
 

@@ -8,5 +8,4 @@ self::$global['tagline'] = "The excellent development tool for future oriented p
 self::$global['copyright'] = ((new DateTime())->format('Y'));
 self::$global['description'] = "Ever thought of how to make your programming life easier in developing website? \nUser Synthetics offers the best solution for a simple programming lifestyle";
 self::$global['website'] = self::$project_url;
-
 self::$global['body.attrs'] = array("class" => 'uss');

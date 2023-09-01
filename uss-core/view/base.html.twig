@@ -2,18 +2,18 @@
 <!doctype html>
 <html>
 <head>
-        <script>const Uss = JSON.parse(atob('{{ console }}'));</script>
+        <script>const Uss = JSON.parse(atob('{{ Uss.attr.console64 }}'));</script>
         {% block head %}
-            {% block head.main %}
+            {% block head_main %}
                 <title>{{ title }}</title>
             {% endblock %}
         {% endblock %}
     </head>
     <body>
         {% block body %}
-            {% block body.before %}{% endblock %}
-            {% block body.main %}{% endblock %}
-            {% block body.after %}{% endblock %}
+            {% block body_before %}{% endblock %}
+            {% block body_main %}{% endblock %}
+            {% block body_after %}{% endblock %}
         {% endblock %}
     </body>
 </html>

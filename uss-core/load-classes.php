@@ -15,7 +15,8 @@ $classResource = [
         "Menufy.php",
         "DOMTable.php",
         "DataMemo.php",
-        "X2Client/X2Client.php"
+        "X2Client/X2Client.php",
+        "UssTwig.php"
     ],
     "external" => [
         "Parsedown.php",

@@ -1,10 +1,9 @@
 <?php
-
 /**
  * Prevent direct access to this file
  * Ensure that it is loaded only by user synthetics system
  */
-(defined("ROOT_DIR") && defined("MOD_DIR")) || die('GREAT! &mdash; GLAD TO SEE YOU ACCESS THIS PAGE ILLEGALLY!');
+defined("MOD_DIR") || die('GREAT! &mdash; GLAD TO SEE YOU ACCESS THIS PAGE ILLEGALLY!');
 
 /**
  * Load Modules
