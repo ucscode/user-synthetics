@@ -9,13 +9,10 @@
  *
  * @package uss
  * @author ucscode
- * @version 2.5.0
  */
 
 class Uss
 {
-    public const VERSION = "2.6.0";
-
     /**
      * @ignore
      */
@@ -31,7 +28,7 @@ class Uss
      * @var array
      */
 
-    public static array $global = array();
+    public static array $global = [];
 
 
     /**
@@ -41,7 +38,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $console = array();
+    private static array $console = [];
 
 
     /**
@@ -54,7 +51,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $focusURLs = array();
+    private static array $routes = [];
 
 
     /**
@@ -85,7 +82,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $engineTags = array();
+    private static array $engineTags = [];
 
 
     /**
@@ -577,107 +574,129 @@ class Uss
      *
      * @page Get Focus Method
      * @param string $path The regular expression path to match against the URL
-     * @param callable $func The function to be called if the URL matches the expression
+     * @param callable $controller The function to be called if the URL matches the expression
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public static function route(string $path, callable $func, $request = null)
+    public static function route(string $path, callable $controller, $methods = null, bool $override = false)
     {
+        $router = new class($path, $controller, $methods, $override) {
 
-        if( is_string($request) || is_null($request) ) {
+            # public properties
+            public $controller;
 
-            # Convert to array;
-            $request = [$request];
+            # protected properties
+            protected $request;
+            protected $route;
+            protected $methods;
 
-        } else if( !is_array($request) ) {
+            # private properties
+            private $authentic = [];
+            private $requestMatch;
+            private $override;
+            private $backtrace;
 
-            $type = gettype($request);
-            throw new TypeError( __METHOD__ . "(): Argument #3 (\$request) must be a type string or array, {$type} given" );
+            public function __construct($path, $controller, $methods, $override) {
+                $this->route = $path;
+                $this->controller = $controller;
+                $this->methods = $methods;
+                $this->override = $override;
+                $this->configure();
+            }
 
-        };
+            public function __get($key) {
+                return $this->{$key} ?? null;
+            }
 
-        # Trim & Capitalize
+            private function configure() {
+                $this->filterMethods();
+                $this->resolveRoute();
+                $this->authentic = !in_array(false, $this->authentic);
+            }
 
-        array_walk_recursive($request, function(&$value) {
-            if( !is_null($value) && is_scalar($value) ) {
-                $value = strtoupper( trim($value) );
-            };
-        });
+            protected function filterMethods() 
+            {
+                # PHP Default Request Methods
+                $requestMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
 
-        # Get only valid request like "GET", "POST", "PUT", ...
+                # Configure Methods
+                if(!is_array($this->methods)) {
+                    if(is_null($this->methods)) {
+                        $this->methods = $requestMethods;
+                    } else {
+                        $this->methods = [$this->methods];
+                    };
+                };
+                
+                # Map Methods
+                $this->methods = array_map(function($value) {
+                    return is_string($value) ? strtoupper($value) : $value;
+                }, $this->methods);
 
-        $request = array_filter($request, function($value) {
-            return is_string($value) || is_null($value);
-        });
+                # Filter Methods
+                $this->methods = array_unique(array_filter($this->methods, function($value) use($requestMethods) {
+                    return in_array($value, $requestMethods);
+                }));
 
-        # Validate Request Method
-        
-        if(!(in_array($_SERVER['REQUEST_METHOD'], $request) || in_array(NULL, $request))) {
-            return;
-        }
-
-        /**
-         * Further Example:
-         * ```php
-         * Uss::route( "users/profile", function() {
-         * 	/*
-         * 		This closure will work only if domain name is directly followed by `users/profile`
-         * 		# domain.com/users/profile - [ will work ]
-         * 		# domain.com/user/profile - [ will not work ]
-         * 		# domain.com/users/profile2 - [ will not work ]
-         *  {@*}
-         * });
-         *```
-        */
-        $focus = implode("/", array_filter(array_map('trim', explode("/", $path))));
-        $query = implode("/", self::query());
-
-        /**
-         * Check if they match;
-         * Test for regular expression of the Path
-         * The request is automatically made case insensitive
-         */
-        $expression = '~^' . $focus . '$~i';
-
-        /**
-         * Compare the focus path to the current URL
-         */
-        if(preg_match($expression, $query, $match)) {
-
-            /**
-             * If the expression matches,
-             * Save the focus string into the @var focusURLs.
-             * *Useful for backtracing and debugging*
-            */
-
-            $key = array_search(__FUNCTION__, array_column(debug_backtrace(), 'function'));
-
-            $trace = debug_backtrace()[ $key ];
-
-            self::$focusURLs[] = array(
-                "router" => $focus,
-                "file" => $trace['file'],
-                "line" => $trace['line'],
-                "callable" => &$func
-            );
-
-            /**
-             * The :{focused} event can be used to trap a focus to modify the output
-             */
-            Events::exec(':{routing}', end(self::$focusURLs));
-
-            if(empty($func) || !is_callable($func)) {
-                return;
+                # Resolve Method
+                $this->authentic[] = in_array($_SERVER['REQUEST_METHOD'], $this->methods);
             }
 
             /**
-             * Execute the callable
-             */
-            call_user_func($func, $match);
+            * Uss::route( "users/profile", function() {
+            * 	This closure will work only if domain name is directly followed by `users/profile`
+            * 	# domain.com/users/profile = true
+            * 	# domain.com/user/profile = false
+            * 	# domain.com/users/profile2 = false
+            * });
+            */
+            protected function resolveRoute() 
+            {
+                $route = implode(
+                    "/", array_filter(
+                        array_map(
+                            'trim', 
+                            explode("/", $this->route)
+                        )
+                    )
+                );
+                
+                # The request
+                $this->request = implode("/", Uss::query());
 
-            return true;
+                # Compare the request path to the current URL
+                $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
+                
+                /** Execute routing event */
+                $this->debugRouter();
+            }
+
+            protected function debugRouter() {
+                $debugBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+                foreach( $debugBacktrace as $key => $currentTrace ) {
+                    if( $key > 255 ) {
+                        break;
+                    } else if(($currentTrace['class'] ?? null) == Uss::class) {
+                        if(strtolower($currentTrace['function']) == 'route') {
+                            $this->backtrace = $currentTrace;
+                        };
+                    };
+                };
+            }
 
         };
+
+        # The @route.routed event can be used to modify any controller output
+        Events::exec('@route.routed', ['router' => $router]);
+
+        if($router->authentic) {
+            # Execute the controller
+            call_user_func($router->controller, $router->requestMatch);
+        }; 
+
+        self::$routes[] = $router;
+
+        return $router->authentic ? $router : false;
 
     }
 
@@ -689,40 +708,35 @@ class Uss
      * @param bool $expr Optional: Whether to return the list of focus expressions or just the current focus expression. Default is `false`.
      * @return string|array|null The current focus expression, an array of focus expressions and their corresponding URLs, or `null` if no focus expressions are set
     */
-    public static function getRoute(bool $expr = false)
+    public static function getRouteInventory(bool $authentic = false)
     {
-        if($expr) {
-            return self::$focusURLs;
-        }
-        if(!empty(self::$focusURLs)) {
-            $focus = end(self::$focusURLs);
-            return $focus['router'];
+        $routes = self::$routes;
+        if( $authentic ) {
+            $routes = array_filter($routes, function($route) {
+                return $route->authentic;
+            });
         };
+        return $routes;
     }
 
 
     /**
-     * Retrieve URL query path segments.
+     * Retrieve URL request path segments.
      *
-     * This method splits the URL query string into individual segments and returns them as an array. The method also accepts an optional integer argument that specifies the index of the segment to retrieve or extract. If the index is out of range, it returns `null`.
+     * This method splits the URL request string into individual segments and returns them as an array. The method also accepts an optional integer argument that specifies the index of the segment to retrieve or extract. If the index is out of range, it returns `null`.
      *
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
-     * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the query string is not set.
+     * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
     public static function query(?int $index = null)
     {
-
-        $DOCUMENT_ROOT = Core::rslash($_SERVER['DOCUMENT_ROOT']);
-        $PROJECT_ROOT = Core::rslash(ROOT_DIR);
-
-        $REQUEST_URI = explode("?", $_SERVER['REQUEST_URI']);
-        $PATH = $REQUEST_URI[0] ?? '';
-
-        $PATH = str_replace($PROJECT_ROOT, '', $DOCUMENT_ROOT . $PATH);
-        $QUERY = array_values(array_filter(array_map('trim', explode("/", $PATH))));
-
-        return is_numeric($index) ? ($QUERY[$index] ?? null) : $QUERY;
-
+        $documentRoot = Core::rslash($_SERVER['DOCUMENT_ROOT']);
+        $projectRoot = Core::rslash(ROOT_DIR);
+        $requestUri = explode("?", $_SERVER['REQUEST_URI']);
+        $path = $requestUri[0] ?? '';
+        $path = str_replace($projectRoot, '', $documentRoot . $path);
+        $request = array_values(array_filter(array_map('trim', explode("/", $path))));
+        return is_numeric($index) ? ($request[$index] ?? null) : $request;
     }
 
 
