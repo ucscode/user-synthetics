@@ -578,9 +578,9 @@ class Uss
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public static function route(string $path, callable $controller, $methods = null, bool $override = false)
+    public static function route(string $path, callable $controller, $methods = null)
     {
-        $router = new class($path, $controller, $methods, $override) {
+        $router = new class($path, $controller, $methods) {
 
             # public properties
             public $controller;
@@ -593,14 +593,12 @@ class Uss
             # private properties
             private $authentic = [];
             private $requestMatch;
-            private $override;
             private $backtrace;
 
-            public function __construct($path, $controller, $methods, $override) {
+            public function __construct($path, $controller, $methods) {
                 $this->route = $path;
                 $this->controller = $controller;
                 $this->methods = $methods;
-                $this->override = $override;
                 $this->configure();
             }
 
