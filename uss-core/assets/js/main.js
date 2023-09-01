@@ -71,9 +71,9 @@ new class {
 			------------------------------------------
 			Backend Sample:
 			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			Uss::console( '@toastr.error[name]', "Error Text" );
-			Uss::console( '@toastr.error[name2]', "Error Text 2" );
-			Uss::console( '@toastr.success[name]', "Success Text" );
+			Uss::instance()->console( '@toastr.error[name]', "Error Text" );
+			Uss::instance()->console( '@toastr.error[name2]', "Error Text 2" );
+			Uss::instance()->console( '@toastr.success[name]', "Success Text" );
 		*/
 		let timeout = 0;
 		Object.keys(Uss).forEach(function(key) {

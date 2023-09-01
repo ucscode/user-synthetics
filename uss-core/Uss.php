@@ -13,8 +13,16 @@
 
 class Uss
 {
+    /**
+     * An instance of the Uss class
+     * 
+     * This will always be returned when Uss::instance() is called
+     * @var Uss
+     */
+    private static $instance;
+
     /** @ignore */
-    private static $project_url = 'https://github.com/ucscode/user-synthetics';
+    private  $project_url = 'https://github.com/ucscode/user-synthetics';
 
     /**
      * Global storage container for User Synthetics application.
@@ -24,7 +32,7 @@ class Uss
      *
      * @var array
      */
-    public static array $global = [];
+    public  array $global = [];
 
 
     /**
@@ -34,7 +42,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $console = [];
+    private  array $console = [];
 
     /**
      * A container for preserving focused expressions
@@ -46,7 +54,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $routes = [];
+    private  array $routes = [];
 
     /**
      * The viewing property indicates whether the User Synthetics application is currently in a viewing state.
@@ -56,7 +64,7 @@ class Uss
      * @var bool
      * @ignore
      */
-    private static bool $viewing = false;
+    private  bool $viewing = false;
 
     /**
      * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
@@ -65,11 +73,11 @@ class Uss
      * @var array
      * @ignore
      */
-    private static array $engineTags = [];
+    private  array $engineTags = [];
 
     /** @ignore **/
-    private static $twigLoader;
-    private static $defaultTwigNamespace;
+    private  $twigLoader;
+    private  $defaultTwigNamespace;
 
     /**
      * Initializes the User Synthetics application.
@@ -79,15 +87,15 @@ class Uss
      * @return void
      * @ignore
      */
-    public static function __configure()
+    private function __construct()
     {
         define('EVENT_ID', "_");
         define('CONFIG_DIR', CORE_DIR . "/config");
 
-        self::$twigLoader = new \Twig\Loader\FilesystemLoader();
-        self::$defaultTwigNamespace = basename(__CLASS__);
-        self::$twigLoader->addPath(VIEW_DIR, self::$defaultTwigNamespace);
-        self::$twigLoader->addPath(VIEW_DIR, '__main__');
+        $this->twigLoader = new \Twig\Loader\FilesystemLoader();
+        $this->defaultTwigNamespace = basename(__CLASS__);
+        $this->twigLoader->addPath(VIEW_DIR, $this->defaultTwigNamespace);
+        $this->twigLoader->addPath(VIEW_DIR, '__main__');
 
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
@@ -95,9 +103,23 @@ class Uss
     }
 
     /**
+     * Singleton
+     *
+     * Uss class becomes an Object that can only be instantiated once but accessible globally
+     * @ignore
+     * @return self
+     */
+    public static function instance() {
+        if(self::$instance === null) {
+            self::$instance = new self();
+        };
+        return self::$instance;
+    }
+
+    /**
      * @ignore
      */
-    private static function include_libraries(string $position, ?array $exclib, ?array $inclib)
+    private  function include_libraries(string $position, ?array $exclib, ?array $inclib)
     {
 
         $libraries = array(
@@ -193,13 +215,13 @@ class Uss
      * the directory that contains their twig template. Then they can render their template
      * or work with template from other modules using the syntax
      * ```php
-     *  Uss::render('@namespace/file.html.twig', []);
+     *  Uss::instance()->render('@namespace/file.html.twig', []);
      * ```
      */
-    public static function addTwigFilesystem(string $namespace, string $directory)
+    public  function addTwigFilesystem(string $namespace, string $directory)
     {
         # Prepare Namespaces
-        $systemBase = strtolower(self::$defaultTwigNamespace);
+        $systemBase = strtolower($this->defaultTwigNamespace);
         $namespace = strtolower($namespace);
 
         # Start Comparism
@@ -211,18 +233,18 @@ class Uss
 
         # Check Uniqueness
         $namespace = ucfirst($namespace);
-        if(in_array($namespace, self::$twigLoader->getNamespaces())) {
+        if(in_array($namespace, $this->twigLoader->getNamespaces())) {
             throw new Exception(__METHOD__ . " #(Argument 1); `{$namespace}` namespace already exists");
         };
 
         # Add Namespace and Directory;
-        self::$twigLoader->addPath($directory, $namespace);
+        $this->twigLoader->addPath($directory, $namespace);
     }
 
     /**
      * Render A Twig Template
      */
-    public static function render(string $templateFile, array $variables = [])
+    public  function render(string $templateFile, array $variables = [])
     {
         # Make namespace case insensitive;
         if(substr($templateFile, 0, 1) === '@') {
@@ -236,7 +258,7 @@ class Uss
         $variables = array_merge($variables);
 
         # Load Twig
-        $twig = new \Twig\Environment(self::$twigLoader, [
+        $twig = new \Twig\Environment($this->twigLoader, [
             'debug' => true
         ]);
 
@@ -257,10 +279,10 @@ class Uss
      * @param callable|null $content Optional: A callable that represents the content of the view template.
      * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
      */
-    public static function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
+    public  function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
     {
-        if(is_null($content) || self::$viewing) {
-            return self::$viewing;
+        if(is_null($content) || $this->viewing) {
+            return $this->viewing;
         }
 
 
@@ -323,7 +345,7 @@ class Uss
          *
          */
 
-        $output = Core::replace_var(ob_get_clean(), self::$engineTags);
+        $output = Core::replace_var(ob_get_clean(), $this->engineTags);
 
 
         # OUTPUT THE CONTENT!
@@ -337,7 +359,7 @@ class Uss
 
         # CHANGE THE VIEW STATUS;
 
-        self::$viewing = true;
+        $this->viewing = true;
 
     }
 
@@ -355,7 +377,7 @@ class Uss
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public static function route(string $path, callable $controller, $methods = null)
+    public  function route(string $path, callable $controller, $methods = null)
     {
         $router = new class ($path, $controller, $methods) {
             # public properties
@@ -420,7 +442,7 @@ class Uss
             }
 
             /**
-            * Uss::route( "users/profile", function() {
+            * Uss::instance()->route( "users/profile", function() {
             * 	This closure will work only if domain name is directly followed by `users/profile`
             * 	# domain.com/users/profile = true
             * 	# domain.com/user/profile = false
@@ -440,7 +462,7 @@ class Uss
                 );
 
                 # The request
-                $this->request = implode("/", Uss::query());
+                $this->request = implode("/", Uss::instance()->query());
 
                 # Compare the request path to the current URL
                 $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
@@ -455,7 +477,7 @@ class Uss
                 foreach($debugBacktrace as $key => $currentTrace) {
                     if($key > 255) {
                         break;
-                    } elseif(($currentTrace['class'] ?? null) == Uss::class) {
+                    } elseif(($currentTrace['class'] ?? null) == Uss::instance()::class) {
                         if(strtolower($currentTrace['function']) == 'route') {
                             $this->backtrace = $currentTrace;
                         };
@@ -466,14 +488,14 @@ class Uss
         };
 
         # The @route.routed event can be used to modify any controller output
-        Events::exec('@route.routed', ['router' => $router]);
+        Events::instance()->exec('@route.routed', ['router' => $router]);
 
         if($router->authentic) {
             # Execute the controller
             call_user_func($router->controller, $router->requestMatch);
         };
 
-        self::$routes[] = $router;
+        $this->routes[] = $router;
 
         return $router->authentic ? $router : false;
 
@@ -482,14 +504,14 @@ class Uss
     /**
      * Get the current focus expression or list of focus expressions.
      *
-     * This method retrieves the current focus expression that has been set using the `Uss::route()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
+     * This method retrieves the current focus expression that has been set using the `Uss::instance()->route()` method. The focus expression represents the URL path pattern on which a specific function is executed. If the `$expr` parameter is set to `true`, an array of all focus expressions and their corresponding URLs will be returned. Otherwise, if the `$expr` parameter is `false` or not provided, only the current focus expression will be returned.
      *
      * @param bool $expr Optional: Whether to return the list of focus expressions or just the current focus expression. Default is `false`.
      * @return string|array|null The current focus expression, an array of focus expressions and their corresponding URLs, or `null` if no focus expressions are set
     */
-    public static function getRouteInventory(bool $authentic = false)
+    public  function getRouteInventory(bool $authentic = false)
     {
-        $routes = self::$routes;
+        $routes = $this->routes;
         if($authentic) {
             $routes = array_filter($routes, function ($route) {
                 return $route->authentic;
@@ -507,7 +529,7 @@ class Uss
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
      * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
-    public static function query(?int $index = null)
+    public  function query(?int $index = null)
     {
         $documentRoot = Core::rslash($_SERVER['DOCUMENT_ROOT']);
         $projectRoot = Core::rslash(ROOT_DIR);
@@ -522,13 +544,13 @@ class Uss
     /**
      * Generate a one-time security token.
      *
-     * The `Uss::nonce()` method generates a one-time security token based on a secret input and the current session ID. This token can be used for secure operations, such as verifying the authenticity of requests. To verify a token, simply provide it as the second argument when invoking the method.
+     * The `Uss::instance()->nonce()` method generates a one-time security token based on a secret input and the current session ID. This token can be used for secure operations, such as verifying the authenticity of requests. To verify a token, simply provide it as the second argument when invoking the method.
      *
      * @param string $input The secret input used to generate the token. Defaults to '1' if not provided.
      * @param string|null $token The token to verify. If not provided, a new token is generated.
      * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
      */
-    public static function nonce($input = '1', ?string $token = null)
+    public  function nonce($input = '1', ?string $token = null)
     {
 
         // generate a new session_id;
@@ -576,14 +598,14 @@ class Uss
      * I Love JSO...
      * I mean, uss platform works great with JSON!
      *
-     * `Uss::exit` method is the platform way of calling `die()` or `exit()`
+     * `Uss::instance()->exit` method is the platform way of calling `die()` or `exit()`
      * It exits the script and print a json response
      */
 
     /**
      * Exit the script and print a JSON response.
      *
-     * The `Uss::exit()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
+     * The `Uss::instance()->exit()` method is used to terminate the script execution and return a JSON response. This method is particularly useful when handling AJAX requests and returning structured data.
      *
      * @param bool|null   $status  The status of the response. Set to `true` for a successful response, or `false` for an error response.
      * @param string|null $message A message accompanying the response. It can provide additional information about the status or error.
@@ -591,7 +613,7 @@ class Uss
      *
      * @return void
      */
-    public static function exit(?string $message = null, ?bool $status = null, ?array $data = [])
+    public  function exit(?string $message = null, ?bool $status = null, ?array $data = [])
     {
 
         $args = func_get_args();
@@ -618,7 +640,7 @@ class Uss
 
     }
 
-    public static function die(?bool $status = null, ?string $message = null, ?array $data = [])
+    public  function die(?bool $status = null, ?string $message = null, ?array $data = [])
     {
         self::exit($status, $message, $data);
     }
@@ -627,7 +649,7 @@ class Uss
     /**
      * Pass a variable from PHP to JavaScript.
      *
-     * The `Uss::console()` method facilitates the transfer of data from PHP to JavaScript in a convenient manner.
+     * The `Uss::instance()->console()` method facilitates the transfer of data from PHP to JavaScript in a convenient manner.
      * It provides different functionalities based on the arguments passed:
      *
      * - If the first argument is `NULL`, it returns an array containing the list of data that will be forwarded to the browser.
@@ -641,35 +663,35 @@ class Uss
      *
      * @return mixed If no key is specified, an array of data to be forwarded to the browser. If a key is provided, the associated value is returned.
      */
-    public static function console(?string $key = null)
+    public  function console(?string $key = null)
     {
         // accepts 2 arguments
         if(is_null($key)) {
-            return self::$console;
+            return $this->console;
         }
         $key = trim($key);
         $args = func_get_args();
         if(count($args) === 1) {
-            return self::$console[ $key ] ?? null;
+            return $this->console[ $key ] ?? null;
         }
-        self::$console[ $key ] = $args[1];
+        $this->console[ $key ] = $args[1];
     }
 
 
     /**
      * Remove a value from the list of console data.
      *
-     * The `Uss::remove_console()` method allows you to remove a specific value from the console data list.
+     * The `Uss::instance()->remove_console()` method allows you to remove a specific value from the console data list.
      *
      * @param string $key The key or identifier of the value to be removed from the console data.
      *
      * @return mixed The value that was removed, or `null` if the key does not exist.
      */
-    public static function remove_console(string $key)
+    public  function remove_console(string $key)
     {
-        if(isset(self::$console[$key])) {
-            $value = self::$console[ $key ];
-            unset(self::$console[ $key ]);
+        if(isset($this->console[$key])) {
+            $value = $this->console[ $key ];
+            unset($this->console[ $key ]);
             return $value;
         }
     }
@@ -677,7 +699,7 @@ class Uss
     /**
      * Assign and update template tag values in user synthetics.
      *
-     * The `Uss::tag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
+     * The `Uss::instance()->tag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
      *
      * When encountering a tag, the method checks the `engineTags` list to find a matching key. If a match is found, the tag is replaced with the corresponding string value. Otherwise, the tag is replaced with an empty string.
      *
@@ -687,32 +709,32 @@ class Uss
      *
      * @return string|null If $key is set to `null`, an array containing a list of all tags. Otherwise, returns the value of the specified tag or `null` if the tag doesn't exist.
      */
-    public static function tag(?string $key, ?string $value = null, bool $overwrite = true)
+    public  function tag(?string $key, ?string $value = null, bool $overwrite = true)
     {
 
         if(is_null($key)) {
-            return self::$engineTags;
+            return $this->engineTags;
         }
 
         if(!array_key_exists(1, func_get_args())) {
-            return (self::$engineTags[ $key ] ?? null);
+            return ($this->engineTags[ $key ] ?? null);
         }
 
         // Try not to overwrite an existing tag;
-        if(!$overwrite && array_key_exists($key, self::$engineTags)) {
+        if(!$overwrite && array_key_exists($key, $this->engineTags)) {
             return;
         }
 
         if(is_null($value)) {
             // remove an existing tag
-            if(array_key_exists($key, self::$engineTags)) {
-                unset(self::$engineTags[$key]);
+            if(array_key_exists($key, $this->engineTags)) {
+                unset($this->engineTags[$key]);
             };
             return;
         };
 
         // Assign a new tag
-        self::$engineTags[$key] = $value;
+        $this->engineTags[$key] = $value;
     }
 
 };
@@ -723,4 +745,4 @@ class Uss
     NOW! LET'S INITIALIZE IT!
 */
 
-Uss::__configure();
+Uss::instance();

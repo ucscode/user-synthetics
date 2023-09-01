@@ -56,4 +56,4 @@ foreach($directories as $sysIter) {
  * Therefore, modules that rely on features of other modules should add a listener to the "modules-loaded" event.
  * This ensures that all features of the parent module are available for use before execution.
  */
-Events::exec("modules:loaded");
+Events::instance()->exec("modules:loaded");

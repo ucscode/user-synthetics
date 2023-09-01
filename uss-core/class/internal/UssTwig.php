@@ -9,8 +9,8 @@ class UssTwig {
     public array $attr = [];
 
     private function __construct() {
-        Uss::console('platform', PROJECT_NAME);
-        $this->setAttr('console64', base64_encode(json_encode(Uss::console())));
+        Uss::instance()->console('platform', PROJECT_NAME);
+        $this->setAttr('console64', base64_encode(json_encode(Uss::instance()->console())));
     }
 
     public static function instance() {

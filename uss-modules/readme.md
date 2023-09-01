@@ -11,11 +11,11 @@ That's it! You can now write your code within the `index.php` file of your modul
 ```php
 // Focus on the home page
 
-Uss::route('', function() {
+Uss::instance()->route('', function() {
 
     // Render HTML Document
 
-    Uss::view(function() {
+    Uss::instance()->view(function() {
 
         // Print your HTML Content
 

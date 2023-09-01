@@ -9,20 +9,20 @@
 	<?php
 
         # Pass variables from PHP to JavaScript environment
-        $console = base64_encode(json_encode((object)self::$console));
+        $console = base64_encode(json_encode((object)$this->console));
         echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";
 
         # Before Default Scripts
-        Events::exec('@head:before');
+        Events::instance()->exec('@head:before');
 
         # Print Default Scripts
         echo self::include_libraries('head', $exclib, $inclib) . "\n";
 
         # After Default Scripts
-        Events::exec('@head:after');
+        Events::instance()->exec('@head:after');
 
         # Set Body Attributes;
-        $bodyAttrs = Core::array_to_html_attrs( Uss::$global['body.attrs'] );
+        $bodyAttrs = Core::array_to_html_attrs( Uss::instance()->$global['body.attrs'] );
 
     ?>
 
@@ -32,5 +32,5 @@
 	
     <?php 
         # Before Body Content
-        Events::exec("@body:before"); 
+        Events::instance()->exec("@body:before"); 
     ?>

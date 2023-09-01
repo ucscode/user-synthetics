@@ -19,23 +19,23 @@ if(DB_CONNECT) {
 
     try {
 
-        self::$global['mysqli'] = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $this->global['mysqli'] = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
-        if(self::$global['mysqli']->connect_errno) {
+        if($this->global['mysqli']->connect_errno) {
 
-            self::tag('connect_error', self::$global['mysqli']->connect_error);
+            self::tag('connect_error', $this->global['mysqli']->connect_error);
 
             self::view(function () {
                 require_once VIEW_DIR . '/db-conn-failed.php';
             });
 
-            Uss::exit();
+            Uss::instance()->exit();
 
         } else {
 
-            $__options = new Pairs(self::$global['mysqli'], DB_TABLE_PREFIX . "_options");
+            $__options = new Pairs($this->global['mysqli'], DB_TABLE_PREFIX . "_options");
 
-            self::$global['options'] = $__options;
+            $this->global['options'] = $__options;
 
         };
 
@@ -47,10 +47,10 @@ if(DB_CONNECT) {
             require_once VIEW_DIR . "/db-conn-failed.php";
         });
 
-        Uss::exit();
+        Uss::instance()->exit();
 
     }
 
 } else {
-    self::$global['mysqli'] = self::$global['options'] = null;
+    $this->global['mysqli'] = $this->global['options'] = null;
 }

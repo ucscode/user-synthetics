@@ -2,4 +2,4 @@
 
 defined('CONFIG_DIR') || DIE;
 
-Uss::addTwigFilesystem('Uss', __DIR__);
+Uss::instance()->addTwigFilesystem('Uss', __DIR__);

@@ -2,7 +2,7 @@
 
 <div class='px-3 py-2 my-2 text-center'>
 
-	<img class='d-block mx-auto mb-4' src='<?php echo self::$global['icon']; ?>' alt='user synthetics logo' height='76'>
+	<img class='d-block mx-auto mb-4' src='<?php echo $this->global['icon']; ?>' alt='user synthetics logo' height='76'>
 	
 	<h1 class='display-6 fw-light mb-2'>Database Connection Failed</h1>
 	
@@ -33,7 +33,7 @@
 		</div>
 		
 		<div class='mb-2'>
-			<div class='mb-1'> Powered By <a href='<?php echo self::$project_url; ?>' target='_blank'><?php echo PROJECT_NAME; ?></a> </div> 
+			<div class='mb-1'> Powered By <a href='<?php echo $this->project_url; ?>' target='_blank'><?php echo PROJECT_NAME; ?></a> </div> 
 			<div>&copy; 2022</div>
 		</div>
 		

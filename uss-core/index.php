@@ -19,11 +19,11 @@ require_once CORE_DIR . "/load-modules.php";
  * In the absence of routing, a 404 error page will be rendered
  * The display of 404 error page is carried out by the index page!
 */
-if(empty(Uss::getRouteInventory(true)) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    Uss::render('@Uss/error_404.html.twig');
+if(empty(Uss::instance()->getRouteInventory(true)) && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    Uss::instance()->render('@Uss/error_404.html.twig');
 };
 
 # close database connection;
-if(Uss::$global['mysqli'] instanceof MYSQLI) {
-    Uss::$global['mysqli']->close();
+if(Uss::instance()->global['mysqli'] instanceof MYSQLI) {
+    Uss::instance()->global['mysqli']->close();
 }

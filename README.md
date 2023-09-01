@@ -87,7 +87,7 @@ While this is not a formal recommendation, it can be useful for defining or iden
 Consider the following code snippet in PHP:
 
 ```php
-Events::addListener('uss:pages/users@nav.dropdown', ...);
+Events::instance()->addListener('uss:pages/users@nav.dropdown', ...);
 ```
 
 The event name `uss:pages/users@nav.dropdown` can be broken down as follows:
