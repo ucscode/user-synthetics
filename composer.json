@@ -1,6 +1,7 @@
 {
     "require": {
         "pedroborges/meta-tags": "^0.0.2",
-        "twig/twig": "^3.0"
+        "twig/twig": "^3.0",
+        "erusev/parsedown-extra": "^0.8.1"
     }
 }

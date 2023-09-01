@@ -1,0 +1,19 @@
+{# The base template of user synthetics #}
+<!doctype html>
+<html>
+<head>
+        <script>const Uss = JSON.parse(atob('{{ console }}'));</script>
+        {% block head %}
+            {% block head.main %}
+                <title>{{ title }}</title>
+            {% endblock %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            {% block body.before %}{% endblock %}
+            {% block body.main %}{% endblock %}
+            {% block body.after %}{% endblock %}
+        {% endblock %}
+    </body>
+</html>

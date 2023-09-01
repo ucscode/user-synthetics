@@ -41,3 +41,11 @@ define("VIEW_DIR", CORE_DIR . '/view');
  * Defines the directory that contain class files which empowers user synthetics
  */
 define("CLASS_DIR", CORE_DIR . '/class');
+
+/**
+ * Verify PHP Version!
+ *
+ * User Synthetics requires at least PHP 7.4 to run properly
+ * @ignore
+ */
+define('MIN_PHP_VERSION', 7.4);
