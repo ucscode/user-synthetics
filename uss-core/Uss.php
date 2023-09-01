@@ -18,7 +18,6 @@ class Uss
      */
     private static $project_url = 'https://github.com/ucscode/user-synthetics';
 
-
     /**
      * Global storage container for User Synthetics application.
      *
@@ -27,7 +26,6 @@ class Uss
      *
      * @var array
      */
-
     public static array $global = [];
 
 
@@ -39,7 +37,6 @@ class Uss
      * @ignore
      */
     private static array $console = [];
-
 
     /**
      * A container for preserving focused expressions
@@ -53,7 +50,6 @@ class Uss
      */
     private static array $routes = [];
 
-
     /**
      * The viewing property indicates whether the User Synthetics application is currently in a viewing state.
      *
@@ -64,7 +60,6 @@ class Uss
      */
     private static bool $viewing = false;
 
-
     /**
      * The init property represents the initialization state of the User Synthetics application.
      * It is a boolean value that indicates whether the application has been initialized.
@@ -73,7 +68,6 @@ class Uss
      * @ignore
      */
     private static bool $init = false;
-
 
     /**
      * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
@@ -84,7 +78,6 @@ class Uss
      */
     private static array $engineTags = [];
 
-
     /**
      * Initializes the User Synthetics application.
      * This method is responsible for performing essential initialization tasks, such as connecting to the database,
@@ -93,68 +86,16 @@ class Uss
      * @return void
      * @ignore
      */
-    public static function __init()
+    public static function __configure()
     {
-
-        // If the USS has been initialized, ignore the call to this method;
-
-        if(self::$init) {
-            return;
-        }
-
-        /**
-         * User Synthetics is primarily built upon events, and the priority of an event is determined by its event ID.
-         * This docblock provides insights into the event priority system and guidelines for module developers.
-         *
-         * ## Event Priority Usage
-         *
-         * User Synthetics has chosen `_` as its default event ID.
-         * However, to ensure proper execution order and prevent conflicts, follow these guidelines:
-         *
-         * - Modules that need to execute **before** any default USS events should use event IDs starting with "Negative Numbers" or "Upper Case" Characters.
-         * - Modules that need to execute **after** the default USS events should use event IDs starting with "Positive Numbers" or "Lower Case" Characters.
-         * - Modules that want to **override** the default USS event should use the same event ID as that of USS.
-         *
-         * By following these guidelines, modules can effectively prepend, append, or overwrite USS default events to customize the behavior of User Synthetics.
-         *
-         * @param string $eventID The event ID indicating the priority of the event.
-         * @return void
-         */
         define('EVENT_ID', "_");
+        define('CONFIG_DIR', CORE_DIR . "/config");
 
-
-        /**
-         * Prepare the essential variables required for the formation of user synthetics;
-         * These variables may be overridden by other modules
-         */
-        self::__vars();
-
-
-        /**
-         * Establishes a database connection.
-         * The connection file `conn.php` is used to establish the database connection.
-         * If the `DB_CONNECT` constant is set to `false`, the database connection will be ignored.
-         */
-        self::__connect();
-
-
-        /**
-         * Initializes the session.
-         * Sessions are highly significant in PHP and provide important functionality.
-         * Although cookies are great, PHP sessions offer additional capabilities.
-         * Don't like sessions? Then you should consider deleting User Synthetics (just kidding!).
-         */
-        self::__session();
-
-
-        /**
-         * Marks the end of the initialization process.
-         * This signifies the completion of the initialization phase.
-         */
-        self::$init = true;
-
+        require_once CONFIG_DIR . "/twig.php";
+        require_once CONFIG_DIR . "/database.php";
+        require_once CONFIG_DIR . "/variables.php";
+        require_once CONFIG_DIR . "/session.php";
     }
-
 
     /*
      * PRIVATE: [Methods below are not accessible]
@@ -166,200 +107,10 @@ class Uss
      */
 
 
-    /**
-     * Connect to the database.
-     *
-     * This method establishes a connection to the database using the credentials defined in the `conn.php` file.
-     * If the `DB_CONNECT` constant is set to `false`, the database connection will be ignored.
-     *
-     * @category Database
-     * @access private
-     *
-     * @return void
-     * @ignore
-     */
-    private static function __connect()
-    {
-
-        # Now! Let's setup DataBase Connection!
-
-        if(DB_CONNECT) {
-
-            /**
-             * Save MYSQLI Instance into `Uss::$global` property.
-             *
-             * This proccess assigns the MYSQLI instance to the `Uss::$global` property, allowing easy access to the database connection throughout the User Synthetics system.
-             *
-             * Please note that if you are using **PHP Data Object** (PDO) connection instead of MYSQLI, you will need to declare your own connection inside your module using the appropriate syntax.
-             *
-             * Example for PDO connection:
-             *
-             * ```php
-             * Uss::$global['pdo'] = new PDO('mysql:host=localhost;dbname=test', $user, $pass);
-             * ```
-             */
-
-            try {
-
-                self::$global['mysqli'] = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-                // if database connection fails;
-
-                if(self::$global['mysqli']->connect_errno) {
-
-                    /**
-                     * Display error message;
-                     * Applicable to PHP 7.4
-                     */
-
-                    self::tag('connect_error', self::$global['mysqli']->connect_error);
-
-                    self::view(function () {
-                        require_once VIEW_DIR . '/db-conn-failed.php';
-                    });
-
-                    Uss::exit();
-
-                } else {
-
-                    /**
-                     * Create Database Option Table.
-                     *
-                     * The option table allows storing various settings and configurations that can be accessed and modified easily.
-                     * It provides a centralized location to manage site-specific options and preferences.
-                     */
-
-                    $__options = new Pairs(self::$global['mysqli'], DB_TABLE_PREFIX . "_options");
-
-                    self::$global['options'] = $__options;
-
-                };
-
-            } catch(Exception $e) {
-
-                /**
-                 * Catch "mysqli_sql_exception"
-                 * Applicable to PHP 8
-                 */
-
-                self::tag('connect_error', $e->getMessage());
-
-                self::view(function () {
-                    require_once VIEW_DIR . "/db-conn-failed.php";
-                });
-
-                Uss::exit();
-
-            }
-
-            /**
-             * Uhhh... :\
-             * You seem to have turned off the database connection!
-            */
-
-        } else {
-            self::$global['mysqli'] = self::$global['options'] = null;
-        }
-
-    }
 
 
-    /**
-     * Establish a new session, create a session ID, and generate a browser unique ID.
-     *
-     * This method is responsible for initializing a new session in the User Synthetics system.
-     *
-     * It creates a session ID to identify the session and generates a unique ID specific to the user's browser.
-     *
-     * However, please note that relying solely on the browser ID for long-term usage is not recommended as clearing browser cookies can easily wipe out the browser ID and generate a new one.
-     *
-     * @return void
-     * @ignore
-     */
-    private static function __session()
-    {
-
-        # Let's start the session!
-
-        if(empty(session_id())) {
-            session_start();
-        }
 
 
-        /* Create a unique visitor session ID */
-
-        if(empty($_SESSION['uss_session_id']) || strlen($_SESSION['uss_session_id']) < 50) {
-            $_SESSION['uss_session_id'] = Core::keygen(mt_rand(50, 80), true);
-        };
-
-
-        /* - Unique Device ID; */
-
-        if(empty($_COOKIE['ussid'])) {
-            $time = (new DateTime())->add((new DateInterval("P6M")));
-            $_COOKIE['ussid'] = uniqid(Core::keygen(7));
-            $setCookie = setrawcookie('ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/');
-        };
-
-
-    }
-
-
-    /**
-     * Set up and manage system-defined variables.
-     *
-     * This method is responsible for handling system-defined variables
-     * The method stores values which can be accessed across different parts
-     * of the system through the `Uss::$global` variable.
-     *
-     * @return void
-     * @ignore
-     */
-    private static function __vars()
-    {
-
-        /**
-         * Get Default Content
-         * All of the settings below can be easily modified by any module
-        */
-
-        self::$global['icon'] = Core::url(ASSETS_DIR . '/images/origin.png');
-        self::$global['title'] = PROJECT_NAME;
-        self::$global['tagline'] = "The excellent development tool for future oriented programmers";
-        self::$global['copyright'] = ((new DateTime())->format('Y'));
-        self::$global['description'] = "Ever thought of how to make your programming life easier in developing website? \nUser Synthetics offers the best solution for a simple programming lifestyle";
-        self::$global['website'] = self::$project_url;
-
-        /**
-         * Set body attributes for the HTML output.
-         *
-         * This method allows you to add attributes to the `<body>` tag
-         * of the rendered HTML output. You can provide an associative array
-         * of attribute key-value pairs to be included in the `<body>` tag.
-         * The attributes will be rendered as part of the opening `<body>` tag.
-         *
-         * Example usage:
-         *
-         * ```php
-         * Uss::$global['body.attrs'] = [
-         *     'data-name' => 'ucscode',
-         *     'style' => 'color:green;background:red',
-         *     'class' => 'uss-v2'
-         * ];
-         * ```
-         *
-         * When the HTML output is rendered, the `<body>` tag will contain
-         * the specified attributes:
-         *
-         * ```html
-         * <body data-name="ucscode" style="color:green;background:red" class="uss-v2">
-         *     ...
-         * </body>
-         * ```
-         */
-        self::$global['body.attrs'] = array("class" => 'uss');
-
-    }
 
     /**
      * @ignore
@@ -940,4 +691,4 @@ class Uss
     NOW! LET'S INITIALIZE IT!
 */
 
-Uss::__init();
+Uss::__configure();

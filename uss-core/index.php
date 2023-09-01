@@ -9,9 +9,8 @@ require_once __DIR__ . "/constants.php";
 # require_once __DIR__ . "/check-requirements.php"; 
 require_once CORE_DIR . "/load-vendors.php";
 require_once CORE_DIR . "/load-classes.php";
-require_once CORE_DIR . "/configure.php";
 require_once CORE_DIR . "/conn.php";
-require_once CORE_DIR . "/UssBase.php";
+require_once CORE_DIR . "/Uss.php";
 require_once CORE_DIR . "/load-modules.php";
 
 // =========================================
