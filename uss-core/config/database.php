@@ -15,7 +15,7 @@ defined('CONFIG_DIR') || DIE;
 * @ignore
 */
 
-if(DB_CONNECT) {
+if(DB_CONNECTION_ENABLED) {
 
     try {
 

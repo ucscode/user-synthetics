@@ -5,7 +5,7 @@
 	<div class="container py-4">
 
 		<div class='row'>
-			<div class='col-md-8 m-auto col-lg-5'>
+			<div class='col-md-8 m-auto'>
 
                 {% if subject is defined %} 
 					<h1 class='{{ subject_class|default('mb-4') }}'>
@@ -14,16 +14,16 @@
 				{% endif %}
 
 				{% if message is defined %}
-					<p class='{{ message_class|default('') }}'>
+					<div class='{{ message_class|default('') }}'>
 						{{ message|raw }}
-					</p>
+					</div>
 				{% endif %}
 
 				{% if image is defined or ( subject is empty and message is empty ) %}
 					<img src="{{ image|default(Uss.call('Core::url', constant('ASSETS_DIR') ~ '/images/errors/error-404.webp')) }}" 
 						class="img-fluid user-select-none {{ image_class }}" 
 						alt="ERROR IMAGE" 
-						style='{{ image_style|default('heighmax-height: 100vh;') }}' 
+						style='width: 300px; max-height: 100vh; {{ image_style|default('') }}' 
 						loading="lazy">
 				{% endif %}
 

@@ -72,6 +72,7 @@ class Uss
     private array $engineTags = [];
 
     /** @ignore **/
+    private bool $rendered = false;
     private $twigLoader;
     private $defaultTwigNamespace;
 
@@ -140,6 +141,11 @@ class Uss
      */
     public function render(string $templateFile, array $variables = [], ?UssTwigBlockManager $ussTwigBlockManager = null)
     {
+        # Prevent Multiple Rendering
+        if($this->rendered) {
+            return;
+        };
+        
         # Make namespace case insensitive;
         if(substr($templateFile, 0, 1) === '@') {
             $split = explode("/", $templateFile);
@@ -168,6 +174,9 @@ class Uss
 
         # Render Template
         echo $twig->render($templateFile, $variables);
+
+        $this->rendered = true;
+
     }
 
     /**

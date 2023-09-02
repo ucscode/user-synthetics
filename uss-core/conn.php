@@ -1,7 +1,7 @@
 <?php
 
 # Set the constant below to `false` if you don't intend to access database;
-define("DB_CONNECT", true); 
+define("DB_CONNECTION_ENABLED", !true); 
 
 if($_SERVER['SERVER_NAME'] === 'localhost') {
 
