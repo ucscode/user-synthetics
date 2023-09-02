@@ -31,12 +31,8 @@
 <body>
 
     {% block body %}
-
-        {% block body_header %}{% endblock body_header %}
         
         {% block body_main %}{% endblock body_main %}
-
-        {% block footer %}{% endblock footer %}
 
         {% block body_js %}
             {{ macrobase.renderExternalBlockContent('body_js') }}

@@ -1,33 +1,25 @@
 <?php
 
+# Set the constant below to `false` if you don't intend to access database;
+define("DB_CONNECT", true); 
 
-define("DB_CONNECT", true); // `FALSE` - if you don't intend to access database;
+if($_SERVER['SERVER_NAME'] === 'localhost') {
 
-
-// -------- [{ Manage DataBase Configuration }] ------------
-
-
-if($_SERVER['SERVER_NAME'] == 'localhost'):
-
-    # --- [{ FOR LOCALHOST ONLY }] ---
-
+    # Localhost connection
     define("DB_HOST", "localhost");
     define("DB_USER", 'root');
     define("DB_PASSWORD", '');
     define("DB_NAME", 'uss_courier');
 
-else:
+} else {
 
-    # --- [{ FOR SERVER HOST ONLY }] ---
-
-    define("DB_HOST", "localhost"); //
+    # Server Connection
+    define("DB_HOST", "localhost");
     define("DB_USER", '');
     define("DB_PASSWORD", '');
     define("DB_NAME", '');
 
-endif;
+};
 
-
-// --------- [{ DataBase Table Prefix }] ----------
-
+# Database prefix for tables
 define("DB_TABLE_PREFIX", 'uss');

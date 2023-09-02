@@ -7,7 +7,7 @@
 <head>
 	
 	<?php
-
+        
         # Pass variables from PHP to JavaScript environment
         $console = base64_encode(json_encode((object)$this->console));
         echo "<script>const Uss = JSON.parse(atob('{$console}'));</script>\n";

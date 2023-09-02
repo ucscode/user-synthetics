@@ -4,9 +4,9 @@ defined('ROOT_DIR') || DIE;
 
 /**
  * The Main Classes
- * The are built-in or external classes that are not managed with composer
+ * Retrieve built-in and external Classes, Enum or Traits that are not managed by composer
  */
-$classResource = [
+$dependencies = [
     "internal" => [
         "SingletonTrait.php",
         "Core.php",
@@ -19,15 +19,12 @@ $classResource = [
         "X2Client/X2Client.php",
         "UssTwigBlockManager.php"
     ],
-    "external" => [
-        "Parsedown.php",
-        "ParsedownExtra.php"
-    ]
+    "external" => []
 ];
 
 # Include libraries in project
-foreach($classResource as $directory => $component ) {
-    foreach( $component as $filename ) {
+foreach($dependencies as $directory => $filelist ) {
+    foreach( $filelist as $filename ) {
         require CLASS_DIR . "/{$directory}/{$filename}";
     };
 };

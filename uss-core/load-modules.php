@@ -1,9 +1,6 @@
 <?php
-/**
- * Prevent direct access to this file
- * Ensure that it is loaded only by user synthetics system
- */
-defined("MOD_DIR") || die('GREAT! &mdash; GLAD TO SEE YOU ACCESS THIS PAGE ILLEGALLY!');
+
+defined("MOD_DIR") || die('Hey! Wait a minute');
 
 /**
  * Load Modules
@@ -19,7 +16,7 @@ usort($directories, function ($a, $b) {
 foreach($directories as $sysIter) {
 
     /**
-     * Prevent conflicts with module variables
+     * Prevent variable conflicts with other modules
      *
      * Variables defined within a module automatically become global unless enclosed in a local function.
      * This can lead to conflict when multiple modules overwrite each other's variables.
@@ -35,14 +32,12 @@ foreach($directories as $sysIter) {
             return;
         }
 
-        // Get the `index.php` file;
+        # Get the `index.php` file;
+        $moduleIndex = $sysIter->getPathname() . "/index.php";
 
-        $modIndex = $sysIter->getPathname() . "/index.php";
-
-        // Require the index.php file only if it exists;
-
-        if(file_exists($modIndex)) {
-            require_once $modIndex;
+        # Require the index.php file only if it exists;
+        if(file_exists($moduleIndex)) {
+            require_once $moduleIndex;
         }
 
     });

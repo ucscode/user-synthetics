@@ -4,29 +4,29 @@
  * @author ucscode <uche23mail@gmail.com>
  * @license GNU-v3
  */
-require_once __DIR__ . "/constants.php";
 
-# require_once __DIR__ . "/check-requirements.php"; 
+# Uss Constants
+require_once __DIR__ . "/constants.php"; 
+# Composer Autoload
 require_once CORE_DIR . "/load-vendors.php";
+# Database Connection
 require_once CORE_DIR . "/conn.php";
+# Local Classes
 require_once CORE_DIR . "/load-classes.php";
+# Uss instance
 require_once CORE_DIR . "/Uss.php";
+# Modules Loader
 require_once CORE_DIR . "/load-modules.php";
 
 // =========================================
 
-/**
- * In the absence of routing, a 404 error page will be rendered
- * The display of 404 error page is carried out by the index page!
-*/
-if(empty(Uss::instance()->getRouteInventory(true)) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-
-    # Render Error 404
-    Uss::instance()->render('@Uss/error.html.twig');
-
+if(empty(Uss::instance()->getRouteInventory(true))) {
+    if($_SERVER['REQUEST_METHOD'] === 'GET') {
+        Uss::instance()->render('@Uss/error.html.twig');
+    }
 };
 
-# close database connection;
-if(Uss::instance()->global['mysqli'] instanceof MYSQLI) {
-    Uss::instance()->global['mysqli']->close();
+# Close Database Connection (IF EXISTS)
+if(Uss::$global['mysqli'] instanceof MYSQLI) {
+    Uss::$global['mysqli']->close();
 }

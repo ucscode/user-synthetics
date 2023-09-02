@@ -28,7 +28,7 @@ class Uss
      *
      * @var array
      */
-    public array $global = [];
+    public static array $global = [];
 
 
     /**
@@ -97,7 +97,7 @@ class Uss
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
 
-        $this->importTwigLibraries();
+        $this->importTwigAssets();
     }
 
    
@@ -513,29 +513,19 @@ class Uss
      */
     public function exit(?string $message = null, ?bool $status = null, ?array $data = [])
     {
-
         $args = func_get_args();
-
         if(empty($args)) {
-
             $output = '';
-
         } elseif(count($args) === 1) {
-
             $output = $message;
-
         } else {
-
             $output = json_encode([
                 "message" => $message,
                 "status" => (bool)$status,
                 "data" => $data
             ]);
-
         };
-
         exit($output);
-
     }
 
     public function die(?bool $status = null, ?string $message = null, ?array $data = [])
@@ -638,7 +628,7 @@ class Uss
     /**
     * @ignore
     */
-    private function importTwigLibraries()
+    private function importTwigAssets()
     {
         $ussTwigBlockManager = UssTwigBlockManager::instance();
         
