@@ -1,19 +1,48 @@
 {# The base template of user synthetics #}
+{% import '@Uss/includes/macrobase.twig' as macrobase %}
 <!doctype html>
 <html>
 <head>
-        <script>const Uss = JSON.parse(atob('{{ Uss.attr.console64 }}'));</script>
-        {% block head %}
-            {% block head_main %}
-                <title>{{ title }}</title>
-            {% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}
-            {% block body_before %}{% endblock %}
-            {% block body_main %}{% endblock %}
-            {% block body_after %}{% endblock %}
-        {% endblock %}
-    </body>
+
+    <title>{{ page_title|default('User Synthetics') }}</title>
+    <script>const Uss = JSON.parse(atob('{{ Uss.attr.console64 }}'));</script>
+
+    {% block head %}
+
+        {% block head_metas %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <meta name="generator" content="User Synthetics" />
+        <meta name='description' content='{{ page_description|default('') }}'>
+        {% endblock head_metas %}
+
+        {% block head_css %}
+            {{ macrobase.renderExternalBlockContent('head_css') }}
+        {% endblock head_css %}
+
+        {% block head_js %}
+            {{ macrobase.renderExternalBlockContent('head_js') }}
+        {% endblock head_js %}
+
+    {% endblock head %}
+
+</head>
+<body>
+
+    {% block body %}
+
+        {% block body_header %}{% endblock body_header %}
+        
+        {% block body_main %}{% endblock body_main %}
+
+        {% block footer %}{% endblock footer %}
+
+        {% block body_js %}
+            {{ macrobase.renderExternalBlockContent('body_js') }}
+        {% endblock body_js %}
+
+    {% endblock body %}
+
+</body>
 </html>

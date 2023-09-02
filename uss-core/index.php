@@ -20,7 +20,10 @@ require_once CORE_DIR . "/load-modules.php";
  * The display of 404 error page is carried out by the index page!
 */
 if(empty(Uss::instance()->getRouteInventory(true)) && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    Uss::instance()->render('@Uss/error_404.html.twig');
+
+    # Render Error 404
+    Uss::instance()->render('@Uss/error.html.twig');
+
 };
 
 # close database connection;

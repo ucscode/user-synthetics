@@ -1,14 +1,10 @@
-/**
- * User Synthetics Stylesheet
- *
+/*
+ * Project: User Synthetics
  * Author: Uchenna Ajah <Ucscode>
  * Version: 1.0.0
  * License: MIT
- * Last Updated: 02-May-2023
- *
  * Copyright (c) 2023
  */
-
 .cursor-default {
     cursor: default !important;
 }
@@ -157,24 +153,6 @@
     cursor: zoom-out !important;
 }
 
-.--required::after {
-    content: '*';
-    display: inline-block;
-    margin-left: 0.3rem;
-    color: var(--bs-pink);
-}
-
-.resize-none {
-    resize: none !important;
-}
-
-.line-clamp {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
 /* ========== [ TYPO ] =============*/
 
 .fw-900 {
@@ -217,21 +195,43 @@
     font-family: monospace !important;
 }
 
+/* =========== [ Loading Ellipsis ] ============ */
+
 @keyframes ellipsis {
     0% {
-        content: ".";
+        content: "."; /* 1 dot Appears */
     }
     33% {
-        content:"..";
+        content:".."; /* 2 dots Appear */
     }
     66% {
-        content:"...";
+        content:"..."; /* 3 dots Appear, then the process recycles */
     }
 }
 
 .uss-ellipsis-loading::after {
     content: "";
     animation: ellipsis 1s infinite;
+}
+
+/* ============ [ GENERAL STYLE ] ============= */
+
+.--required::after {
+    content: '*';
+    display: inline-block;
+    margin-left: 0.3rem;
+    color: var(--bs-pink);
+}
+
+.resize-none {
+    resize: none !important;
+}
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
   
 /* =================================*/

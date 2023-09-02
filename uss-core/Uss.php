@@ -12,17 +12,13 @@
  */
 
 class Uss
-{
-    /**
-     * An instance of the Uss class
-     * 
-     * This will always be returned when Uss::instance() is called
-     * @var Uss
-     */
-    private static $instance;
+{   
+    /** To instantiate an object in all global space **/
+
+    use SingletonTrait;
 
     /** @ignore */
-    private  $project_url = 'https://github.com/ucscode/user-synthetics';
+    private $project_url = 'https://github.com/ucscode/user-synthetics';
 
     /**
      * Global storage container for User Synthetics application.
@@ -32,7 +28,7 @@ class Uss
      *
      * @var array
      */
-    public  array $global = [];
+    public array $global = [];
 
 
     /**
@@ -42,7 +38,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private  array $console = [];
+    private array $console = [];
 
     /**
      * A container for preserving focused expressions
@@ -54,7 +50,7 @@ class Uss
      * @var array
      * @ignore
      */
-    private  array $routes = [];
+    private array $routes = [];
 
     /**
      * The viewing property indicates whether the User Synthetics application is currently in a viewing state.
@@ -64,7 +60,7 @@ class Uss
      * @var bool
      * @ignore
      */
-    private  bool $viewing = false;
+    private bool $viewing = false;
 
     /**
      * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
@@ -73,11 +69,11 @@ class Uss
      * @var array
      * @ignore
      */
-    private  array $engineTags = [];
+    private array $engineTags = [];
 
     /** @ignore **/
-    private  $twigLoader;
-    private  $defaultTwigNamespace;
+    private $twigLoader;
+    private $defaultTwigNamespace;
 
     /**
      * Initializes the User Synthetics application.
@@ -87,7 +83,7 @@ class Uss
      * @return void
      * @ignore
      */
-    private function __construct()
+    protected function __construct()
     {
         define('EVENT_ID', "_");
         define('CONFIG_DIR', CORE_DIR . "/config");
@@ -100,116 +96,14 @@ class Uss
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
+
+        $this->importTwigLibraries();
     }
 
-    /**
-     * Singleton
-     *
-     * Uss class becomes an Object that can only be instantiated once but accessible globally
-     * @ignore
-     * @return self
-     */
-    public static function instance() {
-        if(self::$instance === null) {
-            self::$instance = new self();
-        };
-        return self::$instance;
-    }
+   
 
     /**
-     * @ignore
-     */
-    private  function include_libraries(string $position, ?array $exclib, ?array $inclib)
-    {
-
-        $libraries = array(
-            'head' => array(
-                'bootstrap' => Core::url(ASSETS_DIR . '/css/bootstrap.min.css'),
-                'bs-icon' => Core::url(ASSETS_DIR . '/vendor/bootstrap-icons/bootstrap-icons.css'),
-                'animate' => Core::url(ASSETS_DIR . '/css/animate.min.css'),
-                'glightbox' => Core::url(ASSETS_DIR . "/vendor/glightbox/glightbox.min.css"),
-                'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.css'),
-                'font-size' => Core::url(ASSETS_DIR . "/css/font-size.min.css"),
-                'main-css' => Core::url(ASSETS_DIR . '/css/main.css')
-            ),
-            'body' => array(
-                'jquery' => Core::url(ASSETS_DIR . '/js/jquery-3.6.4.min.js'),
-                'bootstrap' => Core::url(ASSETS_DIR . '/js/bootstrap.bundle.min.js'),
-                'bootbox' => Core::url(ASSETS_DIR . '/js/bootbox.all.min.js'),
-                'glightbox' => Core::url(ASSETS_DIR . "/vendor/glightbox/glightbox.min.js"),
-                'toastr' => Core::url(ASSETS_DIR . '/vendor/toastr/toastr.min.js'),
-                'notiflix' => [
-                    Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-loading-aio-3.2.6.min.js'),
-                    Core::url(ASSETS_DIR . '/vendor/notiflix/notiflix-block-aio-3.2.6.min.js')
-                ],
-                'main-js' => Core::url(ASSETS_DIR . '/js/main.js')
-            )
-        );
-
-        if(is_null($exclib)) {
-            # Exclude All;
-            $exclib = array_keys($libraries[$position]);
-            $exclib[] = 'viewport';
-        } else {
-            # Validate;
-            $exclib = array_map(function ($value) {
-                if(is_scalar($value)) {
-                    $value = trim($value);
-                }
-                return $value;
-            }, array_values($exclib));
-        };
-
-        $res_center = "data-rc"; // resource center
-        $include = []; // Libraries to include
-
-        $let = function (string $key) use ($exclib, $inclib) {
-            $stat = !in_array($key, $exclib) || in_array($key, $inclib);
-            return $stat;
-        };
-
-        if($position == 'head' && $let('viewport')) {
-            # include viewport meta tag
-            $include[] = "<meta name='viewport' content='width=device-width, initial-scale=1.0' {$res_center}='viewport'>";
-        };
-
-        # Build Script Function
-        $buildScript = function ($position, $library, $source) use ($res_center) {
-            if($position == 'head') {
-                # CSS on Head
-                $script = "<link rel='stylesheet' href='{$source}' {$res_center}='{$library}'>";
-            } else {
-                # JS on Body
-                $script = "<script src='{$source}' {$res_center}='{$library}'></script>";
-            };
-            return $script;
-        };
-
-        foreach($libraries[$position] as $key => $source) {
-
-            # Forfeit unwanted script;
-            if(!$let($key)) {
-                continue;
-            };
-
-            if(!is_array($source)) {
-                # Include single script
-                $include[] = $buildScript($position, $key, $source);
-            } else {
-                # Include multiple scripts
-                foreach($source as $src) {
-                    $include[] = $buildScript($position, $key, $src);
-                }
-            };
-
-        };
-
-        return implode("\n\t", $include);
-
-    }
-
-    /**
-     * Register a template directory with Uss
+     * Register a template directory with in Uss
      *
      * Modules that intend to use twig template must specify a unique namespace and
      * the directory that contains their twig template. Then they can render their template
@@ -218,7 +112,7 @@ class Uss
      *  Uss::instance()->render('@namespace/file.html.twig', []);
      * ```
      */
-    public  function addTwigFilesystem(string $namespace, string $directory)
+    public function addTwigFilesystem(string $namespace, string $directory)
     {
         # Prepare Namespaces
         $systemBase = strtolower($this->defaultTwigNamespace);
@@ -244,7 +138,7 @@ class Uss
     /**
      * Render A Twig Template
      */
-    public  function render(string $templateFile, array $variables = [])
+    public function render(string $templateFile, array $variables = [], ?UssTwigBlockManager $ussTwigBlockManager = null)
     {
         # Make namespace case insensitive;
         if(substr($templateFile, 0, 1) === '@') {
@@ -264,7 +158,13 @@ class Uss
 
         # Add Extension
         $twig->addExtension(new \Twig\Extension\DebugExtension());
-        $twig->addGlobal('Uss', \UssTwig::instance());
+
+        if( $ussTwigBlockManager === null ) {
+            $ussTwigBlockManager = UssTwigBlockManager::instance();
+        };
+
+        # Custom Extension;
+        $twig->addGlobal('Uss', require_once CONFIG_DIR . "/UssAnonymousTwigExtension.php");
 
         # Render Template
         echo $twig->render($templateFile, $variables);
@@ -279,7 +179,7 @@ class Uss
      * @param callable|null $content Optional: A callable that represents the content of the view template.
      * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
      */
-    public  function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
+    public function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
     {
         if(is_null($content) || $this->viewing) {
             return $this->viewing;
@@ -377,18 +277,16 @@ class Uss
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
      * @return null
      */
-    public  function route(string $path, callable $controller, $methods = null)
+    public function route(string $path, callable $controller, $methods = null)
     {
         $router = new class ($path, $controller, $methods) {
             # public properties
             public $controller;
 
-            # protected properties
             protected $request;
             protected $route;
             protected $methods;
 
-            # private properties
             private $authentic = [];
             private $requestMatch;
             private $backtrace;
@@ -509,7 +407,7 @@ class Uss
      * @param bool $expr Optional: Whether to return the list of focus expressions or just the current focus expression. Default is `false`.
      * @return string|array|null The current focus expression, an array of focus expressions and their corresponding URLs, or `null` if no focus expressions are set
     */
-    public  function getRouteInventory(bool $authentic = false)
+    public function getRouteInventory(bool $authentic = false)
     {
         $routes = $this->routes;
         if($authentic) {
@@ -529,7 +427,7 @@ class Uss
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
      * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
-    public  function query(?int $index = null)
+    public function query(?int $index = null)
     {
         $documentRoot = Core::rslash($_SERVER['DOCUMENT_ROOT']);
         $projectRoot = Core::rslash(ROOT_DIR);
@@ -550,7 +448,7 @@ class Uss
      * @param string|null $token The token to verify. If not provided, a new token is generated.
      * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
      */
-    public  function nonce($input = '1', ?string $token = null)
+    public function nonce($input = '1', ?string $token = null)
     {
 
         // generate a new session_id;
@@ -613,7 +511,7 @@ class Uss
      *
      * @return void
      */
-    public  function exit(?string $message = null, ?bool $status = null, ?array $data = [])
+    public function exit(?string $message = null, ?bool $status = null, ?array $data = [])
     {
 
         $args = func_get_args();
@@ -640,9 +538,9 @@ class Uss
 
     }
 
-    public  function die(?bool $status = null, ?string $message = null, ?array $data = [])
+    public function die(?bool $status = null, ?string $message = null, ?array $data = [])
     {
-        self::exit($status, $message, $data);
+        $this->exit($status, $message, $data);
     }
 
 
@@ -663,7 +561,7 @@ class Uss
      *
      * @return mixed If no key is specified, an array of data to be forwarded to the browser. If a key is provided, the associated value is returned.
      */
-    public  function console(?string $key = null)
+    public function console(?string $key = null)
     {
         // accepts 2 arguments
         if(is_null($key)) {
@@ -687,7 +585,7 @@ class Uss
      *
      * @return mixed The value that was removed, or `null` if the key does not exist.
      */
-    public  function remove_console(string $key)
+    public function remove_console(string $key)
     {
         if(isset($this->console[$key])) {
             $value = $this->console[ $key ];
@@ -709,7 +607,7 @@ class Uss
      *
      * @return string|null If $key is set to `null`, an array containing a list of all tags. Otherwise, returns the value of the specified tag or `null` if the tag doesn't exist.
      */
-    public  function tag(?string $key, ?string $value = null, bool $overwrite = true)
+    public function tag(?string $key, ?string $value = null, bool $overwrite = true)
     {
 
         if(is_null($key)) {
@@ -737,12 +635,59 @@ class Uss
         $this->engineTags[$key] = $value;
     }
 
+    /**
+    * @ignore
+    */
+    private function importTwigLibraries()
+    {
+        $ussTwigBlockManager = UssTwigBlockManager::instance();
+        
+        # All CSS & JS are retrieved from the ASSET_DIR
+
+        $libs = [
+            'head_css' => [
+                'bootstrap' => 'css/bootstrap.min.css',
+                'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.css',
+                'animate' => 'css/animate.min.css',
+                'glightbox' => "vendor/glightbox/glightbox.min.css",
+                'toastr' => 'vendor/toastr/toastr.min.css',
+                'font-size' => "css/font-size.min.css",
+                'main-css' => 'css/main.css'
+            ],
+            'body_js' => [
+                'jquery' => 'js/jquery-3.6.4.min.js',
+                'bootstrap' => 'js/bootstrap.bundle.min.js',
+                'bootbox' => 'js/bootbox.all.min.js',
+                'glightbox' => "vendor/glightbox/glightbox.min.js",
+                'toastr' => 'vendor/toastr/toastr.min.js',
+                'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.6.min.js',
+                'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.6.min.js',
+                'main-js' => 'js/main.js'
+            ]
+        ];
+
+        foreach( $libs as $block => $contents ) {
+
+            $contents = array_map(function($value) {
+                $type = explode(".", $value);
+                $type = strtoupper(end($type));
+                $value = Core::url(ASSETS_DIR . "/" . $value);
+                if( $type == 'CSS' ) {
+                    $element = "<link rel='stylesheet' href='" . $value . "'>";
+                } else {
+                    $element = "<script type='text/javascript' src='" . $value . "'></script>";
+                };
+                return $element;
+            }, $contents);
+
+            $ussTwigBlockManager->appendTo($block, $contents);
+            
+        };
+
+    }
+
 };
 
 
-/*
-    GREAT! WE'VE DONE A LOT IN THE USS CLASS
-    NOW! LET'S INITIALIZE IT!
-*/
-
+/** Instantiate The Uss Class */
 Uss::instance();

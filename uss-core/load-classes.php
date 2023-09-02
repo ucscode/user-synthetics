@@ -8,6 +8,7 @@ defined('ROOT_DIR') || DIE;
  */
 $classResource = [
     "internal" => [
+        "SingletonTrait.php",
         "Core.php",
         "Events.php",
         "SQuery.php",
@@ -16,7 +17,7 @@ $classResource = [
         "DOMTable.php",
         "DataMemo.php",
         "X2Client/X2Client.php",
-        "UssTwig.php"
+        "UssTwigBlockManager.php"
     ],
     "external" => [
         "Parsedown.php",
