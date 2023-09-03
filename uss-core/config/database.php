@@ -19,12 +19,12 @@ if(DB_CONNECTION_ENABLED) {
 
     try {
 
-        self::$global['mysqli'] = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+        $this->mysqli = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
-        if(self::$global['mysqli']->connect_errno) {
+        if($this->mysqli->connect_errno) {
 
             $this->render('@Uss/db.error.html.twig', [
-                'error' => self::$global['mysqli']->connect_error,
+                'error' => $this->mysqli->connect_error,
                 'ussInstance' => $this
             ]);
 
@@ -32,12 +32,10 @@ if(DB_CONNECTION_ENABLED) {
 
         } else {
 
-            $__options = new Pairs(self::$global['mysqli'], DB_TABLE_PREFIX . "_options");
-
-            self::$global['options'] = $__options;
-
+            $this->config = new Pairs($this->mysqli, DB_TABLE_PREFIX . "_config");
+            
         };
-
+        
     } catch(Exception $e) {
 
         $this->render('@Uss/db.error.html.twig', [
@@ -50,5 +48,7 @@ if(DB_CONNECTION_ENABLED) {
     }
 
 } else {
-    self::$global['mysqli'] = self::$global['options'] = null;
+
+    $this->mysqli = $this->config = null;
+
 }

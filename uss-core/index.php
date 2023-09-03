@@ -27,6 +27,6 @@ if(empty(Uss::instance()->getRouteInventory(true))) {
 };
 
 # Close Database Connection (IF EXISTS)
-if(Uss::$global['mysqli'] instanceof MYSQLI) {
-    Uss::$global['mysqli']->close();
+if(Uss::instance()->mysqli instanceof MYSQLI) {
+    Uss::instance()->mysqli->close();
 }

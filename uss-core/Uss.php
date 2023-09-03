@@ -18,7 +18,20 @@ class Uss
     use SingletonTrait;
 
     /** @ignore */
-    public $projectUrl = 'https://github.com/ucscode/user-synthetics';
+    protected string $projectUrl = 'https://github.com/ucscode/user-synthetics';
+
+    /** 
+     * Configuration Object
+     * 
+     * Holds an instance of Pairs
+     * @ignore 
+     */
+    protected ?Pairs $config;
+
+    /**
+     *
+     */
+    protected ?MYSQLI $mysqli;
 
     /**
      * Global storage container for User Synthetics application.
@@ -93,7 +106,24 @@ class Uss
 
     }
 
-   
+   /**
+    * Access Protected Properties
+    * Trying to access private properties will throw an exception
+    */
+    public function __get($property) {
+        $value = $this->{$property} ?? null;
+        if(!is_null($value)) {
+            if((new ReflectionProperty($this, $property))->isPrivate()) {
+                $error = "Cannot access private property " . Uss::class . "::\${$property}";
+            };
+        } else {
+            $error = "Undefined property: " . Uss::class . "::\${$property}";
+        };
+        if(!empty($error)) {
+            throw new Exception($error);
+        };
+        return $value;
+    }
 
     /**
      * Register a template directory with in Uss
