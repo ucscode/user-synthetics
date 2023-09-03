@@ -18,7 +18,7 @@ class Uss
     use SingletonTrait;
 
     /** @ignore */
-    private $project_url = 'https://github.com/ucscode/user-synthetics';
+    public $projectUrl = 'https://github.com/ucscode/user-synthetics';
 
     /**
      * Global storage container for User Synthetics application.
@@ -53,16 +53,6 @@ class Uss
     private array $routes = [];
 
     /**
-     * The viewing property indicates whether the User Synthetics application is currently in a viewing state.
-     *
-     * It is a boolean value that determines if the application is actively rendering content for display.
-     *
-     * @var bool
-     * @ignore
-     */
-    private bool $viewing = false;
-
-    /**
      * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
      * These tags can be used for various purposes, such as replacing placeholders in templates or storing additional information.
      *
@@ -85,7 +75,8 @@ class Uss
      * @ignore
      */
     protected function __construct()
-    {
+    {   
+
         define('EVENT_ID', "_");
         define('CONFIG_DIR', CORE_DIR . "/config");
 
@@ -94,11 +85,12 @@ class Uss
         $this->twigLoader->addPath(VIEW_DIR, $this->defaultTwigNamespace);
         $this->twigLoader->addPath(VIEW_DIR, '__main__');
 
+        $this->importTwigAssets();
+
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
 
-        $this->importTwigAssets();
     }
 
    
@@ -145,7 +137,7 @@ class Uss
         if($this->rendered) {
             return;
         };
-        
+
         # Make namespace case insensitive;
         if(substr($templateFile, 0, 1) === '@') {
             $split = explode("/", $templateFile);

@@ -23,13 +23,12 @@ if(DB_CONNECTION_ENABLED) {
 
         if(self::$global['mysqli']->connect_errno) {
 
-            self::tag('connect_error', self::$global['mysqli']->connect_error);
+            $this->render('@Uss/db.error.html.twig', [
+                'error' => self::$global['mysqli']->connect_error,
+                'ussInstance' => $this
+            ]);
 
-            self::view(function () {
-                require_once VIEW_DIR . '/db-conn-failed.php';
-            });
-
-            self::instance()->exit();
+            die;
 
         } else {
 
@@ -41,13 +40,12 @@ if(DB_CONNECTION_ENABLED) {
 
     } catch(Exception $e) {
 
-        self::tag('connect_error', $e->getMessage());
+        $this->render('@Uss/db.error.html.twig', [
+            'error' => $e->getMessage(),
+            'ussInstance' => $this
+        ]);
 
-        self::view(function () {
-            require_once VIEW_DIR . "/db-conn-failed.php";
-        });
-
-        self::instance()->exit();
+        die;
 
     }
 

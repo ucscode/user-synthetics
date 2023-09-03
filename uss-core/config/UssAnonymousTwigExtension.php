@@ -7,7 +7,7 @@
  * while the properties are access from the `attr` array (E.G Uss.attr.properyName).
  * All of which are managed by this anonymous class 
  */
-return new class($ussTwigBlockManager) {
+return new class($this, $ussTwigBlockManager) {
 
     use SingletonTrait;
     
@@ -15,10 +15,10 @@ return new class($ussTwigBlockManager) {
 
     public $twigBlockManager;
 
-    public function __construct($ussTwigBlockManager) {
+    public function __construct(Uss $ussInstance, UssTwigBlockManager $ussTwigBlockManager) {
         $this->twigBlockManager = $ussTwigBlockManager;
-        Uss::instance()->console('platform', PROJECT_NAME);
-        $this->setAttr('console64', base64_encode(json_encode(Uss::instance()->console())));
+        $ussInstance->console('platform', PROJECT_NAME);
+        $this->setAttr('console64', base64_encode(json_encode($ussInstance->console())));
     }
     
     private function setAttr(string $key, mixed $value) {
