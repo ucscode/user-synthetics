@@ -1,7 +1,7 @@
 <?php
 
 # Set the constant below to `false` if you don't intend to access database;
-define("DB_CONNECTION_ENABLED", true); 
+define("DB_CONNECTION_ENABLED", true);
 
 if($_SERVER['SERVER_NAME'] === 'localhost') {
 
@@ -9,7 +9,7 @@ if($_SERVER['SERVER_NAME'] === 'localhost') {
     define("DB_HOST", "localhost");
     define("DB_USER", 'root');
     define("DB_PASSWORD", '');
-    define("DB_NAME", 'uss_courier');
+    define("DB_NAME", 'uss_test');
 
 } else {
 

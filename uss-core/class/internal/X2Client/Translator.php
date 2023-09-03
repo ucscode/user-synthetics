@@ -58,7 +58,7 @@ class Translator
 
         foreach($cssArray as $input) {
             $output = $this->convertSingleSelector(trim($input));
-            $xPathArray []= $output;
+            $xPathArray [] = $output;
         }
 
         return implode(" | ", $xPathArray);
@@ -83,7 +83,7 @@ class Translator
             switch ($currentThreadItem["type"]) {
                 case "star":
                 case "element":
-                    $xpath []= $currentThreadItem['content'];
+                    $xpath [] = $currentThreadItem['content'];
                     $hasElement = true;
                     break;
 

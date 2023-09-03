@@ -233,7 +233,7 @@ class DataMemo
      */
     public function __set($key, $value)
     {
-        $this->memo[$key] =& $value;
+        $this->memo[$key] = & $value;
     }
 
     /**

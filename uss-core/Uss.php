@@ -12,19 +12,20 @@
  */
 
 class Uss
-{   
+{
     /** To instantiate an object in all global space **/
 
     use SingletonTrait;
+    use ProtectedPropertyAccessTrait;
 
     /** @ignore */
     protected string $projectUrl = 'https://github.com/ucscode/user-synthetics';
 
-    /** 
+    /**
      * Configuration Object
-     * 
+     *
      * Holds an instance of Pairs
-     * @ignore 
+     * @ignore
      */
     protected ?Pairs $config;
 
@@ -41,7 +42,7 @@ class Uss
      *
      * @var array
      */
-    public static array $global = [];
+    public static array $globals = [];
 
 
     /**
@@ -88,7 +89,7 @@ class Uss
      * @ignore
      */
     protected function __construct()
-    {   
+    {
 
         define('EVENT_ID', "_");
         define('CONFIG_DIR', CORE_DIR . "/config");
@@ -104,25 +105,6 @@ class Uss
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
 
-    }
-
-   /**
-    * Access Protected Properties
-    * Trying to access private properties will throw an exception
-    */
-    public function __get($property) {
-        $value = $this->{$property} ?? null;
-        if(!is_null($value)) {
-            if((new ReflectionProperty($this, $property))->isPrivate()) {
-                $error = "Cannot access private property " . Uss::class . "::\${$property}";
-            };
-        } else {
-            $error = "Undefined property: " . Uss::class . "::\${$property}";
-        };
-        if(!empty($error)) {
-            throw new Exception($error);
-        };
-        return $value;
     }
 
     /**
@@ -175,7 +157,7 @@ class Uss
             $split[0][1] = strtoupper($split[0][1]);
             $templateFile = implode("/", $split);
         };
-        
+
         # Update Variables
         $variables = array_merge($variables);
 
@@ -187,7 +169,7 @@ class Uss
         # Add Extension
         $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-        if( $ussTwigBlockManager === null ) {
+        if($ussTwigBlockManager === null) {
             $ussTwigBlockManager = UssTwigBlockManager::instance();
         };
 
@@ -294,6 +276,21 @@ class Uss
 
     }
 
+    /**
+     *
+     */
+    public function filterContext(string $path, string $divider = '/')
+    {
+        return implode(
+            $divider,
+            array_filter(
+                array_map(
+                    'trim',
+                    explode($divider, $path)
+                )
+            )
+        );
+    }
 
     /**
      * Set the focus on a specific URL path and execute a function based on the URL match.
@@ -380,18 +377,11 @@ class Uss
             */
             protected function resolveRoute()
             {
-                $route = implode(
-                    "/",
-                    array_filter(
-                        array_map(
-                            'trim',
-                            explode("/", $this->route)
-                        )
-                    )
-                );
+                # The route
+                $route = Uss::instance()->filterContext($this->route);
 
                 # The request
-                $this->request = implode("/", Uss::instance()->query());
+                $this->request = Uss::instance()->filterContext(Uss::instance()->query());
 
                 # Compare the request path to the current URL
                 $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
@@ -662,7 +652,7 @@ class Uss
     private function importTwigAssets()
     {
         $ussTwigBlockManager = UssTwigBlockManager::instance();
-        
+
         # All CSS & JS are retrieved from the ASSET_DIR
 
         $libs = [
@@ -687,13 +677,13 @@ class Uss
             ]
         ];
 
-        foreach( $libs as $block => $contents ) {
+        foreach($libs as $block => $contents) {
 
-            $contents = array_map(function($value) {
+            $contents = array_map(function ($value) {
                 $type = explode(".", $value);
                 $type = strtoupper(end($type));
                 $value = Core::url(ASSETS_DIR . "/" . $value);
-                if( $type == 'CSS' ) {
+                if($type == 'CSS') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {
                     $element = "<script type='text/javascript' src='" . $value . "'></script>";
@@ -702,7 +692,7 @@ class Uss
             }, $contents);
 
             $ussTwigBlockManager->appendTo($block, $contents);
-            
+
         };
 
     }

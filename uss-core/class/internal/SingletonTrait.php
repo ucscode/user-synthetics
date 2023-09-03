@@ -3,10 +3,10 @@
 /**
  * @ignore
  */
-trait SingletonTrait {
-
+trait SingletonTrait
+{
     /**
-     * Hold the instance of the current class 
+     * Hold the instance of the current class
      */
     private static $instance;
 
@@ -17,7 +17,8 @@ trait SingletonTrait {
      * @ignore
      * @return self
      */
-    public static function instance() {
+    public static function instance()
+    {
         if(self::$instance === null) {
             self::$instance = new self();
         };
@@ -29,6 +30,8 @@ trait SingletonTrait {
      *
      * This should be updated within the class that inherits this trait
      */
-    protected function __construct() {}
-    
+    protected function __construct()
+    {
+    }
+
 }

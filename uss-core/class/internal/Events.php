@@ -36,11 +36,12 @@
  */
 class Events
 {
-    protected  $events = array();
+    protected $events = array();
 
     private static $instance;
 
-    public static function instance() {
+    public static function instance()
+    {
         if(self::$instance === null) {
             self::$instance = new self();
         }
@@ -63,7 +64,7 @@ class Events
      * @throws \Exception  When the item is of an unhandled type
      * @ignore
      */
-    protected  function sort_order($item, array $sort)
+    protected function sort_order($item, array $sort)
     {
         if(is_numeric($item)) {
             /**
@@ -101,7 +102,7 @@ class Events
      * @return int  The result of the comparison
      * @ignore
      */
-    protected  function compare($a, $b, $sort)
+    protected function compare($a, $b, $sort)
     {
         $res = $this->sort_order($a, $sort) <=> $this->sort_order($b, $sort);
         if($res) {
@@ -123,7 +124,7 @@ class Events
      * @return void
      * @ignore
      */
-    protected  function sortEvents(array &$eventList, ?bool $order)
+    protected function sortEvents(array &$eventList, ?bool $order)
     {
 
         if(!is_null($order)) {
@@ -155,7 +156,7 @@ class Events
                 $b = $convertType($b);
                 return $this->compare($a, $b, $sort);
             });
-            
+
         };
 
     }
@@ -171,10 +172,10 @@ class Events
      *        - `null` indicates no sorting.
      *        - `true` indicates sorting in ascending order.
      *        - `false` indicates sorting in descending order.
-     * 
+     *
      * @return void
      */
-    public  function exec(string $eventName, ?array $data = null, ?bool $sort = true)
+    public function exec(string $eventName, ?array $data = null, ?bool $sort = true)
     {
 
         // get the event type to execute;
@@ -187,7 +188,7 @@ class Events
 
         /**
          * # Order Of Sorting
-         * 
+         *
          * 1. Negative Number
          * 2. Uppercase Letters
          * 3. Symbols
@@ -204,15 +205,17 @@ class Events
         $eventList = &$this->events[ $eventName ];
 
         $this->sortEvents($eventList, $sort);
-        
+
         # Loop and execute each individual event
-        
+
         foreach($eventList as $key => $callback) {
 
             # Call all associated event
 
-            if( is_null($callback) ) continue;
-            
+            if(is_null($callback)) {
+                continue;
+            }
+
             call_user_func_array($callback, [&$data, &$eventName]);
 
         };
@@ -238,25 +241,25 @@ class Events
      *
      * @return void
      */
-    public  function addListener(string $eventNames, ?callable $callback, ?string $eid = null)
+    public function addListener(string $eventNames, ?callable $callback, ?string $eid = null)
     {
 
         # split the events by comma
 
         $this->splitEvents($eventNames, function ($event) use ($callback, $eid) {
-            
+
             # If the event name doesn't already exist, create
-            
+
             if(!array_key_exists($event, $this->events)) {
                 $this->events[ $event ] = array();
             };
-            
+
             # Get reference to the eventlist
-            
+
             $eventList = &$this->events[ $event ];
-            
+
             # If no event ID is given, add the event using PHP Array incrementing index
-            
+
             if(is_null($eid)) {
 
                 $eventList[] = $callback;
@@ -284,28 +287,28 @@ class Events
      *
      * @return void
      */
-    public  function removeListener(string $eventName, ?string $eid)
+    public function removeListener(string $eventName, ?string $eid)
     {
 
         $status = false;
 
         # Get the event by reference
         $eventList = &$this->events[ $eventName ] ?? null;
-        
+
         # If the eventname does not exist, ignore
-        if( empty($eventList) ) {
+        if(empty($eventList)) {
 
             $status = true;
 
         } else {
 
             # Remove the specified event
-            if( is_null($eid) ) {
+            if(is_null($eid)) {
 
-                unset( $this->events[ $eventName ] );
+                unset($this->events[ $eventName ]);
                 $status = true;
 
-            } else if(array_key_exists($eid, $eventList)) {
+            } elseif(array_key_exists($eid, $eventList)) {
 
                 unset($eventList[ $eid ]);
                 $status = true;
@@ -334,7 +337,7 @@ class Events
      *
      * @return void
      */
-    public  function clear(string $eventNames)
+    public function clear(string $eventNames)
     {
         $this->splitEvents($eventNames, function ($event) {
             # If the event exists, delete it
@@ -357,14 +360,14 @@ class Events
      *
      * @return array|callable|null The list of associated events. If event ID is given, returns the `callable` associated with the event ID, or `null` if neither the event nor event ID is found
      */
-    public  function getListener(string $eventName, ?string $eid = null)
+    public function getListener(string $eventName, ?string $eid = null)
     {
         # Get the eventList, or return null
         $eventList = $this->events[ trim($eventName) ] ?? null;
 
-        if( is_null($eid) ) {
+        if(is_null($eid)) {
             return $eventList;
-        } else if(!empty($eventList) && array_key_exists($eid, $eventList)) {
+        } elseif(!empty($eventList) && array_key_exists($eid, $eventList)) {
             return $eventList[$eid];
         };
 
@@ -381,11 +384,11 @@ class Events
      *
      * @return bool     `true` if a listener exists, `false` otherwise
      */
-    public  function hasListener(string $eventName, ?string $eid = null)
+    public function hasListener(string $eventName, ?string $eid = null)
     {
         return !!$this->getListener($eventName, $eid);
     }
-    
+
     /**
      * List Listeners
      *
@@ -396,7 +399,7 @@ class Events
      *
      * @return array    An array containing a list of listeners. If `$verbose` is `false`, an array of event names. If `$verbose` is true, an associative array with event names as keys and their corresponding listeners as values. If `$eventName` is provided, an array of listeners for the specific event name.
      */
-    public  function list($verbose = false, ?string $eventName = null)
+    public function list($verbose = false, ?string $eventName = null)
     {
         if(!$verbose) {
             return array_keys($this->events);
@@ -407,10 +410,11 @@ class Events
     /**
      *
      */
-    private function __construct() {
+    private function __construct()
+    {
 
     }
-    
+
     /**
      * Split Events
      *
@@ -424,7 +428,7 @@ class Events
      * @return void
      * @ignore
      */
-    private  function splitEvents(string $eventNames, callable $func)
+    private function splitEvents(string $eventNames, callable $func)
     {
         $eventNames = array_map("trim", explode(",", $eventNames));
         foreach($eventNames as $eventName) {

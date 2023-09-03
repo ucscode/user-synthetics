@@ -1,6 +1,7 @@
-<?php 
+<?php
 
-defined('ROOT_DIR') || DIE;
+
+defined('ROOT_DIR') || die;
 
 // If version is lower than the specified php version, exit the script!
 

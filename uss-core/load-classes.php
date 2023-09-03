@@ -1,6 +1,6 @@
 <?php
 
-defined('ROOT_DIR') || DIE;
+defined('ROOT_DIR') || die;
 
 /**
  * The Main Classes
@@ -9,6 +9,7 @@ defined('ROOT_DIR') || DIE;
 $dependencies = [
     "internal" => [
         "SingletonTrait.php",
+        "ProtectedPropertyAccessTrait.php",
         "Core.php",
         "Events.php",
         "SQuery.php",
@@ -23,8 +24,8 @@ $dependencies = [
 ];
 
 # Include libraries in project
-foreach($dependencies as $directory => $filelist ) {
-    foreach( $filelist as $filename ) {
+foreach($dependencies as $directory => $filelist) {
+    foreach($filelist as $filename) {
         require CLASS_DIR . "/{$directory}/{$filename}";
     };
 };

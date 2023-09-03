@@ -6,7 +6,7 @@
  */
 
 # Uss Constants
-require_once __DIR__ . "/constants.php"; 
+require_once __DIR__ . "/constants.php";
 # Composer Autoload
 require_once CORE_DIR . "/load-vendors.php";
 # Database Connection

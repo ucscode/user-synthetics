@@ -1,6 +1,6 @@
 <?php
 
-defined('CONFIG_DIR') || DIE;
+defined('CONFIG_DIR') || die;
 
 /**
 * Connect to the database.
@@ -33,9 +33,9 @@ if(DB_CONNECTION_ENABLED) {
         } else {
 
             $this->config = new Pairs($this->mysqli, DB_TABLE_PREFIX . "_config");
-            
+
         };
-        
+
     } catch(Exception $e) {
 
         $this->render('@Uss/db.error.html.twig', [

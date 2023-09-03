@@ -448,7 +448,7 @@ class DOMTable
                 $tr->appendChild($tx);
             };
             $element = $this->table->getElementsByTagName($appendTo)->item(0);
-            if( $element ) {
+            if($element) {
                 $element->appendChild($tr);
             };
         };

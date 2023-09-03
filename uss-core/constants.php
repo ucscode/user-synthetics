@@ -10,7 +10,7 @@ define("PROJECT_NAME", 'User Synthetics');
  * The installation directory
  * Defines the directory where the user synthetics project is installed
  */
-define("ROOT_DIR", realpath( __DIR__ . "/../") );
+define("ROOT_DIR", realpath(__DIR__ . "/../"));
 
 /**
  * The core directory

@@ -1,6 +1,6 @@
 <?php
 
-defined('CONFIG_DIR') || DIE;
+defined('CONFIG_DIR') || die;
 
 /**
 * Establish a new session, create a session ID, and generate a browser unique ID.
@@ -32,4 +32,3 @@ if(empty($_COOKIE['ussid'])) {
     $_COOKIE['ussid'] = uniqid(Core::keygen(7));
     $setCookie = setrawcookie('ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/');
 };
-
