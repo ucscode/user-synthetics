@@ -19,13 +19,15 @@ trait ProtectedPropertyAccessTrait
     */
     public function __get($property)
     {
-        $value = $this->{$property} ?? null;
-        if(!is_null($value)) {
-            if((new ReflectionProperty($this, $property))->isPrivate()) {
-                $error = "Cannot access private property " . Uss::class . "::\${$property}";
-            };
+        if(!property_exists($this, $property)) {
+            $error = "Undefined property: " . $this::class . "::\${$property}";
         } else {
-            $error = "Undefined property: " . Uss::class . "::\${$property}";
+            $value = $this->{$property} ?? null;
+            if(!is_null($value)) {
+                if((new ReflectionProperty($this, $property))->isPrivate()) {
+                    $error = "Cannot access private property " . $this::class . "::\${$property}";
+                };
+            }
         };
         if(!empty($error)) {
             throw new Exception($error);

@@ -15,8 +15,7 @@ class Uss
 {
     /** To instantiate an object in all global space **/
 
-    use SingletonTrait;
-    use ProtectedPropertyAccessTrait;
+    use SingletonTrait, ProtectedPropertyAccessTrait;
 
     /** @ignore */
     protected string $projectUrl = 'https://github.com/ucscode/user-synthetics';
@@ -27,7 +26,7 @@ class Uss
      * Holds an instance of Pairs
      * @ignore
      */
-    protected ?Pairs $config;
+    protected ?Pairs $options;
 
     /**
      *
@@ -75,10 +74,12 @@ class Uss
      */
     private array $engineTags = [];
 
-    /** @ignore **/
+    /**
+     * @ignore
+     */
+    private ?\Twig\Loader\FilesystemLoader $twigLoader;
+    private ?string $defaultTwigNamespace;
     private bool $rendered = false;
-    private $twigLoader;
-    private $defaultTwigNamespace;
 
     /**
      * Initializes the User Synthetics application.
@@ -104,6 +105,12 @@ class Uss
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
+        
+        $sampler = CONFIG_DIR . "/sample.php";
+        if(is_file($sampler)) {
+            require_once $sampler;
+        };
+
 
     }
 
@@ -117,7 +124,7 @@ class Uss
      *  Uss::instance()->render('@namespace/file.html.twig', []);
      * ```
      */
-    public function addTwigFilesystem(string $namespace, string $directory)
+    public function addTwigFilesystem(string $directory, string $namespace)
     {
         # Prepare Namespaces
         $systemBase = strtolower($this->defaultTwigNamespace);
@@ -175,6 +182,27 @@ class Uss
 
         # Custom Extension;
         $twig->addGlobal('Uss', require_once CONFIG_DIR . "/UssAnonymousTwigExtension.php");
+
+        /**
+         * To add twig extension from a module,
+         * Simple implement the '\Twig\Extension\ExtensionInterface' from within your module
+         * And it will be automatically added to twig extension. E.G
+         *
+         * class MyTwigExtension extends \Twig\Extension\AbstractExtension {}
+         *
+         * The '\Twig\Extension\AbstractExtension' already implements the '\Twig\Extension\ExtensionInterface'
+         */
+        foreach(get_declared_classes() as $class) {
+            $reflection = new ReflectionClass($class);
+            if($reflection->implementsInterface('\\Twig\\Extension\\ExtensionInterface')) {
+                if(!$twig->hasExtension($class) && $reflection->isInstantiable()) {
+                    $isModular = preg_match("#^" . MOD_DIR . "#i", $reflection->getFileName());
+                    if($isModular) {
+                        $twig->addExtension(new $class());
+                    };
+                };
+            };
+        };
 
         # Render Template
         echo $twig->render($templateFile, $variables);
@@ -279,8 +307,11 @@ class Uss
     /**
      *
      */
-    public function filterContext(string $path, string $divider = '/')
+    public function filterContext(string|array $path, string $divider = '/')
     {
+        if(is_array($path)) {
+            $path = implode($divider, $path);
+        };
         return implode(
             $divider,
             array_filter(

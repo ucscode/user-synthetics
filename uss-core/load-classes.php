@@ -10,6 +10,9 @@ $dependencies = [
     "internal" => [
         "SingletonTrait.php",
         "ProtectedPropertyAccessTrait.php",
+        "UssTwigBlockManager.php",
+        "AbstractUssElementParser.php",
+        "UssElementBuilder.php",
         "Core.php",
         "Events.php",
         "SQuery.php",
@@ -17,8 +20,7 @@ $dependencies = [
         "Menufy.php",
         "DOMTable.php",
         "DataMemo.php",
-        "X2Client/X2Client.php",
-        "UssTwigBlockManager.php"
+        "X2Client/X2Client.php"
     ],
     "external" => []
 ];

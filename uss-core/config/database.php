@@ -32,7 +32,7 @@ if(DB_CONNECTION_ENABLED) {
 
         } else {
 
-            $this->config = new Pairs($this->mysqli, DB_TABLE_PREFIX . "_config");
+            $this->options = new Pairs($this->mysqli, DB_TABLE_PREFIX . "_options");
 
         };
 
@@ -49,6 +49,6 @@ if(DB_CONNECTION_ENABLED) {
 
 } else {
 
-    $this->mysqli = $this->config = null;
+    $this->mysqli = $this->options = null;
 
 }

@@ -6,7 +6,7 @@ self::$globals['icon'] = Core::url(ASSETS_DIR . '/images/origin.png');
 
 self::$globals['title'] = PROJECT_NAME;
 
-self::$globals['tagline'] = "The excellent development tool for future oriented programmers";
+self::$globals['headline'] = "The excellent development tool for future oriented programmers";
 
 self::$globals['copyright'] = ((new DateTime())->format('Y'));
 
