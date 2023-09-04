@@ -19,7 +19,8 @@ class UssElementBuilder extends AbstractUssElementParser
 
     public function __construct(string $tagName)
     {
-        $this->tagName = strtoupper($tagName);
+        $this->tagName = strtolower(trim($tagName));
+        $this->void = in_array($this->tagName, $this->voidTags);
     }
 
     public function isVoid(bool $void) {
@@ -28,6 +29,7 @@ class UssElementBuilder extends AbstractUssElementParser
          * Example: link, input, image etc
          */
         $this->void = $void;
+        return $this;
     }
 
     // Attribute Management
@@ -127,8 +129,9 @@ class UssElementBuilder extends AbstractUssElementParser
     }
 
     public function getHTML(bool $indent = false) {
-        $html = $this->buildNode($this, $indent ? 0 : null);
-        echo $html;
+        $index = $indent ? 0 : null;
+        $html = $this->buildNode($this, $index);
+        return $html;
     }
 
     protected function setParent(UssElementBuilder $parent)

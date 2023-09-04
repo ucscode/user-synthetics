@@ -2,11 +2,29 @@
 
 abstract class AbstractUssElementParser
 {
+    protected $voidTags = [
+        'area',
+        'base',
+        'br',
+        'col',
+        'embed',
+        'hr',
+        'img',
+        'input',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'wbr'
+    ];
+
     public function __debugInfo()
     {
         $debugInfo = [];
+        $skip = ['parentElement', 'voidTags'];
         foreach ($this as $property => $value) {
-            if($property == 'parentElement') {
+            if(in_array($property, $skip)) {
                 continue;
             } elseif($property == 'child') {
                 $value = count($value);
@@ -43,9 +61,9 @@ abstract class AbstractUssElementParser
             $selector = $this->splitSelector($selector);
 
             # Now, we have to breakdown the selector into an array representing tags and attributes
-
+            
             $collapsedSelector = $this->collapseSelector($selector);
-
+            
             # Now, let's used the collapsed selector to find elements that match the selector
 
             $results = $this->seek($this->child, $collapsedSelector);
@@ -63,16 +81,20 @@ abstract class AbstractUssElementParser
 
     }
 
-    public function buildNode(UssElementBuilder $node, ?int $indent)
+    protected function buildNode(UssElementBuilder $node, ?int $indent)
     {
-        $indentation = is_null($indent) ? '' : str_repeat("\t", $indent);
-        $carriage = is_null($indent) ? '' : "\r\n";
-
-        $nodename = strtolower($node->tagName);
+        $nodename = $node->tagName;
         $attributes = [];
 
         foreach($node->attributes as $key => $values) {
-            $attributes[] = $key . '="' . htmlentities(implode(" ", $values)) . '"';
+            $attributes[] = $key . "=\"" . htmlentities(implode(" ", $values)) . "\"";
+        }
+        
+        if(!is_null($indent)) {
+            $indentation = str_repeat("\t", $indent);
+            $carriage = "\n";
+        } else {
+            $indentation = $carriage = null;
         }
 
         $html = $indentation . "<" . $nodename;
@@ -81,21 +103,28 @@ abstract class AbstractUssElementParser
             $html .= " " . implode(" ", $attributes);
         };
 
-        $html .= ($node->void ? '/' : null ) . ">" . $carriage;
-        
         if(!$node->void) {
+            
+            $html .= ">" . $carriage;
 
             foreach($node->child as $child) {
-                $html .= $this->buildNode($child, $indent + 1) . $carriage;
+                if(is_null($indent)) {
+                    $index = null;
+                } else {
+                    $index = $indent + 1;
+                }
+                $html .= $this->buildNode($child, $index) . $carriage;
             }
 
             $html .= $indentation . "</" . $nodename . ">";
 
-        };
+        } else {
 
+            $html .= "/>";
+        
+        }
 
         return $html;
-
     }
 
     protected function slice(?string $value = null)
@@ -113,7 +142,7 @@ abstract class AbstractUssElementParser
     {
         # For each match, a selector key will be shifted so we must retain accurate numeric keys
         $collapsedSelector = array_values($collapsedSelector);
-
+        
         # An array to store matched nodes
         $capturedNodes = [];
 
@@ -195,9 +224,7 @@ abstract class AbstractUssElementParser
     private function parseSelector(string $selector): array
     {
         $result = [
-            'tagname' => null,
-            'class' => [],
-            'id' => [],
+            'tagname' => null
         ];
 
         if(preg_match_all('/(\.|#|\[)?[^.#\[]+/', $selector, $matches)) {
@@ -207,49 +234,71 @@ abstract class AbstractUssElementParser
                 $type = substr($unit, 0, 1);
 
                 if($type === '.') {
+
+                    if(!isset($result['class'])) {
+                        $result['class'] = [];
+                    };
                     $result['class'][] = substr($unit, 1);
+                    
                 } elseif($type === '#') {
+
+                    if(!isset($result[''])) {
+                        $result['id'] = [];
+                    }
                     $result['id'][] = substr($unit, 1);
+
                 } elseif($type === '[') {
+
                     $attrs = array_map('trim', explode("=", substr($unit, 1, -1)));
                     $key = $attrs[0];
                     $value = $attrs[1] ?? null;
                     $value = !empty($value) ? explode(' ', trim($value, "'\"")) : [];
+
                     if(isset($result[$key])) {
                         $result[$key] = array_merge($result[$key], $value);
                     } else {
                         $result[$key] = $value;
                     }
+
                 } else {
+
                     $result['tagname'] = $unit;
+
                 }
 
             };
 
         };
 
-        return array_filter($result);
+        return array_filter($result, function($value) {
+            return $value !== null;
+        });
+
     }
 
     private function matchSelectorNode(UssElementBuilder $node, array $selector)
     {
-        $progress = [];
+        $matches = [];
+
         if(!empty($selector['tagname'])) {
-            $progress[] = strtoupper($selector['tagname']) === $node->tagName;
+            $matches[] = strtolower($selector['tagname']) === $node->tagName;
         };
+
         unset($selector['tagname']);
+
         # Match Properties
         foreach($selector as $attr => $values) {
             if($node->hasAttribute($attr)) {
+                $matches[] = true;
                 foreach($values as $value) {
-                    $progress[] = $node->hasProperty($attr, $value);
+                    $matches[] = $node->hasProperty($attr, $value);
                 }
             } else {
-                $progress[] = false;
+                $matches[] = false;
             };
         };
-        //var_dump($node, $selector, $progress);
-        return !in_array(false, $progress) && !empty($progress);
+        
+        return !in_array(false, $matches) && !empty($matches);
     }
 
 }
