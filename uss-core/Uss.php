@@ -105,12 +105,6 @@ class Uss
         require_once CONFIG_DIR . "/database.php";
         require_once CONFIG_DIR . "/variables.php";
         require_once CONFIG_DIR . "/session.php";
-        
-        $sampler = CONFIG_DIR . "/sample.php";
-        if(is_file($sampler)) {
-            require_once $sampler;
-        };
-
 
     }
 

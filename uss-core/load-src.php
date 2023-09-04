@@ -9,7 +9,7 @@ defined('ROOT_DIR') || die;
 $dependencies = [
 
     'interface' => [
-
+        "UssFormInterface.php",
     ],
 
     'trait' => [
@@ -24,6 +24,7 @@ $dependencies = [
     "class" => [
         "UssTwigBlockManager.php",
         "UssElementBuilder.php",
+        "UssForm.php",
         "Core.php",
         "Events.php",
         "SQuery.php",
