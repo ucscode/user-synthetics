@@ -63,8 +63,11 @@ abstract class AbstractUssElementParser
 
     }
 
-    public function buildNode(UssElementBuilder $node)
+    public function buildNode(UssElementBuilder $node, ?int $indent)
     {
+        $indentation = is_null($indent) ? '' : str_repeat("\t", $indent);
+        $carriage = is_null($indent) ? '' : "\r\n";
+
         $nodename = strtolower($node->tagName);
         $attributes = [];
 
@@ -72,13 +75,24 @@ abstract class AbstractUssElementParser
             $attributes[] = $key . '="' . htmlentities(implode(" ", $values)) . '"';
         }
 
-        $html = "<" . $nodename . " " . implode(" ", $attributes) . ">";
+        $html = $indentation . "<" . $nodename;
+        
+        if(!empty($attributes)) {
+            $html .= " " . implode(" ", $attributes);
+        };
 
-        foreach($node->child as $child) {
-            $html .= $this->buildNode($child);
-        }
+        $html .= ($node->void ? '/' : null ) . ">" . $carriage;
+        
+        if(!$node->void) {
 
-        $html .= "</" . $nodename . ">";
+            foreach($node->child as $child) {
+                $html .= $this->buildNode($child, $indent + 1) . $carriage;
+            }
+
+            $html .= $indentation . "</" . $nodename . ">";
+
+        };
+
 
         return $html;
 

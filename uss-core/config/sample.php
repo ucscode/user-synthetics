@@ -29,6 +29,11 @@ $h1->appendChild($hr);
 
 $span->appendChild(new UssElementBuilder('view'));
 
+$head = new UssElementBuilder('head');
+$body->prependChild($head);
+$link = new UssElementBuilder("link");
+$link->isVoid(true);
+$head->appendChild($link);
 $body->appendChild($h1);
 $body->setAttribute("name", "lorem ipsum is dummy");
 $body->setAttribute(" data-left", "try again");
