@@ -13,8 +13,6 @@ class UssElementBuilder extends AbstractUssElementParser
 
     protected string $tagName;
     protected $attributes = [];
-    protected $parentElement;
-    protected $child = [];
     protected bool $void = false;
 
     public function __construct(string $tagName)

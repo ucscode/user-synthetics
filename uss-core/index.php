@@ -12,7 +12,7 @@ require_once CORE_DIR . "/load-vendors.php";
 # Database Connection
 require_once CORE_DIR . "/conn.php";
 # Local Classes
-require_once CORE_DIR . "/load-classes.php";
+require_once CORE_DIR . "/load-src.php";
 # Uss instance
 require_once CORE_DIR . "/Uss.php";
 # Modules Loader

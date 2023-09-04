@@ -40,7 +40,7 @@ define("VIEW_DIR", CORE_DIR . '/view');
  * The class directory
  * Defines the directory that contain class files which empowers user synthetics
  */
-define("CLASS_DIR", CORE_DIR . '/class');
+define('SRC_DIR', CORE_DIR . "/src");
 
 /**
  * Verify PHP Version!

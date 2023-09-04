@@ -2,6 +2,10 @@
 
 abstract class AbstractUssElementParser
 {
+    protected $parentElement;
+    
+    protected $child = [];
+
     protected $voidTags = [
         'area',
         'base',

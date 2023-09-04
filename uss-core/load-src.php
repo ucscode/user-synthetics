@@ -7,11 +7,22 @@ defined('ROOT_DIR') || die;
  * Retrieve built-in and external Classes, Enum or Traits that are not managed by composer
  */
 $dependencies = [
-    "internal" => [
+
+    'interface' => [
+
+    ],
+
+    'trait' => [
         "SingletonTrait.php",
         "ProtectedPropertyAccessTrait.php",
-        "UssTwigBlockManager.php",
+    ],
+
+    'abstract' => [
         "AbstractUssElementParser.php",
+    ],
+    
+    "class" => [
+        "UssTwigBlockManager.php",
         "UssElementBuilder.php",
         "Core.php",
         "Events.php",
@@ -21,13 +32,14 @@ $dependencies = [
         "DOMTable.php",
         "DataMemo.php",
         "X2Client/X2Client.php"
-    ],
-    "external" => []
+    ]
+
 ];
 
 # Include libraries in project
-foreach($dependencies as $directory => $filelist) {
+
+foreach($dependencies as $path => $filelist) {
     foreach($filelist as $filename) {
-        require CLASS_DIR . "/{$directory}/{$filename}";
+        require SRC_DIR . "/{$path}/{$filename}";
     };
 };
