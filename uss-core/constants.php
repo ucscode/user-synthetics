@@ -45,7 +45,7 @@ define('SRC_DIR', CORE_DIR . "/src");
 /**
  * Verify PHP Version!
  *
- * User Synthetics requires at least PHP 7.4 to run properly
+ * User Synthetics requires at least PHP 8.1 to run properly
  * @ignore
  */
-define('MIN_PHP_VERSION', 7.4);
+define('MIN_PHP_VERSION', 8.1);

@@ -9,18 +9,20 @@ defined('ROOT_DIR') || die;
 $dependencies = [
 
     'interface' => [
+        "UssElementInterface.php",
         "UssFormInterface.php",
     ],
 
     'trait' => [
         "SingletonTrait.php",
-        "ProtectedPropertyAccessTrait.php",
+        "EncapsulatedPropertyAccessTrait.php",
     ],
 
     'abstract' => [
+        "AbstractUssElementNodeList.php",
         "AbstractUssElementParser.php",
     ],
-    
+
     "class" => [
         "UssTwigBlockManager.php",
         "UssElementBuilder.php",

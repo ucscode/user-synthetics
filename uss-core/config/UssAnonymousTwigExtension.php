@@ -7,18 +7,16 @@
  * while the properties are access from the `attr` array (E.G Uss.attr.properyName).
  * All of which are managed by this anonymous class
  */
- 
-return new class ($this, $ussTwigBlockManager) {
 
+return new class ($this, $ussTwigBlockManager) {
     use SingletonTrait;
 
     public array $attr = [];
 
     public function __construct(
-        private Uss $ussInstance, 
+        private Uss $ussInstance,
         public UssTwigBlockManager $twigBlockManager
-    )
-    {
+    ) {
         $this->ussInstance->console('platform', PROJECT_NAME);
         $this->attr['console64'] = base64_encode(json_encode($ussInstance->console()));
     }
@@ -39,7 +37,8 @@ return new class ($this, $ussTwigBlockManager) {
     }
 
     # Get an option
-    public function getOption(string $name) {
+    public function getOption(string $name)
+    {
         return $this->ussInstance->options->get($name);
     }
 

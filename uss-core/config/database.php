@@ -25,7 +25,7 @@ if(DB_CONNECTION_ENABLED) {
 
             $this->render('@Uss/db.error.html.twig', [
                 'error' => $this->mysqli->connect_error,
-                'ussInstance' => $this
+                'url' => $this->projectUrl
             ]);
 
             die;
@@ -40,7 +40,7 @@ if(DB_CONNECTION_ENABLED) {
 
         $this->render('@Uss/db.error.html.twig', [
             'error' => $e->getMessage(),
-            'ussInstance' => $this
+            'url' => $this->projectUrl
         ]);
 
         die;

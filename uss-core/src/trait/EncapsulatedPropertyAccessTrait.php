@@ -11,7 +11,7 @@
  * The idea is to ensure that PROTECTED properties can be accessed but can never be overwritten
  * While private properties can never be accessed
  */
-trait ProtectedPropertyAccessTrait
+trait EncapsulatedPropertyAccessTrait
 {
     /**
     * Access Protected Properties
@@ -20,19 +20,15 @@ trait ProtectedPropertyAccessTrait
     public function __get($property)
     {
         if(!property_exists($this, $property)) {
-            $error = "Undefined property: " . $this::class . "::\${$property}";
-        } else {
-            $value = $this->{$property} ?? null;
-            if(!is_null($value)) {
-                if((new ReflectionProperty($this, $property))->isPrivate()) {
-                    $error = "Cannot access private property " . $this::class . "::\${$property}";
-                };
-            }
+            throw new Error("Undefined property: " . $this::class . "::\${$property}");
         };
-        if(!empty($error)) {
-            throw new Exception($error);
+        $reflectionProperty = new ReflectionProperty($this, $property);
+        $attributes = $reflectionProperty->getAttributes('Accessible');
+        if(empty($attributes)) {
+            $scope = $reflectionProperty->isPrivate() ? 'private' : 'protected';
+            throw new Error("Cannot access {$scope} property " . $this::class . "::\${$property}");
         };
-        return $value;
+        return $this->{$property} ?? null;
     }
 
 }

@@ -15,9 +15,11 @@ class Uss
 {
     /** To instantiate an object in all global space **/
 
-    use SingletonTrait, ProtectedPropertyAccessTrait;
+    use SingletonTrait;
+    use EncapsulatedPropertyAccessTrait;
 
     /** @ignore */
+    #[Accessible]
     protected string $projectUrl = 'https://github.com/ucscode/user-synthetics';
 
     /**
@@ -26,11 +28,13 @@ class Uss
      * Holds an instance of Pairs
      * @ignore
      */
+    #[Accessible]
     protected ?Pairs $options;
 
     /**
      *
      */
+    #[Accessible]
     protected ?MYSQLI $mysqli;
 
     /**
@@ -64,15 +68,6 @@ class Uss
      * @ignore
      */
     private array $routes = [];
-
-    /**
-     * The engineTags property is used to store tags that are dynamically generated and used within the User Synthetics engine.
-     * These tags can be used for various purposes, such as replacing placeholders in templates or storing additional information.
-     *
-     * @var array
-     * @ignore
-     */
-    private array $engineTags = [];
 
     /**
      * @ignore
@@ -179,7 +174,7 @@ class Uss
 
         /**
          * To add twig extension from a module,
-         * Simple implement the '\Twig\Extension\ExtensionInterface' from within your module
+         * Simple create a class that implement the '\Twig\Extension\ExtensionInterface' from within your module
          * And it will be automatically added to twig extension. E.G
          *
          * class MyTwigExtension extends \Twig\Extension\AbstractExtension {}
@@ -189,11 +184,9 @@ class Uss
         foreach(get_declared_classes() as $class) {
             $reflection = new ReflectionClass($class);
             if($reflection->implementsInterface('\\Twig\\Extension\\ExtensionInterface')) {
-                if(!$twig->hasExtension($class) && $reflection->isInstantiable()) {
-                    $isModular = preg_match("#^" . MOD_DIR . "#i", $reflection->getFileName());
-                    if($isModular) {
-                        $twig->addExtension(new $class());
-                    };
+                $isModular = preg_match("#^" . MOD_DIR . "#i", $reflection->getFileName());
+                if(!$twig->hasExtension($class) && $reflection->isInstantiable() && $isModular) {
+                    $twig->addExtension(new $class());
                 };
             };
         };

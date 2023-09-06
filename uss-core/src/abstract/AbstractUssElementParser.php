@@ -1,10 +1,18 @@
 <?php
 
-abstract class AbstractUssElementParser
+abstract class AbstractUssElementParser extends AbstractUssElementNodeList implements UssElementInterface
 {
+    protected string $tagName;
+
+    protected $attributes = [];
+
+    protected ?string $content = null;
+
     protected $parentElement;
-    
-    protected $child = [];
+
+    protected $children = [];
+
+    protected bool $void = false;
 
     protected $voidTags = [
         'area',
@@ -20,7 +28,7 @@ abstract class AbstractUssElementParser
         'param',
         'source',
         'track',
-        'wbr'
+        'wbr',
     ];
 
     public function __debugInfo()
@@ -30,7 +38,7 @@ abstract class AbstractUssElementParser
         foreach ($this as $property => $value) {
             if(in_array($property, $skip)) {
                 continue;
-            } elseif($property == 'child') {
+            } elseif($property == 'children') {
                 $value = count($value);
             }
             $debugInfo[$property] = $value;
@@ -65,12 +73,12 @@ abstract class AbstractUssElementParser
             $selector = $this->splitSelector($selector);
 
             # Now, we have to breakdown the selector into an array representing tags and attributes
-            
+
             $collapsedSelector = $this->collapseSelector($selector);
-            
+
             # Now, let's used the collapsed selector to find elements that match the selector
 
-            $results = $this->seek($this->child, $collapsedSelector);
+            $results = $this->seek($this->children, $collapsedSelector);
 
             foreach($results as $node) {
                 $key = array_search($node, $nodelist, true);
@@ -87,13 +95,13 @@ abstract class AbstractUssElementParser
 
     protected function buildNode(UssElementBuilder $node, ?int $indent)
     {
-        $nodename = $node->tagName;
+        $nodename = strtolower($node->tagName);
         $attributes = [];
 
         foreach($node->attributes as $key => $values) {
             $attributes[] = $key . "=\"" . htmlentities(implode(" ", $values)) . "\"";
         }
-        
+
         if(!is_null($indent)) {
             $indentation = str_repeat("\t", $indent);
             $carriage = "\n";
@@ -102,41 +110,59 @@ abstract class AbstractUssElementParser
         }
 
         $html = $indentation . "<" . $nodename;
-        
+
         if(!empty($attributes)) {
             $html .= " " . implode(" ", $attributes);
         };
 
         if(!$node->void) {
-            
-            $html .= ">" . $carriage;
 
-            foreach($node->child as $child) {
-                if(is_null($indent)) {
-                    $index = null;
-                } else {
-                    $index = $indent + 1;
+            $html .= ">";
+
+            if(!$node->hasContent()) {
+
+                if(!empty($node->children)) {
+
+                    $html .= $carriage;
+
+                    foreach($node->children as $child) {
+                        if(is_null($indent)) {
+                            $index = null;
+                        } else {
+                            $index = $indent + 1;
+                        }
+                        $html .= $this->buildNode($child, $index) . $carriage;
+                    }
+
+                    $html .= $indentation;
+
                 }
-                $html .= $this->buildNode($child, $index) . $carriage;
+
+            } else {
+
+                $html .= $node->getContent();
+
             }
 
-            $html .= $indentation . "</" . $nodename . ">";
+            $html .= "</" . $nodename . ">";
 
         } else {
 
             $html .= "/>";
-        
+
         }
 
         return $html;
     }
 
-    protected function slice(?string $value = null)
+    protected function slice(?string $value = null): array
     {
         if(is_null($value)) {
             $value = '';
         };
-        $value = array_filter(array_map('trim', explode(' ', $value)));
+        $value = array_filter(array_map('trim', explode(' ', $value)), function($value) {
+            return $value !== '';
+        });
         return $value;
     }
 
@@ -146,7 +172,7 @@ abstract class AbstractUssElementParser
     {
         # For each match, a selector key will be shifted so we must retain accurate numeric keys
         $collapsedSelector = array_values($collapsedSelector);
-        
+
         # An array to store matched nodes
         $capturedNodes = [];
 
@@ -173,7 +199,7 @@ abstract class AbstractUssElementParser
 
                 };
 
-                $capturedNodes = array_merge($capturedNodes, $this->seek($node->child, $copySelector));
+                $capturedNodes = array_merge($capturedNodes, $this->seek($node->children, $copySelector));
 
             };
 
@@ -231,6 +257,20 @@ abstract class AbstractUssElementParser
             'tagname' => null
         ];
 
+        $seperator = [
+            "%^@m{L}%", // encoding for "[" bracket
+            "%^@m{R}%" // encoding for "]" bracket
+        ];
+
+        $selector = preg_replace_callback("/([a-z0-9_\-]+)=('|\")([^\2]+?)\\2/i", function ($match) use ($seperator) {
+            $rephrase = str_replace(
+                array("[", "]"),
+                array($seperator[0], $seperator[1]),
+                $match[0]
+            );
+            return $rephrase;
+        }, $selector);
+
         if(preg_match_all('/(\.|#|\[)?[^.#\[]+/', $selector, $matches)) {
 
             foreach($matches[0] as $unit) {
@@ -243,7 +283,7 @@ abstract class AbstractUssElementParser
                         $result['class'] = [];
                     };
                     $result['class'][] = substr($unit, 1);
-                    
+
                 } elseif($type === '#') {
 
                     if(!isset($result[''])) {
@@ -256,7 +296,14 @@ abstract class AbstractUssElementParser
                     $attrs = array_map('trim', explode("=", substr($unit, 1, -1)));
                     $key = $attrs[0];
                     $value = $attrs[1] ?? null;
+
                     $value = !empty($value) ? explode(' ', trim($value, "'\"")) : [];
+
+                    $value = str_replace(
+                        array($seperator[0], $seperator[1]),
+                        array("[", "]"),
+                        $value
+                    );
 
                     if(isset($result[$key])) {
                         $result[$key] = array_merge($result[$key], $value);
@@ -274,7 +321,7 @@ abstract class AbstractUssElementParser
 
         };
 
-        return array_filter($result, function($value) {
+        return array_filter($result, function ($value) {
             return $value !== null;
         });
 
@@ -285,7 +332,7 @@ abstract class AbstractUssElementParser
         $matches = [];
 
         if(!empty($selector['tagname'])) {
-            $matches[] = strtolower($selector['tagname']) === $node->tagName;
+            $matches[] = strtoupper($selector['tagname']) === $node->tagName;
         };
 
         unset($selector['tagname']);
@@ -295,13 +342,13 @@ abstract class AbstractUssElementParser
             if($node->hasAttribute($attr)) {
                 $matches[] = true;
                 foreach($values as $value) {
-                    $matches[] = $node->hasProperty($attr, $value);
+                    $matches[] = $node->hasAttributeValue($attr, $value);
                 }
             } else {
                 $matches[] = false;
             };
         };
-        
+
         return !in_array(false, $matches) && !empty($matches);
     }
 

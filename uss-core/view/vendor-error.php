@@ -33,20 +33,20 @@
             <div class='bg-light p-4 rounded-2'>
                 <ul>    
                     <li>
-                        Install <a href='https://getcomposer.org/' target='_blank'>composer</a> if you don't already have it
+                        Install <a href='https://getcomposer.org/' target='_blank'>composer</a> (If you don't already have it)
                     </li>
                     <li>
-                        Open your <code>Terminal</code> ( <code>Command Prompt</code> )
+                        Open your <code>Terminal</code> ( or <code>Command Prompt</code> )
                     </li>
                     <li>
-                        Go to the project installation directory as shown below: <br>
-                        <div class='text-bg-dark mt-3 p-2 px-3 codeblock'>
+                        Go to the project installation directory (as shown below): <br>
+                        <div class='text-bg-dark mt-3 p-3 codeblock'>
                             cd <?php echo ROOT_DIR; ?>
                         </div>
                     </li>
                     <li>
                         Then run the following command: <br>
-                        <div class='text-bg-dark mt-3 p-2 px-3 codeblock'>
+                        <div class='text-bg-dark mt-3 p-3 codeblock'>
                             composer install
                         </div>
                     </li>

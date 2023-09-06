@@ -1,4 +1,7 @@
 <?php
+
+use UssElementBuilder as GlobalUssElementBuilder;
+
 /**
  * Uss Element Builder
  *
@@ -9,41 +12,40 @@
  */
 class UssElementBuilder extends AbstractUssElementParser
 {
-    use ProtectedPropertyAccessTrait;
+    use EncapsulatedPropertyAccessTrait;
 
+    #[Accessible]
     protected string $tagName;
-    protected $attributes = [];
-    protected bool $void = false;
 
     public function __construct(string $tagName)
     {
-        $this->tagName = strtolower(trim($tagName));
+        $this->tagName = strtoupper(trim($tagName));
         $this->void = in_array($this->tagName, $this->voidTags);
     }
 
-    public function isVoid(bool $void) {
-        /**
-         * Void elements are those without closing tags
-         * Example: link, input, image etc
-         */
+    public function isVoid(bool $void): self
+    {
+        # Void elements are those without closing tags (e.g link, image, br)
         $this->void = $void;
         return $this;
     }
 
     // Attribute Management
 
-    public function hasAttribute(string $attr) {
+    public function hasAttribute(string $attr): bool
+    {
         return isset($this->attributes[$attr]);
     }
 
-    public function setAttribute(string $attr, ?string $value = null)
+    public function setAttribute(string $attr, ?string $value = null): self
     {
-        $attr = $this->write($attr);
+        $attr = $this->evaluate($attr);
         $this->attributes[$attr] = $this->slice($value);
         return $this;
     }
 
-    public function hasProperty(string $attr, string $value) {
+    public function hasAttributeValue(string $attr, string $value): bool
+    {
         if(!$this->hasAttribute($attr)) {
             return false;
         };
@@ -51,30 +53,38 @@ class UssElementBuilder extends AbstractUssElementParser
         foreach($value as $unit) {
             if(!in_array($unit, $this->attributes[$attr])) {
                 return false;
-            };      
+            };
         };
         return !empty($value);
     }
 
-    public function addProperty(string $attr, string $value)
+    public function getAttribute(string $attr): ?string
     {
-        $attr = $this->write($attr);
+        if($this->hasAttribute($attr)) {
+            return implode(" ", $this->attributes[$attr]);
+        };
+        return null;
+    }
+
+    public function addAttributeValue(string $attr, string $value): self
+    {
+        $attr = $this->evaluate($attr);
         $value = $this->slice($value);
         $merge = array_merge($this->attributes[$attr], $value);
         $this->attributes[$attr] = array_unique($merge);
         return $this;
     }
 
-    public function removeProperty(string $attr, string $value)
+    public function removeAttributeValue(string $attr, string $value): self
     {
-        $attr = $this->write($attr);
+        $attr = $this->evaluate($attr);
         $value = $this->slice($value);
         $diff = array_diff($this->attributes[$attr], $value);
         $this->attributes[$attr] = $diff;
         return $this;
     }
 
-    public function unsetAttribute(string $attr)
+    public function removeAttribute(string $attr): self
     {
         if(isset($this->attributes[$attr])) {
             unset($this->attributes[$attr]);
@@ -82,51 +92,97 @@ class UssElementBuilder extends AbstractUssElementParser
         return $this;
     }
 
+    public function setContent(string $content): self
+    {
+        array_walk($this->children, function ($child) {
+            $child->setParent(null);
+        });
+        $this->children = [];
+        $this->content = $content;
+        return $this;
+    }
+
+    public function hasContent(): bool
+    {
+        return !is_null($this->content);
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
     // Child Management
 
-    public function appendChild(UssElementBuilder $child)
+    public function appendChild(UssElementBuilder $child): void
     {
         $child = $this->scan($child, __METHOD__);
-        $this->child[] = $child;
+        $this->children[] = $child;
     }
 
-    public function prependChild(UssElementBuilder $child)
+    public function prependChild(UssElementBuilder $child): void
     {
         $child = $this->scan($child, __METHOD__);
-        array_unshift($this->child, $child);
+        array_unshift($this->children, $child);
     }
 
-    public function insertBefore(UssElementBuilder $child, UssElementBuilder $refNode)
+    public function insertBefore(UssElementBuilder $child, UssElementBuilder $refNode): void
     {
-        $key = array_search($refNode, $this->child, true);
+        $key = array_search($refNode, $this->children, true);
         if($key === false) {
             return;
         };
         $child = $this->scan($child, __METHOD__);
-        array_splice($this->child, $key, 0, [$child]);
+        array_splice($this->children, $key, 0, [$child]);
     }
 
-    public function insertAfter(UssElementBuilder $child, UssElementBuilder $refNode)
+    public function insertAfter(UssElementBuilder $child, UssElementBuilder $refNode): void
     {
-        $key = array_search($refNode, $this->child, true);
+        $key = array_search($refNode, $this->children, true);
         if($key === false) {
             return;
         }
         $child = $this->scan($child, __METHOD__);
-        array_splice($this->child, ($key + 1), 0, [$child]);
+        array_splice($this->children, ($key + 1), 0, [$child]);
     }
 
-    public function replaceChild(UssElementBuilder $child, UssElementBuilder $refNode)
+    public function replaceChild(UssElementBuilder $child, UssElementBuilder $refNode): void
     {
-        $key = array_search($refNode, $this->child, true);
+        $key = array_search($refNode, $this->children, true);
         if($key === false) {
             return;
         }
         $child = $this->scan($child, __METHOD__);
-        $this->child[$key] = $child;
+        $this->children[$key] = $child;
     }
 
-    public function getHTML(bool $indent = false) {
+    public function firstChild(): ?UssElementBuilder
+    {
+        return $this->children[0] ?? null;
+    }
+
+    public function lastChild(): ?UssElementBuilder
+    {
+        $index = count($this->children) - 1;
+        return $this->children[$index] ?? null;
+    }
+
+    public function getChild(int $index): ?UssElementBuilder
+    {
+        return $this->children[$index] ?? null;
+    }
+
+    public function removeChild(UssElementBuilder $child): void
+    {
+        $key = array_search($child, $this->children, true);
+        if($key !== false) {
+            unset($this->children[$key]);
+            $this->children = array_values($this->children);
+        };
+    }
+
+    public function getHTML(bool $indent = false): string
+    {
         $index = $indent ? 0 : null;
         $html = $this->buildNode($this, $index);
         return $html;
@@ -140,7 +196,7 @@ class UssElementBuilder extends AbstractUssElementParser
 
     // Helper Methods
 
-    private function write(string $attr)
+    private function evaluate(string $attr)
     {
         $attr = str_replace(" ", '', $attr);
         if(!isset($this->attributes[$attr])) {
@@ -154,10 +210,10 @@ class UssElementBuilder extends AbstractUssElementParser
         if($this === $child) {
             throw new Exception("Trying to add self as child in " . $method);
         };
-        $key = array_search($child, $this->child, true);
+        $key = array_search($child, $this->children, true);
         if($key !== false) {
-            array_splice($this->child, $key, 1);
-            $this->child = array_values($this->child);
+            array_splice($this->children, $key, 1);
+            $this->children = array_values($this->children);
         };
         $child->setParent($this);
         return $child;
