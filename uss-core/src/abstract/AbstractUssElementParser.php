@@ -15,20 +15,20 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
     protected bool $void = false;
 
     protected $voidTags = [
-        'area',
-        'base',
-        'br',
-        'col',
-        'embed',
-        'hr',
-        'img',
-        'input',
-        'link',
-        'meta',
-        'param',
-        'source',
-        'track',
-        'wbr',
+        self::NODE_AREA,
+        self::NODE_BASE,
+        self::NODE_BR,
+        self::NODE_COL,
+        self::NODE_EMBED,
+        self::NODE_HR,
+        self::NODE_IMG,
+        self::NODE_INPUT,
+        self::NODE_LINK,
+        self::NODE_META,
+        self::NODE_PARAM,
+        self::NODE_SOURCE,
+        self::NODE_TRACK,
+        self::NODE_WBR,
     ];
 
     public function __debugInfo()

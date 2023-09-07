@@ -54,6 +54,7 @@ $form->add("name", UssForm::INPUT);
 # Configured Field
 $form->add("email", UssForm::INPUT, UssForm::TYPE_TEXT, [
     "label" => "Enter your email address", // use a custom label
+    "label_class" => "custom_label_class", // set custom label class
     "value" => "uche23mail@gmail.com", // add a default value
     "group" => [
         "prepend" => '$', // prepend icon or button
@@ -63,9 +64,13 @@ $form->add("email", UssForm::INPUT, UssForm::TYPE_TEXT, [
         'message' => "Sorry, the email address is wrong", // display message for the field
         'class' => 'text-danger' // custom report class
     ],
-    "id" => "custom_id", // set custom id,
-    "class" => "custom_class", // set custom class,
+    "id" => "custom_id", // set widget custom id,
+    "class" => "custom_class", // set widget custom class,
     "column" => "col-lg-9 mb-3", // set custom column size
+    "attr" => [
+        'data-name' => 'cool',
+        'placeholder' => 'Set email'
+    ]
     "fields" => function($fields) {
         // custom configuration;
         $fields['widget']

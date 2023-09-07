@@ -1,7 +1,5 @@
 <?php
 
-use UssElementBuilder as GlobalUssElementBuilder;
-
 /**
  * Uss Element Builder
  *

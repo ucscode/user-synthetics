@@ -29,14 +29,17 @@ class UssForm extends UssElementBuilder implements UssFormInterface
     public const TYPE_DATETIME_LOCAL = 'datetime-local';
 
     private ?array $populate = [];
+    private string $radioKey = 'data-checked';
 
-    public function __construct(string $name, ?string $route = null, string $method = 'GET', $enctype = 'application/x-www-form-urlencoded')
+    public function __construct(string $name, ?string $route = null, string $method = 'GET', string $enctype = null)
     {
         parent::__construct(self::NODE_FORM);
         $this->setAttribute('name', $name);
         $this->setAttribute('action', $route);
         $this->setAttribute('method', $method);
-        $this->setAttribute('enctype', $enctype);
+        if(!empty($enctype)) {
+            $this->setAttribute('enctype', $enctype);
+        };
         $this->setElementId("_ussf_" . $name, null, $this);
     }
 
@@ -107,7 +110,7 @@ class UssForm extends UssElementBuilder implements UssFormInterface
             $fieldColumn = $this->buildField($name, $widget, $config);
         }
 
-        return $this->addNewField($fieldColumn);
+        return $this->appendField($fieldColumn);
 
     }
 
@@ -169,14 +172,8 @@ class UssForm extends UssElementBuilder implements UssFormInterface
             
             if($this->isCheckable($node)) {
 
-                $checked = $node->hasAttribute('checked');
-
-                if($checked) {
-
-                    return !empty($value) ? $value : '1';
-
-                };
-
+                return $node->getAttribute($this->radioKey);
+                
             } else {
 
                 return $value;
@@ -210,7 +207,8 @@ class UssForm extends UssElementBuilder implements UssFormInterface
 
         if(is_scalar($value)) {
             
-            $hasValue = !empty($this->getValue($node));
+            $nodevalue = $this->getValue($node);
+            $hasValue =  !is_null($nodevalue) && $nodevalue !== '';
 
             if(in_array($node->tagName, [self::INPUT, self::BUTTON], true)) {
 
@@ -221,10 +219,12 @@ class UssForm extends UssElementBuilder implements UssFormInterface
                         if(!empty($value)) {
 
                             $node->setAttribute('checked', 'checked');
+                            $node->setAttribute($this->radioKey, '1');
 
                         } else {
 
                             $node->removeAttribute('checked');
+                            $node->setAttribute($this->radioKey, '0');
 
                         }
 
@@ -266,6 +266,23 @@ class UssForm extends UssElementBuilder implements UssFormInterface
         return false;
     }
 
+    /**
+     * Append a new field into the current active form row
+     */
+    public function appendField(UssElementBuilder $column): UssElementBuilder
+    {
+        if(empty($this->children)) {
+            $row = $this->addRow();
+        } else {
+            $row = $this->lastChild();
+            if($row->tagName !== self::NODE_DIV || !$row->hasAttributeValue('class', 'row')) {
+                $row = $this->addRow();
+            }
+        };
+        $row->appendChild($column);
+        return $column;
+    }
+
     protected function buildButtonWidget(string $name, string $type, $data): UssElementBuilder
     {
         if($type !== self::INPUT) {
@@ -276,7 +293,9 @@ class UssForm extends UssElementBuilder implements UssFormInterface
         };
         $button->setAttribute('type', self::TYPE_SUBMIT);
         $button->setAttribute('class', $data['class'] ?? 'btn btn-primary');
-        $this->setValue($button, $data['value'] ?? null);
+        if(array_key_exists('value', $data)) {
+            $this->setValue($button, $data['value']);
+        }
         if($button->hasAttribute('value') || !empty($data['use_name'])) {
             $button->setAttribute('name', $name);
         };
@@ -294,7 +313,9 @@ class UssForm extends UssElementBuilder implements UssFormInterface
                 $input->setAttribute('role', self::TYPE_SWITCH);
             };
             $input->setAttribute('type', $type);
-            $this->setValue($input, $data['checked'] ?? null);
+            if(array_key_exists('checked', $data)) {
+                $this->setValue($input, $data['checked']);
+            }
             $input->setAttribute('class', 'form-check-input ' . ($data['class'] ?? ''));
             if(!empty($data['value'])) {
                 $input->setAttribute('value', $data['value']);
@@ -302,7 +323,9 @@ class UssForm extends UssElementBuilder implements UssFormInterface
         } else {
             $input->setAttribute('type', $type);
             $input->setAttribute('class', 'form-control ' . ($data['class'] ?? ''));
-            $this->setValue($input, $data['value'] ?? null);
+            if(array_key_exists('value', $data)) {
+                $this->setValue($input, $data['value']);
+            }
         };
         return $input;
     }
@@ -318,7 +341,9 @@ class UssForm extends UssElementBuilder implements UssFormInterface
             $option->setContent($display);
             $select->appendChild($option);
         };
-        $this->setValue($select, $data['value'] ?? null);
+        if(array_key_exists('value', $data)) {
+            $this->setValue($select, $data['value']);
+        }
         return $select;
     }
 
@@ -327,7 +352,9 @@ class UssForm extends UssElementBuilder implements UssFormInterface
         $textarea = new UssElementBuilder(self::NODE_TEXTAREA);
         $textarea->setAttribute('name', $name);
         $textarea->setAttribute('class', 'form-control ' . ($data['class'] ?? ''));
-        $this->setValue($textarea, $data['value'] ?? null);
+        if(array_key_exists('value', $data)) {
+            $this->setValue($textarea, $data['value']);
+        }
         return $textarea;
     }
 
@@ -362,7 +389,7 @@ class UssForm extends UssElementBuilder implements UssFormInterface
         $field['group'] = (new UssElementBuilder(self::NODE_DIV))->setAttribute('class', 'input-single');
 
         $field['label'] = (new UssElementBuilder(self::NODE_LABEL))
-            ->setAttribute('class', 'form-label')
+            ->setAttribute('class', $data['label_class'] ?? 'form-label')
             ->setContent($label);
         
         $field['report'] = (new UssElementBuilder(self::NODE_DIV))->setAttribute('class', 'form-text form-report');
@@ -427,20 +454,6 @@ class UssForm extends UssElementBuilder implements UssFormInterface
     {
         $field = ['widget' => $widget];
         return $this->concludeField($field, $name, $data, 'widget');
-    }
-
-    protected function addNewField(UssElementBuilder $column): UssElementBuilder
-    {
-        if(empty($this->children)) {
-            $row = $this->addRow();
-        } else {
-            $row = $this->lastChild();
-            if($row->tagName !== self::NODE_DIV || !$row->hasAttributeValue('class', 'row')) {
-                $row = $this->addRow();
-            }
-        };
-        $row->appendChild($column);
-        return $column;
     }
 
     private function setElementId(string $name, ?string $part, UssElementBuilder $node): void
@@ -554,6 +567,17 @@ class UssForm extends UssElementBuilder implements UssFormInterface
                 $widget->setAttribute('id', $data['id']);
             };
         };
+        if(!empty($data['attr']) && is_array($data['attr'])) {
+            foreach($data['attr'] as $key => $value) {
+                if(in_array($key, ['type'])) {
+                    continue;
+                }
+                if(is_numeric($key)) {
+                    $key = $value;
+                }
+                $widget->setAttribute($key, $value);
+            };
+        }
         return $widget;
     }
 
