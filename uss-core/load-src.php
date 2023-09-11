@@ -8,41 +8,86 @@ defined('ROOT_DIR') || die;
  */
 $dependencies = [
 
-    'interface' => [
-        "UssElementInterface.php",
-        "UssFormInterface.php",
+    'services' => [
+
+        'UssElement' => [
+            'UssElementInterface.php',
+            'AbstractUssElementNodeList.php',
+            'AbstractUssElementParser.php',
+            'UssElement.php'
+        ],
+
+        'UssForm' => [
+            'UssFormInterface.php',
+            'UssForm.php'
+        ],
+
+        'Events' => [
+            'Events.php'
+        ],
+
+        'DOMTable' => [
+            'DOMTable.php'
+        ],
+
+        'DataMemo' => [
+            'DataMemo.php'
+        ],
+
+        'FamilyTree' => [
+            'FamilyTree.php'
+        ],
+
+        'Pairs' => [
+            'Pairs.php'
+        ],
+
+        'SQuery' => [
+            'SQuery.php'
+        ],
+
+        'X2Client' => [
+            'Translator.php',
+            'X2Client.php'
+        ]
+
     ],
 
-    'trait' => [
-        "SingletonTrait.php",
-        "EncapsulatedPropertyAccessTrait.php",
-    ],
+    'components' => [
 
-    'abstract' => [
-        "AbstractUssElementNodeList.php",
-        "AbstractUssElementParser.php",
-    ],
+        'interface' => [],
 
-    "class" => [
-        "UssTwigBlockManager.php",
-        "UssElementBuilder.php",
-        "UssForm.php",
-        "Core.php",
-        "Events.php",
-        "SQuery.php",
-        "Pairs.php",
-        "Menufy.php",
-        "DOMTable.php",
-        "DataMemo.php",
-        "X2Client/X2Client.php"
+        'enum' => [],
+
+        'trait' => [
+            "SingletonTrait.php",
+            "EncapsulatedPropertyAccessTrait.php",
+        ],
+
+        'abstract' => [],
+
+        "class" => [
+            "UssTwigBlockManager.php",
+            "Core.php",
+        ]
+
     ]
 
 ];
 
-# Include libraries in project
+# components, services:
+foreach($dependencies as $directory => $content) {
 
-foreach($dependencies as $path => $filelist) {
-    foreach($filelist as $filename) {
-        require SRC_DIR . "/{$path}/{$filename}";
+    # UssElement, UssForm, Interface...
+    foreach($content as $path => $includes) {
+        
+        # ".php" files
+        foreach($includes as $filename) {
+
+            require SRC_DIR . "/{$directory}/{$path}/{$filename}";
+
+        }
+
     };
+
 };

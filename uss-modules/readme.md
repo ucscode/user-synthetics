@@ -9,19 +9,19 @@ That's it! You can now write your code within the `index.php` file of your modul
 ## Code Sample
 
 ```php
+// Register your template directory and unique namespace
+
+Uss::instance()->addTwigFilesystem( __DIR__ . "/templates", "MyTemplate" );
+
 // Focus on the home page
 
 Uss::instance()->route('', function() {
 
     // Render HTML Document
 
-    Uss::instance()->view(function() {
-
-        // Print your HTML Content
-
-        echo "<h1>Bootstrap is enabled</h1>";
-
-    });
+    Uss::instance()->render('@MyTemplate/base.html.twig', [
+        'option' => 'value'
+    ]);
 
 })
 ```
