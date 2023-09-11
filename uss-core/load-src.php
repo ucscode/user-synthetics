@@ -8,6 +8,7 @@ defined('ROOT_DIR') || die;
  */
 $dependencies = [
 
+    /*
     'services' => [
 
         'UssElement' => [
@@ -53,6 +54,7 @@ $dependencies = [
 
     ],
 
+    */
     'components' => [
 
         'interface' => [],
@@ -69,6 +71,9 @@ $dependencies = [
         "class" => [
             "UssTwigBlockManager.php",
             "Core.php",
+            "SQuery.php",
+            "Pairs.php",
+            "Events.php"
         ]
 
     ]
