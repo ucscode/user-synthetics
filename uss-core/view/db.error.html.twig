@@ -3,7 +3,12 @@
 {% block body_main %}
 <div class='px-3 py-2 my-2 text-center'>
 
-	<img class='d-block mx-auto mb-4' src='{{ Uss.call(['Core','url'], constant('ASSETS_DIR') ~ '/images/origin.png') }}' alt='user synthetics logo' height='76'>
+	<img class='d-block mx-auto mb-4' src='{{ 
+		Uss.call(
+			['Core','url'], 
+			constant('UssEnum::ASSETS_DIR') ~ '/images/origin.png'
+		) 
+	}}' alt='user synthetics logo' height='76'>
 	
 	<h1 class='display-6 fw-light mb-3'>Database Connection Failed</h1>
 	
@@ -27,14 +32,14 @@
 		<div class='border-top border-bottom mb-3'>
 			<div class='py-4'>
 			<p class='fs-5'>Need Help?</p>
-			<a type='button' class='btn btn-primary px-4 gap-3' href='mailto:uche23mail@gmail.com'>
+			<a type='button' class='btn btn-primary px-4 gap-3' href='{{ mail }}'>
 				Contact Developer
 			</a>
 			</div>
 		</div>
 		
 		<div class='mb-2'>
-			<div class='mb-1'> Powered By <a href='{{ url }}' target='_blank'>{{ constant("PROJECT_NAME") }}</a> </div> 
+			<div class='mb-1'> Powered By <a href='{{ url }}' target='_blank'>{{ constant("UssEnum::PROJECT_NAME") }}</a> </div> 
 			<div>&copy; 2022</div>
 		</div>
 		

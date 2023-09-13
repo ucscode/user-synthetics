@@ -1,3 +1,0 @@
-[submodule "uss-core/src/services/DataMemo"]
-	path = uss-core/src/services/DataMemo
-	url = https://github.com/ucscode/DataMemo.git

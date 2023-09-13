@@ -1,12 +1,14 @@
 <?php
 
-defined("MOD_DIR") || die('Hey! Wait a minute');
+use Ucscode\Packages\Events;
+
+defined("UssEnum::MOD_DIR") || die('Illegal Module Loader Access');
 
 /**
  * Load Modules
  * Iterate over the contents of this directory and include the `index.php` file for each module
  */
-$directories = iterator_to_array(new FileSystemIterator(MOD_DIR));
+$directories = iterator_to_array(new FileSystemIterator(UssEnum::MOD_DIR));
 
 /** sort ascending */
 usort($directories, function ($a, $b) {

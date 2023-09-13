@@ -1,5 +1,9 @@
 <?php
 
+use Ucscode\Packages\Pairs;
+use Ucscode\Packages\Events;
+use Twig\Loader\FilesystemLoader;
+
 /**
  * The central class for managing User Synthetics application
  *
@@ -11,29 +15,15 @@
  * @author ucscode
  */
 
-class Uss
+final class Uss
 {
-    /** To instantiate an object in all global space **/
-
-    use SingletonTrait;
-    use EncapsulatedPropertyAccessTrait;
+    use SingletonTrait, EncapsulatedPropertyAccessTrait;
 
     /** @ignore */
     #[Accessible]
-    protected string $projectUrl = 'https://github.com/ucscode/user-synthetics';
-
-    /**
-     * Configuration Object
-     *
-     * Holds an instance of Pairs
-     * @ignore
-     */
-    #[Accessible]
     protected ?Pairs $options;
-
-    /**
-     *
-     */
+    
+    /** @ignore */
     #[Accessible]
     protected ?MYSQLI $mysqli;
 
@@ -72,7 +62,7 @@ class Uss
     /**
      * @ignore
      */
-    private ?\Twig\Loader\FilesystemLoader $twigLoader;
+    private ?FilesystemLoader $twigLoader;
     private ?string $defaultTwigNamespace;
     private bool $rendered = false;
 
@@ -87,19 +77,16 @@ class Uss
     protected function __construct()
     {
 
-        define('EVENT_ID', "_");
-        define('CONFIG_DIR', CORE_DIR . "/config");
-
-        $this->twigLoader = new \Twig\Loader\FilesystemLoader();
+        $this->twigLoader = new FilesystemLoader();
         $this->defaultTwigNamespace = basename(__CLASS__);
-        $this->twigLoader->addPath(VIEW_DIR, $this->defaultTwigNamespace);
-        $this->twigLoader->addPath(VIEW_DIR, '__main__');
+        $this->twigLoader->addPath(UssEnum::VIEW_DIR, $this->defaultTwigNamespace);
+        $this->twigLoader->addPath(UssEnum::VIEW_DIR, '__main__');
 
         $this->importTwigAssets();
 
-        require_once CONFIG_DIR . "/database.php";
-        require_once CONFIG_DIR . "/variables.php";
-        require_once CONFIG_DIR . "/session.php";
+        require_once UssEnum::CONFIG_DIR . "/database.php";
+        require_once UssEnum::CONFIG_DIR . "/variables.php";
+        require_once UssEnum::CONFIG_DIR . "/session.php";
 
     }
 
@@ -113,7 +100,7 @@ class Uss
      *  Uss::instance()->render('@namespace/file.html.twig', []);
      * ```
      */
-    public function addTwigFilesystem(string $directory, string $namespace)
+    public function addTwigFilesystem(string $directory, string $namespace): void
     {
         # Prepare Namespaces
         $systemBase = strtolower($this->defaultTwigNamespace);
@@ -138,8 +125,14 @@ class Uss
 
     /**
      * Render A Twig Template
+     *
+     * @param string $templateFile: Reference to the twig template.
+     * @param array $variables: A list of variables that will be passed to the template
+     * @param UssTwigBlockManager $ussTwigBlockManager: A Block manager that enables you write or remove content from template blocks without editing the template file
+     *
+     * @return void
      */
-    public function render(string $templateFile, array $variables = [], ?UssTwigBlockManager $ussTwigBlockManager = null)
+    public function render(string $templateFile, array $variables = [], ?UssTwigBlockManager $ussTwigBlockManager = null): void
     {
         # Prevent Multiple Rendering
         if($this->rendered) {
@@ -170,7 +163,7 @@ class Uss
         };
 
         # Custom Extension;
-        $twig->addGlobal('Uss', require_once CONFIG_DIR . "/UssAnonymousTwigExtension.php");
+        $twig->addGlobal('Uss', require_once UssEnum::CONFIG_DIR . "/UssTwigExtension.php");
 
         /**
          * To add twig extension from a module,
@@ -184,7 +177,7 @@ class Uss
         foreach(get_declared_classes() as $class) {
             $reflection = new ReflectionClass($class);
             if($reflection->implementsInterface('\\Twig\\Extension\\ExtensionInterface')) {
-                $isModular = preg_match("#^" . MOD_DIR . "#i", $reflection->getFileName());
+                $isModular = preg_match("#^" . UssEnum::MOD_DIR . "#i", $reflection->getFileName());
                 if(!$twig->hasExtension($class) && $reflection->isInstantiable() && $isModular) {
                     $twig->addExtension(new $class());
                 };
@@ -199,102 +192,9 @@ class Uss
     }
 
     /**
-     * Display content on the browser using a fully featured header and footer.
-     *
-     * This method is used to render content on the browser by providing a callable which represents the content of the view template. It provides a visually blank page with a fully featured header and footer, including assets such as Bootstrap, SEO tags, and other resources.
-     * By using this method, you are creating a blank page with a doctype declaration, ensuring the availability of necessary resources.
-     *
-     * @param callable|null $content Optional: A callable that represents the content of the view template.
-     * @return null|bool Returns `null` if the content is supplied. Otherwise, returns a `boolean` indicating if content has already been displayed.
+     * Explode a content by a seperator and rejoin the filtered value
      */
-    public function view(?callable $content = null, ?array $exclib = [], ?array $inclib = [])
-    {
-        if(is_null($content) || $this->viewing) {
-            return $this->viewing;
-        }
-
-
-        /**
-         * Output Buffering
-         *
-         * In order to activate user synthetic's template engine, output buffering needs to be turned on
-         * Hence, no output will be sent to the browser.
-         * Instead, the output will be captured &amp; stored in an internal buffer
-         */
-
-        $level = ob_get_level();
-
-        ob_start();
-
-        /**
-         * Now one problem about output buffer is
-         * When an error or an uncaught exception is thrown, the script is exited
-         * The printed error message then dis-organizes the page
-         *
-         * We need to print exception on a top level buffer (A completely blank page)
-         * Just like a normal PHP script would do
-         */
-
-        try {
-
-
-            # OUTPUT THE HEADER!
-
-            require VIEW_DIR . '/header.php';
-
-
-            # EXECUTE THE CALLABLE CONTENT
-
-            call_user_func($content);
-
-
-            # OUTPUT THE FOOTER!
-
-            require VIEW_DIR . '/footer.php';
-
-
-        } catch (Exception $ex) {
-
-            // discard all buffer output and focus only on the exception
-
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-
-            throw $ex;
-
-        }
-
-        /**
-         * Capture the buffered content
-         *
-         * Copy the content of the internal buffer into a string
-         * Then, replace every eTag in the string
-         *
-         */
-
-        $output = Core::replace_var(ob_get_clean(), $this->engineTags);
-
-
-        # OUTPUT THE CONTENT!
-
-        print_r($output);
-
-
-        /**
-         *
-         */
-
-        # CHANGE THE VIEW STATUS;
-
-        $this->viewing = true;
-
-    }
-
-    /**
-     *
-     */
-    public function filterContext(string|array $path, string $divider = '/')
+    public function filterContext(string|array $path, string $divider = '/'): string
     {
         if(is_array($path)) {
             $path = implode($divider, $path);
@@ -321,40 +221,32 @@ class Uss
      * @param string $path The regular expression path to match against the URL
      * @param callable $controller The function to be called if the URL matches the expression
      * @param string|null $request The request method on which the function should be called ('GET', 'POST', or `null`)
-     * @return null
+     *
+     * @return bool|object A router object or false if route did does not match the request
      */
-    public function route(string $path, callable $controller, $methods = null)
-    {
-        $router = new class ($path, $controller, $methods) {
-            # public properties
-            public $controller;
+    public function route(string $route, callable $controller, $methods = null): bool|object
+    {   
+        $router = new class ($route, $controller, $methods) {
 
             protected $request;
-            protected $route;
-            protected $methods;
-
-            private $authentic = [];
+            private array|bool $authentic = [];
             private $requestMatch;
             private $backtrace;
 
-            public function __construct($path, $controller, $methods)
-            {
-                $this->route = $path;
-                $this->controller = $controller;
-                $this->methods = $methods;
-                $this->configure();
+            public function __construct(
+                protected string $route, 
+                public $controller, 
+                protected array|string|null $methods
+            )
+            {   
+                $this->filterMethods();
+                $this->resolveRoute();
+                $this->authentic = !in_array(false, $this->authentic);
             }
 
             public function __get($key)
             {
                 return $this->{$key} ?? null;
-            }
-
-            private function configure()
-            {
-                $this->filterMethods();
-                $this->resolveRoute();
-                $this->authentic = !in_array(false, $this->authentic);
             }
 
             protected function filterMethods()
@@ -384,15 +276,7 @@ class Uss
                 # Resolve Method
                 $this->authentic[] = in_array($_SERVER['REQUEST_METHOD'], $this->methods);
             }
-
-            /**
-            * Uss::instance()->route( "users/profile", function() {
-            * 	This closure will work only if domain name is directly followed by `users/profile`
-            * 	# domain.com/users/profile = true
-            * 	# domain.com/user/profile = false
-            * 	# domain.com/users/profile2 = false
-            * });
-            */
+            
             protected function resolveRoute()
             {
                 # The route
@@ -414,8 +298,8 @@ class Uss
                 foreach($debugBacktrace as $key => $currentTrace) {
                     if($key > 255) {
                         break;
-                    } elseif(($currentTrace['class'] ?? null) == Uss::instance()::class) {
-                        if(strtolower($currentTrace['function']) == 'route') {
+                    } elseif(($currentTrace['class'] ?? null) === Uss::instance()::class) {
+                        if(strtolower($currentTrace['function']) === 'route') {
                             $this->backtrace = $currentTrace;
                         };
                     };
@@ -424,17 +308,18 @@ class Uss
 
         };
 
-        # The @route.routed event can be used to modify any controller output
-        Events::instance()->exec('@route.routed', ['router' => $router]);
-
-        if($router->authentic) {
-            # Execute the controller
-            call_user_func($router->controller, $router->requestMatch);
-        };
-
         $this->routes[] = $router;
 
-        return $router->authentic ? $router : false;
+        if($router->authentic) {
+
+            // Execute the controller and pass the matching request as argument
+            call_user_func($router->controller, $router->requestMatch);
+            
+            return $router;
+
+        };
+
+        return false;
 
     }
 
@@ -487,46 +372,27 @@ class Uss
      * @param string|null $token The token to verify. If not provided, a new token is generated.
      * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
      */
-    public function nonce($input = '1', ?string $token = null)
+    public function nonce($input = '1', ?string $receivedNonce = null)
     {
+        $secretKey = UssEnum::SECRET_KEY . md5($_SESSION['USSID']);
+        $algorithm = 'ripemd160';
+        $salt = bin2hex(random_bytes(3));
+        $dataToHash = $input . $salt . $secretKey;
 
-        // generate a new session_id;
-
-        $hash = call_user_func(function () use ($input) {
-
-            // get length of uss_session_id
-            $length = strlen($_SESSION['uss_session_id']);
-
-            // join hashed input with hashed session_id;
-            $bind_hash = hash('sha256', session_id()) . hash('sha256', $input);
-
-            // extract some string and split the string into array;
-            $input =  str_split(substr($bind_hash, -$length), 5);
-
-            // encode the uss_session_id and split the string into array;
-            $session_id = str_split(str_rot13($_SESSION['uss_session_id']), 5);
-
-            $result = [];
-
-            // now! rearrange the strings into a very improper and abnormal way
-            for($x = 0; $x < count($session_id); $x++) {
-                $__a = str_rot13($input[ $x ] ?? '');
-                $__b = str_rot13($session_id[ $x ] ?? '');
-                $result[] = $__a . $__b;
-            };
-
-            // join the improper string
-            return implode('', $result);
-
-        });
-
-        // return a hashed version of the improper string!
-
-        if(is_null($token)) {
-            return password_hash($hash, PASSWORD_BCRYPT);
+        $nonce = hash_hmac($algorithm, $dataToHash, $secretKey);
+        
+        if ($receivedNonce === null) {
+            return $nonce . ':' . $salt;
+        } else {
+            $token = explode(':', $receivedNonce);
+            if(count($token) === 2) {
+                list($expectedNonce, $expectedSalt) = $token;
+                $computedNonce = hash_hmac($algorithm, $input . $expectedSalt . $secretKey, $secretKey);
+                return hash_equals($computedNonce, $expectedNonce);
+            } else {
+                return false;
+            }
         }
-
-        return password_verify($hash, $token);
 
     }
 
@@ -590,7 +456,7 @@ class Uss
      *
      * @return mixed If no key is specified, an array of data to be forwarded to the browser. If a key is provided, the associated value is returned.
      */
-    public function console(?string $key = null)
+    public function console(?string $key = null, mixed $value = null)
     {
         // accepts 2 arguments
         if(is_null($key)) {
@@ -598,10 +464,10 @@ class Uss
         }
         $key = trim($key);
         $args = func_get_args();
-        if(count($args) === 1) {
-            return $this->console[ $key ] ?? null;
+        if(func_num_args() === 1) {
+            return $this->console[$key] ?? null;
         }
-        $this->console[ $key ] = $args[1];
+        $this->console[$key] = $value;
     }
 
 
@@ -621,47 +487,6 @@ class Uss
             unset($this->console[ $key ]);
             return $value;
         }
-    }
-
-    /**
-     * Assign and update template tag values in user synthetics.
-     *
-     * The `Uss::instance()->tag()` method is used in the User Synthetics framework to modify content through template tags. Template tags are written in the format `%\{tagName}` and can be replaced with corresponding values.
-     *
-     * When encountering a tag, the method checks the `engineTags` list to find a matching key. If a match is found, the tag is replaced with the corresponding string value. Otherwise, the tag is replaced with an empty string.
-     *
-     * @param string|null $key The tag name to be replaced. If set to null, an array containing a list of all tags will be returned and the other parameters will be ignored.
-     * @param string|null $value The value to assign or update the tag. If set to null, the tag will be removed from the tag list. If not supplied, the value of the tag will be returned. If a string value is provided, the tag value will be assigned or updated.
-     * @param bool $overwrite (default = `true`) Set to `false` if the value of an existing tag should not be overwritten.
-     *
-     * @return string|null If $key is set to `null`, an array containing a list of all tags. Otherwise, returns the value of the specified tag or `null` if the tag doesn't exist.
-     */
-    public function tag(?string $key, ?string $value = null, bool $overwrite = true)
-    {
-
-        if(is_null($key)) {
-            return $this->engineTags;
-        }
-
-        if(!array_key_exists(1, func_get_args())) {
-            return ($this->engineTags[ $key ] ?? null);
-        }
-
-        // Try not to overwrite an existing tag;
-        if(!$overwrite && array_key_exists($key, $this->engineTags)) {
-            return;
-        }
-
-        if(is_null($value)) {
-            // remove an existing tag
-            if(array_key_exists($key, $this->engineTags)) {
-                unset($this->engineTags[$key]);
-            };
-            return;
-        };
-
-        // Assign a new tag
-        $this->engineTags[$key] = $value;
     }
 
     /**
@@ -700,7 +525,7 @@ class Uss
             $contents = array_map(function ($value) {
                 $type = explode(".", $value);
                 $type = strtoupper(end($type));
-                $value = Core::url(ASSETS_DIR . "/" . $value);
+                $value = Core::url(UssEnum::ASSETS_DIR . "/" . $value);
                 if($type == 'CSS') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {

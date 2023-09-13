@@ -1,6 +1,6 @@
 <?php
 
-defined('CONFIG_DIR') || die;
+defined('UssEnum::CONFIG_DIR') || die('Invalid Session Access');
 
 /**
 * Establish a new session, create a session ID, and generate a browser unique ID.
@@ -19,16 +19,31 @@ if(empty(session_id())) {
     session_start();
 }
 
-/* Create a unique visitor session ID */
+/** 
+ * Create a Unique Session ID 
+ */
+$sidIndex = 'USSID';
 
-if(empty($_SESSION['uss_session_id']) || strlen($_SESSION['uss_session_id']) < 50) {
-    $_SESSION['uss_session_id'] = Core::keygen(mt_rand(50, 80), true);
+if(empty($_SESSION[$sidIndex])) {
+
+    $_SESSION[$sidIndex] = Core::keygen(40, true);
+
 };
 
-/* - Unique Device ID; */
+/**
+ * Unique Device ID
+ */
+$cookieIndex = 'USSCLIENTID';
 
-if(empty($_COOKIE['ussid'])) {
-    $time = (new DateTime())->add((new DateInterval("P6M")));
-    $_COOKIE['ussid'] = uniqid(Core::keygen(7));
-    $setCookie = setrawcookie('ussid', $_COOKIE['ussid'], $time->getTimestamp(), '/');
+if(empty($_COOKIE[$cookieIndex])) {
+
+    // Available For 3 Months
+    $time = (new \DateTime())->add((new \DateInterval("P3M")));
+
+    // Predefined Cookie
+    $_COOKIE[$cookieIndex] = uniqid(Core::keygen(7));
+
+    // Set Cookie Value
+    $setCookie = setrawcookie($cookieIndex, $_COOKIE[$cookieIndex], $time->getTimestamp(), '/');
+
 };

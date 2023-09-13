@@ -8,8 +8,7 @@ defined('ROOT_DIR') || die;
  */
 $dependencies = [
 
-    /*
-    'services' => [
+    'packages' => [
 
         'UssElement' => [
             'UssElementInterface.php',
@@ -54,7 +53,6 @@ $dependencies = [
 
     ],
 
-    */
     'components' => [
 
         'interface' => [],
@@ -71,25 +69,23 @@ $dependencies = [
         "class" => [
             "UssTwigBlockManager.php",
             "Core.php",
-            "SQuery.php",
-            "Pairs.php",
-            "Events.php"
         ]
 
     ]
 
 ];
 
-# components, services:
-foreach($dependencies as $directory => $content) {
+// components, services:
+foreach($dependencies as $directory => $container) {
 
-    # UssElement, UssForm, Interface...
-    foreach($content as $path => $includes) {
+    // UssElement, UssForm, Interface...
+    foreach($container as $path => $array) {
         
-        # ".php" files
-        foreach($includes as $filename) {
-
-            require SRC_DIR . "/{$directory}/{$path}/{$filename}";
+        // List of PHP Files
+        foreach($array as $filename) {
+            
+            // Include PHP Files
+            require_once UssEnum::SRC_DIR . "/" . $directory . "/" . $path . "/" . $filename;
 
         }
 

@@ -17,7 +17,7 @@
         <div class='container py-5'>
 
             <h2 class='mb-3'>
-                {{ OOPs }} Boot Error!
+                Vendor Autoload Error!
             </h2>
 
             <div class='alert alert-danger'>

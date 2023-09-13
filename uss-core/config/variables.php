@@ -1,15 +1,13 @@
 <?php
 
-defined('CONFIG_DIR') || die;
+defined('UssEnum::CONFIG_DIR') || die('Invalid Variable Declaration Access');
 
-self::$globals['icon'] = Core::url(ASSETS_DIR . '/images/origin.png');
+self::$globals['icon'] = Core::url(UssEnum::ASSETS_DIR . '/images/origin.png');
 
-self::$globals['title'] = PROJECT_NAME;
+self::$globals['title'] = UssEnum::PROJECT_NAME;
 
-self::$globals['headline'] = "The excellent development tool for future oriented programmers";
+self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
 
-self::$globals['copyright'] = ((new DateTime())->format('Y'));
+self::$globals['copyright'] = '©' . ((new \DateTime())->format('Y'));
 
-self::$globals['description'] = "Ever thought of how to make your programming life easier in developing website? \nUser Synthetics offers the best solution for a simple programming lifestyle";
-
-self::$globals['website'] = $this->projectUrl;
+self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";

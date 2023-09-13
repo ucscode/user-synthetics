@@ -1,27 +1,29 @@
 <?php
 /**
- * This file loads the database config, Uss class and Modules
+ * @package UserSynthetics
  * @author ucscode <uche23mail@gmail.com>
  * @license GNU-v3
  */
 
-# Uss Constants
-require_once __DIR__ . "/constants.php";
+define('ROOT_DIR', realpath(__DIR__ . "/../"));
 
-# Composer Autoload
-require_once CORE_DIR . "/load-vendors.php";
+// Uss Enumerations
+require_once __DIR__ . "/UssEnum.php";
 
-# Database Connection
-require_once CORE_DIR . "/conn.php";
+// Composer Autoload
+require_once UssEnum::CORE_DIR . "/vendors.php";
 
-# Local Classes
-require_once CORE_DIR . "/load-src.php";
+// Database Connection
+require_once UssEnum::CORE_DIR . "/UssDB.php";
 
-# Uss instance
-require_once CORE_DIR . "/Uss.php";
+// Local Classes
+require_once UssEnum::CORE_DIR . "/load-src.php";
+
+// Uss instance
+require_once UssEnum::CORE_DIR . "/Uss.php";
 
 # Modules Loader
-require_once CORE_DIR . "/load-modules.php";
+require_once UssEnum::CORE_DIR . "/modules.php";
 
 // =========================================
 

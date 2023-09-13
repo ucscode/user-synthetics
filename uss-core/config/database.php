@@ -1,6 +1,6 @@
 <?php
 
-defined('CONFIG_DIR') || die;
+use Ucscode\Packages\Pairs;
 
 /**
 * Connect to the database.
@@ -15,7 +15,9 @@ defined('CONFIG_DIR') || die;
 * @ignore
 */
 
-if(DB_CONNECTION_ENABLED) {
+if(DB_ENABLED) {
+
+    $error = null;
 
     try {
 
@@ -23,28 +25,30 @@ if(DB_CONNECTION_ENABLED) {
 
         if($this->mysqli->connect_errno) {
 
-            $this->render('@Uss/db.error.html.twig', [
-                'error' => $this->mysqli->connect_error,
-                'url' => $this->projectUrl
-            ]);
-
-            die;
+            $error = $this->mysqli->connect_error;
 
         } else {
 
-            $this->options = new Pairs($this->mysqli, DB_TABLE_PREFIX . "_options");
+            $this->options = new Pairs($this->mysqli, DB_PREFIX . "_options");
 
         };
 
     } catch(Exception $e) {
 
+        $error = $e->getMessage();
+
+    };
+
+    if($error) {
+
         $this->render('@Uss/db.error.html.twig', [
-            'error' => $e->getMessage(),
-            'url' => $this->projectUrl
+            'error' => $error,
+            'url' => UssEnum::GITHUB_REPO,
+            'mail' => UssEnum::AUTHOR_EMAIL
         ]);
 
-        die;
-
+        die();
+        
     }
 
 } else {

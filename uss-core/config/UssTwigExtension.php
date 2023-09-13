@@ -17,7 +17,7 @@ return new class ($this, $ussTwigBlockManager) {
         private Uss $ussInstance,
         public UssTwigBlockManager $twigBlockManager
     ) {
-        $this->ussInstance->console('platform', PROJECT_NAME);
+        $this->ussInstance->console('platform', UssEnum::PROJECT_NAME);
         $this->attr['console64'] = base64_encode(json_encode($ussInstance->console()));
     }
 
