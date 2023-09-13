@@ -2,7 +2,7 @@
 /**
  * @package UserSynthetics
  * @author ucscode <uche23mail@gmail.com>
- * @license GNU-v3
+ * @license MIT
  */
 
 define('ROOT_DIR', realpath(__DIR__ . "/../"));
