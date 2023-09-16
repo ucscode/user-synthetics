@@ -162,7 +162,7 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
         if(is_null($value)) {
             $value = '';
         };
-        $value = array_filter(array_map('trim', explode(' ', $value)), function($value) {
+        $value = array_filter(array_map('trim', explode(' ', $value)), function ($value) {
             return $value !== '';
         });
         return $value;

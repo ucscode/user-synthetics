@@ -19,8 +19,8 @@ if(empty(session_id())) {
     session_start();
 }
 
-/** 
- * Create a Unique Session ID 
+/**
+ * Create a Unique Session ID
  */
 $sidIndex = 'USSID';
 

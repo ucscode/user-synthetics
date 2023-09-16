@@ -1,39 +1,39 @@
 <?php
 
-final class UssEnum {
-    
+final class UssEnum
+{
     /**
      * Please change the secret key for security purpose
      * You can use a custom key or generate a random secret key using the function below
      *
      * bin2hex(random_bytes(16))
      */
-    const SECRET_KEY = 'any_secret_key'; 
-    
-    const PROJECT_NAME = 'User Synthetics';
-    
-    const GITHUB_REPO = 'https://github.com/ucscode/user-synthetics';
+    public const SECRET_KEY = 'any_secret_key';
 
-    const AUTHOR = 'Ucscode';
+    public const PROJECT_NAME = 'User Synthetics';
 
-    const AUTHOR_EMAIL = 'mailto:uche23mail@gmail.com';
+    public const GITHUB_REPO = 'https://github.com/ucscode/user-synthetics';
 
-    const AUTHOR_WEBSITE = 'https://ucscode.me';
+    public const AUTHOR = 'Ucscode';
 
-    const MIN_PHP_VERSION = '8.1';
+    public const AUTHOR_EMAIL = 'mailto:uche23mail@gmail.com';
 
-    const CORE_DIR = ROOT_DIR . "/uss-core";
+    public const AUTHOR_WEBSITE = 'https://ucscode.me';
 
-    const MOD_DIR = ROOT_DIR . '/uss-modules';
+    public const MIN_PHP_VERSION = '8.1';
 
-    const ASSETS_DIR = self::CORE_DIR . '/assets';
+    public const CORE_DIR = ROOT_DIR . "/uss-core";
 
-    const VIEW_DIR = self::CORE_DIR . '/view';
+    public const MOD_DIR = ROOT_DIR . '/uss-modules';
 
-    const SRC_DIR = self::CORE_DIR . "/src";
+    public const ASSETS_DIR = self::CORE_DIR . '/assets';
 
-    const CONFIG_DIR = self::CORE_DIR . "/config";
+    public const VIEW_DIR = self::CORE_DIR . '/view';
 
-    const EVENT_ID = '_';
+    public const SRC_DIR = self::CORE_DIR . "/src";
+
+    public const CONFIG_DIR = self::CORE_DIR . "/config";
+
+    public const EVENT_ID = '_';
 
 }

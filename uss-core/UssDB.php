@@ -2,7 +2,7 @@
 
 /**
  * Enable or disable database connection
- */ 
+ */
 define('DB_ENABLED', true);
 
 /**
@@ -10,8 +10,8 @@ define('DB_ENABLED', true);
  */
 define('DB_PREFIX', 'uss_');
 
-/** 
- * Local Server Only 
+/**
+ * Local Server Only
  */
 if($_SERVER['SERVER_NAME'] === 'localhost') {
 
@@ -31,4 +31,3 @@ if($_SERVER['SERVER_NAME'] === 'localhost') {
     define('DB_NAME', '');
 
 };
-

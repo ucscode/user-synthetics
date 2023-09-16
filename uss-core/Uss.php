@@ -17,12 +17,13 @@ use Twig\Loader\FilesystemLoader;
 
 final class Uss
 {
-    use SingletonTrait, EncapsulatedPropertyAccessTrait;
+    use SingletonTrait;
+    use EncapsulatedPropertyAccessTrait;
 
     /** @ignore */
     #[Accessible]
     protected ?Pairs $options;
-    
+
     /** @ignore */
     #[Accessible]
     protected ?MYSQLI $mysqli;
@@ -225,20 +226,18 @@ final class Uss
      * @return bool|object A router object or false if route did does not match the request
      */
     public function route(string $route, callable $controller, $methods = null): bool|object
-    {   
+    {
         $router = new class ($route, $controller, $methods) {
-
             protected $request;
             private array|bool $authentic = [];
             private $requestMatch;
             private $backtrace;
 
             public function __construct(
-                protected string $route, 
-                public $controller, 
+                protected string $route,
+                public $controller,
                 protected array|string|null $methods
-            )
-            {   
+            ) {
                 $this->filterMethods();
                 $this->resolveRoute();
                 $this->authentic = !in_array(false, $this->authentic);
@@ -276,7 +275,7 @@ final class Uss
                 # Resolve Method
                 $this->authentic[] = in_array($_SERVER['REQUEST_METHOD'], $this->methods);
             }
-            
+
             protected function resolveRoute()
             {
                 # The route
@@ -314,7 +313,7 @@ final class Uss
 
             // Execute the controller and pass the matching request as argument
             call_user_func($router->controller, $router->requestMatch);
-            
+
             return $router;
 
         };
@@ -380,7 +379,7 @@ final class Uss
         $dataToHash = $input . $salt . $secretKey;
 
         $nonce = hash_hmac($algorithm, $dataToHash, $secretKey);
-        
+
         if ($receivedNonce === null) {
             return $nonce . ':' . $salt;
         } else {

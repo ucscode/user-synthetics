@@ -80,10 +80,10 @@ foreach($dependencies as $directory => $container) {
 
     // UssElement, UssForm, Interface...
     foreach($container as $path => $array) {
-        
+
         // List of PHP Files
         foreach($array as $filename) {
-            
+
             // Include PHP Files
             require_once UssEnum::SRC_DIR . "/" . $directory . "/" . $path . "/" . $filename;
 

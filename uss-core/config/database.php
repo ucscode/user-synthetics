@@ -48,7 +48,7 @@ if(DB_ENABLED) {
         ]);
 
         die();
-        
+
     }
 
 } else {

@@ -105,7 +105,7 @@ class UssForm extends UssElement implements UssFormInterface
         $fieldColumn = $this->buildFieldElements($name, $fieldType, $context, $config);
 
         $this->appendField($fieldColumn);
-        
+
         return $fieldColumn;
 
     }
@@ -134,7 +134,8 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @return array|null An array containing each elements within the field or null if not found.
      */
-    public function getFieldset(string $name): ?array {
+    public function getFieldset(string $name): ?array
+    {
         $fieldset = [];
         $identity = $this->makeIdentity($name, 'column');
         $column = $this->find('#' . $identity);
@@ -145,14 +146,14 @@ class UssForm extends UssElement implements UssFormInterface
         }
         // column, group, label, widget, report
         $fieldset['column'] = $column;
-        $fieldset['group'] = call_user_func(function() use($column) {
+        $fieldset['group'] = call_user_func(function () use ($column) {
             $groupset = ['input-single', 'input-group', 'form-check'];
             foreach($groupset as $class) {
                 $element = $column->find(".{$class}")[0] ?? null;
                 if(!empty($element)) {
                     return $element;
                 }
-            }   
+            }
         });
         $fieldset['label'] = $column->find('label')[0] ?? null;
         $fieldset['report'] = $column->find('.form-report')[0] ?? null;
@@ -189,11 +190,11 @@ class UssForm extends UssElement implements UssFormInterface
 
             # Get input or button value
             $value = $node->getAttribute('value');
-            
+
             if($this->isCheckable($node)) {
 
                 return $node->getAttribute($this->radioKey);
-                
+
             } else {
 
                 return $value;
@@ -235,7 +236,7 @@ class UssForm extends UssElement implements UssFormInterface
         };
 
         if(is_scalar($value)) {
-            
+
             $nodevalue = $this->getValue($node);
             $hasValue =  !is_null($nodevalue) && $nodevalue !== '';
 
@@ -308,7 +309,7 @@ class UssForm extends UssElement implements UssFormInterface
     {
         if(empty($this->children)) {
             $row = $this->addRow();
-        } else if($rowIndex !== null) {
+        } elseif($rowIndex !== null) {
             $row = $this->getChild(abs($rowIndex));
         } else {
             $row = $this->lastChild();
@@ -347,7 +348,7 @@ class UssForm extends UssElement implements UssFormInterface
     {
         return $this->details[$key] ?? null;
     }
-    
+
     /**
      * Remove a detail with the specified key from the UssForm object.
      *
@@ -406,7 +407,7 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @ignore
      */
-    
+
     protected function buildButtonWidget(string $name, string $type, $data): UssElement
     {
         if($type !== self::INPUT) {
@@ -443,7 +444,7 @@ class UssForm extends UssElement implements UssFormInterface
             $input->setAttribute('class', 'form-check-input ' . ($data['class'] ?? ''));
             if(!empty($data['value'])) {
                 $input->setAttribute('value', $data['value']);
-            }   
+            }
         } else {
             $input->setAttribute('type', $type);
             $input->setAttribute('class', 'form-control ' . ($data['class'] ?? ''));
@@ -492,7 +493,7 @@ class UssForm extends UssElement implements UssFormInterface
             }, ($matches[0] ?? []));
             return implode(" ", $label);
         });
-        
+
         $field = [
             'widget' => $widget,
             'column' => (new UssElement(self::NODE_DIV))->setAttribute('class', $data['column'] ?? 'col-md-12 mb-3'),
@@ -503,19 +504,20 @@ class UssForm extends UssElement implements UssFormInterface
         } else {
             $field = $this->constructRegularField($field, $name, $label, $data);
         };
-        
+
         return $this->concludeField($field, $name, $data);
 
     }
 
-    protected function &constructRegularField(array &$field, string $name, string $label, array $data): array {
+    protected function &constructRegularField(array &$field, string $name, string $label, array $data): array
+    {
 
         $field['group'] = (new UssElement(self::NODE_DIV))->setAttribute('class', 'input-single');
 
         $field['label'] = (new UssElement(self::NODE_LABEL))
             ->setAttribute('class', $data['label_class'] ?? 'form-label')
             ->setContent($label);
-        
+
         $field['report'] = (new UssElement(self::NODE_DIV))->setAttribute('class', 'form-text form-report');
 
         # Update Data
@@ -538,7 +540,7 @@ class UssForm extends UssElement implements UssFormInterface
     }
 
     protected function &constructCheckableField(array &$field, string $name, string $label, array $data): array
-    {   
+    {
         # Get Type
         $type = $field['widget']->getAttribute('role');
 
@@ -556,7 +558,7 @@ class UssForm extends UssElement implements UssFormInterface
         $field['column']->appendChild($field['group']);
         $field['group']->appendChild($field['widget']);
         $field['group']->appendChild($field['label']);
-        
+
         return $field;
     }
 
@@ -580,8 +582,9 @@ class UssForm extends UssElement implements UssFormInterface
         return $this->concludeField($field, $name, $data, 'widget');
     }
 
-    protected function makeIdentity(string $name, ?string $part): string {
-        
+    protected function makeIdentity(string $name, ?string $part): string
+    {
+
         $formId = $this->getAttribute('id');
 
         if(!is_null($formId)) {
@@ -617,13 +620,14 @@ class UssForm extends UssElement implements UssFormInterface
 
     /**
      * [PRIVATE] METHODS
-     * 
+     *
      * This methods cannot be extended
      *
      * @ignore
      */
 
-    private function buildFieldElements(string $name,string $fieldType, array|string|null $context, array $config): UssElement {
+    private function buildFieldElements(string $name, string $fieldType, array|string|null $context, array $config): UssElement
+    {
 
         if($fieldType === self::TEXTAREA) {
             $widget = $this->buildTextareaWidget($name, $context, $config);
@@ -674,10 +678,10 @@ class UssForm extends UssElement implements UssFormInterface
         if(!is_array($data)) {
             $data = ['append' => $data];
         };
-        
+
         # Available Group Options
         $default = ['prepend', 'append'];
-        
+
         # Parse Data
         foreach($default as $index) {
             $value = $data[$index] ?? null;
@@ -766,13 +770,16 @@ class UssForm extends UssElement implements UssFormInterface
         return $widget;
     }
 
-    private function isCheckable(string|UssElement $entity): bool {
+    private function isCheckable(string|UssElement $entity): bool
+    {
         if(!is_string($entity)) {
             if($entity->tagName !== self::INPUT) {
                 return false;
             }
             $value = $entity->getAttribute('type');
-        } else $value = $entity;
+        } else {
+            $value = $entity;
+        }
         return in_array($value, [self::TYPE_CHECKBOX, self::TYPE_SWITCH, self::TYPE_RADIO]);
     }
 
@@ -812,7 +819,8 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @return array The flattened array with keys in the specified format.
      */
-    private function flattenArray($value, ?string $key = null) {
+    private function flattenArray($value, ?string $key = null)
+    {
         $result = [];
         if (!is_array($value)) {
             // If the value is not an array, assign it to the result with the specified key

@@ -12,7 +12,6 @@ namespace Ucscode\UssElement;
  */
 class UssElement extends AbstractUssElementParser
 {
-
     public readonly string $tagName;
 
     public function __construct(string $tagName)
@@ -20,7 +19,7 @@ class UssElement extends AbstractUssElementParser
         $this->tagName = strtoupper(trim($tagName));
         $this->void = in_array($this->tagName, $this->voidTags);
     }
-    
+
     /**
      * Indicate whether the element should have a closing tag or not.
      *
@@ -185,7 +184,7 @@ class UssElement extends AbstractUssElementParser
         $child = $this->scan($child, __METHOD__);
         $this->children[] = $child;
     }
-    
+
     /**
      * Prepends a child element to the current element.
      *

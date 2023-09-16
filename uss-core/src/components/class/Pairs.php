@@ -244,13 +244,13 @@ class Pairs
 
         # Check if argument 1 is given;
 
-        if( !empty(func_get_args()) ) {
+        if(!empty(func_get_args())) {
 
             $ref = func_get_arg(0);
-            
-            if( !is_null($ref) ) {
 
-                if( is_numeric($ref) ) {
+            if(!is_null($ref)) {
+
+                if(is_numeric($ref)) {
 
                     $ref = (int)$ref;
 
@@ -264,13 +264,15 @@ class Pairs
 
                     $error = __METHOD__ . "(): Argument #1 (\$ref) must be of type ?int, {$type} given, called in {$callerPath} on line {$errorLine}";
 
-                    throw new TypeError( $error );
+                    throw new TypeError($error);
 
                 };
 
             };
 
-        } else $ref = false;
+        } else {
+            $ref = false;
+        }
 
         # Prepare Reference;
 
@@ -287,7 +289,7 @@ class Pairs
 
         # Prepare Query;
 
-        $Query = sQuery::select( $this->tablename, $reference . $expression . " ORDER BY _ref");
+        $Query = sQuery::select($this->tablename, $reference . $expression . " ORDER BY _ref");
 
         # Execute Query;
 
@@ -298,12 +300,12 @@ class Pairs
             while($pair = $result->fetch_assoc()) {
 
                 $refId = $pair['_ref'];
-                $refId = is_numeric($refId ) ? (int)$refId : null;
-                
-                if( !isset($group[$refId]) ) {
+                $refId = is_numeric($refId) ? (int)$refId : null;
+
+                if(!isset($group[$refId])) {
                     $group[$refId] = array();
                 };
-                
+
                 $key = $pair['_key'];
                 $value = json_decode($pair['_value'], true);
 
@@ -312,7 +314,7 @@ class Pairs
             };
 
         };
-        
+
         return ($ref === false) ? $group : $group[$ref];
 
     }

@@ -2,8 +2,8 @@
 
 namespace Ucscode\UssElement;
 
-abstract class AbstractUssElementNodeList {
-
+abstract class AbstractUssElementNodeList
+{
     public const NODE_A = 'A';
     public const NODE_ABBR = 'ABBR';
     public const NODE_ACRONYM = 'ACRONYM';
