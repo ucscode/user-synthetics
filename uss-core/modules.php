@@ -2,7 +2,7 @@
 
 use Ucscode\Packages\Events;
 
-defined("UssEnum::MOD_DIR") || die('Illegal Module Loader Access');
+defined('ROOT_DIR') && defined("UssEnum::MOD_DIR") || die('Illegal Access to Module Loader');
 
 /**
  * Load Modules

@@ -16,4 +16,14 @@ interface UssFormInterface extends UssElementInterface
 
     public function addRow(string $class): UssElement;
 
+    public function getFieldset(string $name): ?array;
+
+    public function populate(array $data): void;
+
+    public function getValue(UssElement $node): ?string;
+
+    public function setValue(UssElement $node, $value, bool $overwrite): bool;
+
+    public function appendField(UssElement $column): ?UssElement;
+
 }

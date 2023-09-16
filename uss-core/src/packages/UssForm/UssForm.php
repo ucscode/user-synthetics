@@ -36,22 +36,23 @@ class UssForm extends UssElement implements UssFormInterface
     private ?array $populate = [];
     private string $radioKey = 'data-checked';
 
+    /**
+     * [PUBLIC] METHODS
+     *
+     * This methods can be called publicly
+     *
+     * @ignore
+     */
     public function __construct(string $name, ?string $route = null, string $method = 'GET', string $enctype = null)
     {
         parent::__construct(self::NODE_FORM);
         $this->setAttribute('name', $name);
         $this->setAttribute('action', $route);
-        $this->setAttribute('method', $method);
+        $this->setAttribute('method', strtoupper($method));
         if(!empty($enctype)) {
             $this->setAttribute('enctype', $enctype);
         };
         $this->setElementId("_ussf_" . $name, null, $this);
-    }
-
-    public function isVoid(bool $void): self
-    {
-        $this->void = false;
-        return $this;
     }
 
     /**
@@ -59,8 +60,7 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @param string $name The name of the field
      *
-     * @param string $fieldType The type of file; Possible values include
-     * UssForm::INPUT, UssForm::SELECT, UssForm::TEXTAREA, UssForm::BUTTON"
+     * @param string $fieldType The type of field; UssForm::INPUT, UssForm::SELECT, UssForm::TEXTAREA, UssForm::BUTTON"
      *
      * @param string|array|null $context
      * - UssForm::INPUT - Context is a string that defines the field type e.g UssForm::TYPE_TEXT, UssForm::TYPE_NUMBER...
@@ -69,6 +69,8 @@ class UssForm extends UssElement implements UssFormInterface
      * - UssForm::BUTTON - Context defines submit button of type UssForm::BUTTON or UssForm::INPUT
      *
      * @param array $data An array of configurations
+     *
+     * @return UssElement The added field element
      */
     public function add(
         string $name,
@@ -89,13 +91,20 @@ class UssForm extends UssElement implements UssFormInterface
 
         $fieldColumn = $this->buildFieldElements($name, $fieldType, $context, $config);
 
-        return $this->appendField($fieldColumn);
+        $this->appendField($fieldColumn);
+        
+        return $fieldColumn;
 
     }
 
     /**
-     * Add a new row to the form
+     * Add a new row to the form.
+     *
      * New fields will be added to the last added row
+     *
+     * @param string $class The CSS class for the row.
+     *
+     * @return UssElement The added row element.
      */
     public function addRow(string $class = ''): UssElement
     {
@@ -106,7 +115,11 @@ class UssForm extends UssElement implements UssFormInterface
     }
 
     /**
-     * Get a list of elements in a field
+     * Get the list of elements added to a field.
+     *
+     * @param string $name The name of the field.
+     *
+     * @return array|null An array containing each elements within the field or null if not found.
      */
     public function getFieldset(string $name): ?array {
         $fieldset = [];
@@ -137,40 +150,25 @@ class UssForm extends UssElement implements UssFormInterface
     /**
      * Populate the form with data
      *
-     * Automatically set the value of fields with populated data
-     * Value set directly on the form will override the populated data
+     * Automatically set the value of field widgets with populated data;
+     * Values set directly on the form will override the populated data
+     *
+     * @param array $data An associative array of data to populate the form.
+     *
+     * @return void
      */
-    public function populate(array $data)
+    public function populate(array $data): void
     {
         $this->populate = $data;
     }
 
     /**
-     * Get HTML Output
+     * Get the value of a form element.
+     *
+     * @param UssElement $node The form element.
+     *
+     * @return string|null The value of the form element or null.
      */
-    public function getHTML(bool $indent = false): string
-    {
-        foreach($this->populate as $key => $value) {
-            if(!is_scalar($value)) {
-                continue;
-            };
-            $nodes = $this->find("[name='{$key}']");
-            if(!empty($nodes)) {
-                $node = $nodes[0];
-                $isWidget = in_array($node->tagName, [
-                    self::BUTTON,
-                    self::INPUT,
-                    self::TEXTAREA,
-                    self::SELECT
-                ]);
-                if($isWidget) {
-                    $this->setValue($node, $value, false);
-                }
-            };
-        };
-        return parent::getHTML($indent);
-    }
-
     public function getValue(UssElement $node): ?string
     {
         if(in_array($node->tagName, [self::INPUT, self::BUTTON], true)) {
@@ -207,6 +205,15 @@ class UssForm extends UssElement implements UssFormInterface
         return null;
     }
 
+    /**
+     * Set the value of a form element.
+     *
+     * @param UssElement $node      The form element.
+     * @param mixed      $value     The value to set.
+     * @param bool       $overwrite Whether to overwrite existing value.
+     *
+     * @return bool True if the value was set, false otherwise.
+     */
     public function setValue(UssElement $node, $value, bool $overwrite = true): bool
     {
         if(is_null($value)) {
@@ -275,22 +282,77 @@ class UssForm extends UssElement implements UssFormInterface
     }
 
     /**
-     * Append a new field into the current active form row
+     * Append a field to the active form row.
+     *
+     * @param UssElement $column The field to append.
+     *
+     * @param int $rowIndex The index of an existing row
+     *
+     * @return UssElement The row to which the field element was appended or null if not appended.
      */
-    public function appendField(UssElement $column): UssElement
+    public function appendField(UssElement $column, ?int $rowIndex = null): ?UssElement
     {
         if(empty($this->children)) {
             $row = $this->addRow();
+        } else if($rowIndex !== null) {
+            $row = $this->getChild(abs($rowIndex));
         } else {
             $row = $this->lastChild();
             if($row->tagName !== self::NODE_DIV || !$row->hasAttributeValue('class', 'row')) {
                 $row = $this->addRow();
             }
         };
-        $row->appendChild($column);
-        return $column;
+        if(!empty($row)) {
+            $row->appendChild($column);
+        };
+        return $row;
     }
 
+    /**
+     * Get HTML Output
+     */
+    public function getHTML(bool $indent = false): string
+    {
+        foreach($this->populate as $key => $value) {
+            if(!is_scalar($value)) {
+                continue;
+            };
+            $nodes = $this->find("[name='{$key}']");
+            if(!empty($nodes)) {
+                $node = $nodes[0];
+                $isWidget = in_array($node->tagName, [
+                    self::BUTTON,
+                    self::INPUT,
+                    self::TEXTAREA,
+                    self::SELECT
+                ]);
+                if($isWidget) {
+                    $this->setValue($node, $value, false);
+                }
+            };
+        };
+        return parent::getHTML($indent);
+    }
+
+    /**
+     * Force Form element to never be void
+     * @ignore
+     */
+    public function isVoid(bool $void): self
+    {
+        $this->void = false;
+        return $this;
+    }
+
+
+    /**
+     * [PROTECTED] METHODS
+     *
+     * This methods can be extended but cannot be called publicly
+     *
+     * @ignore
+     */
+    
     protected function buildButtonWidget(string $name, string $type, $data): UssElement
     {
         if($type !== self::INPUT) {
@@ -497,6 +559,15 @@ class UssForm extends UssElement implements UssFormInterface
 
         return $identity;
     }
+
+
+    /**
+     * [PRIVATE] METHODS
+     * 
+     * This methods cannot be extended
+     *
+     * @ignore
+     */
 
     private function buildFieldElements(string $name,string $fieldType, array|string|null $context, array $config): UssElement {
 

@@ -29,7 +29,7 @@ if(DB_ENABLED) {
 
         } else {
 
-            $this->options = new Pairs($this->mysqli, DB_PREFIX . "_options");
+            $this->options = new Pairs($this->mysqli, DB_PREFIX . "options");
 
         };
 

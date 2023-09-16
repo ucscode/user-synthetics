@@ -8,6 +8,4 @@ self::$globals['title'] = UssEnum::PROJECT_NAME;
 
 self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
 
-self::$globals['copyright'] = '©' . ((new \DateTime())->format('Y'));
-
 self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";
