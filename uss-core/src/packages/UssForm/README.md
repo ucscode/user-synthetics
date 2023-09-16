@@ -141,7 +141,8 @@ $form->add("email", UssForm::INPUT, UssForm::TYPE_TEXT, [
     "attr" => [
         'data-name' => 'cool',
         'placeholder' => 'Set email'
-    ]
+    ],
+    'ignore' => true, // do not submit this field (will not be available in $_POST variable)
     "fields" => function($fields) {
         // custom configuration;
         $fields['widget']

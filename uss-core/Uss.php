@@ -509,7 +509,7 @@ final class Uss
                 'main-css' => 'css/main.css'
             ],
             'body_js' => [
-                'jquery' => 'js/jquery-3.6.4.min.js',
+                'jquery' => 'js/jquery-3.7.1.min.js',
                 'bootstrap' => 'js/bootstrap.bundle.min.js',
                 'bootbox' => 'js/bootbox.all.min.js',
                 'glightbox' => "vendor/glightbox/glightbox.min.js",

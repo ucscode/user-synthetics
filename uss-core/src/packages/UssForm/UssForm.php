@@ -156,7 +156,7 @@ class UssForm extends UssElement implements UssFormInterface
         });
         $fieldset['label'] = $column->find('label')[0] ?? null;
         $fieldset['report'] = $column->find('.form-report')[0] ?? null;
-        $fieldset['widget'] = $column->find("[name], button")[0] ?? null;
+        $fieldset['widget'] = $column->find("[name], input[type], select, textarea, button[type], button")[0] ?? null;
         return $fieldset;
     }
 
@@ -172,7 +172,8 @@ class UssForm extends UssElement implements UssFormInterface
      */
     public function populate(array $data): void
     {
-        $this->populate = $data;
+        $result = $this->flattenArray($data);
+        $this->populate = $result;
     }
 
     /**
@@ -735,14 +736,17 @@ class UssForm extends UssElement implements UssFormInterface
 
     private function configureWidget(UssElement $widget, array $data): UssElement
     {
+        // Create Custom ID
         if(!empty($data['id'])) {
             if(preg_match("/\w(?:[a-z0-9_\-]+)?/", $data['id'])) {
                 $widget->setAttribute('id', $data['id']);
             };
         };
+        // Set Field As Required
         if(!empty($data['required'])) {
             $widget->setAttribute('required', 'required');
         }
+        // Set Widget Attributes
         if(!empty($data['attr']) && is_array($data['attr'])) {
             foreach($data['attr'] as $key => $value) {
                 if(in_array($key, ['type'])) {
@@ -754,6 +758,11 @@ class UssForm extends UssElement implements UssFormInterface
                 $widget->setAttribute($key, $value);
             };
         }
+        // Ignore the name attribute
+        if(!empty($data['ignore'])) {
+            $widget->removeAttribute('name');
+        };
+        // return the widget
         return $widget;
     }
 
@@ -793,6 +802,36 @@ class UssForm extends UssElement implements UssFormInterface
         };
 
         return $field[$__key];
+    }
+
+    /**
+     * Recursively flattens a multi-dimensional array and constructs keys in the specified format.
+     *
+     * @param array  $array   The multi-dimensional array to flatten.
+     * @param string $prefix  (Optional) The prefix to prepend to keys.
+     *
+     * @return array The flattened array with keys in the specified format.
+     */
+    private function flattenArray($value, ?string $key = null) {
+        $result = [];
+        if (!is_array($value)) {
+            // If the value is not an array, assign it to the result with the specified key
+            $result[$key] = $value;
+        } else {
+            // If the value is an array, iterate through its elements
+            foreach ($value as $innerKey => $innerValue) {
+                if (func_num_args() > 1) {
+                    // If a key is provided, concatenate it with the inner key using square brackets
+                    $newKey = $key . "[$innerKey]";
+                } else {
+                    // If no key is provided, use the inner key directly
+                    $newKey = $innerKey;
+                }
+                // Recursively call flattenArray with the inner value and new key
+                $result = array_merge($result, $this->flattenArray($innerValue, $newKey));
+            }
+        }
+        return $result;
     }
 
 }
