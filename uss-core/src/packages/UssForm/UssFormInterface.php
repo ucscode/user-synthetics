@@ -26,4 +26,10 @@ interface UssFormInterface extends UssElementInterface
 
     public function appendField(UssElement $column): ?UssElement;
 
+    public function addDetail(string $key, $value): bool;
+
+    public function getDetail(string $key): mixed;
+
+    public function removeDetail(string $key): void;
+
 }

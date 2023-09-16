@@ -360,6 +360,66 @@ $value = $form->getValue($textarea); // 'This is a value'
 
 These methods make it convenient to interact with and manipulate the values of form field widgets within the **UssForm** library.
 
+# Public Methods
+
+<table>
+    <tr>
+        <td><strong>Method</strong></td>
+        <td><strong>Return Type</strong></td>
+        <td><strong>Description</strong></td>
+    </tr>
+    <tr>
+        <td><code>add</code></td>
+        <td><code>UssElement</code></td>
+        <td>Adds a new field to the form with the specified name, field type, context, and configuration.</td>
+    </tr>
+    <tr>
+        <td><code>addRow</code></td>
+        <td><code>UssElement</code></td>
+        <td>Adds a new row to the form with the specified CSS class.</td>
+    </tr>
+    <tr>
+        <td><code>getFieldset</code></td>
+        <td><code>array|null</code></td>
+        <td>Retrieves a collection of elements that makes up a field; returns null if the field does not exist.</td>
+    </tr>
+    <tr>
+        <td><code>populate</code></td>
+        <td><code>void</code></td>
+        <td>Populates the form with data from the provided array.</td>
+    </tr>
+    <tr>
+        <td><code>getValue</code></td>
+        <td><code>string|null</code></td>
+        <td>Gets the value of a form element or returns null if not found.</td>
+    </tr>
+    <tr>
+        <td><code>setValue</code></td>
+        <td><code>bool</code></td>
+        <td>Sets the value of a form element and returns true if successful, false otherwise.</td>
+    </tr>
+    <tr>
+        <td><code>appendField</code></td>
+        <td><code>UssElement|null</code></td>
+        <td>Appends a field to the form row and returns the row in which the field was appended; null if it couldn't be appended.</td>
+    </tr>
+    <tr>
+        <td><code>addDetail</code></td>
+        <td><code>bool</code></td>
+        <td>Adds an isolated detail to the UssForm object with the specified key and value.</td>
+    </tr>
+    <tr>
+        <td><code>getDetail</code></td>
+        <td><code>mixed|null</code></td>
+        <td>Gets the value of a detail associated with the specified key or returns null if the key does not exist.</td>
+    </tr>
+    <tr>
+        <td><code>removeDetail</code></td>
+        <td><code>void</code></td>
+        <td>Removes a detail with the specified key from the UssForm object.</td>
+    </tr>
+</table>
+
 ### Acknowledgment
 
 The UssForm library is a part of the <a href='https://github.com/ucscode/user-synthetics'>User Synthetics</a> project developed by UCSCode.

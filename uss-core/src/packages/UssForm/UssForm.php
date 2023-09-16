@@ -34,6 +34,7 @@ class UssForm extends UssElement implements UssFormInterface
     public const TYPE_DATETIME_LOCAL = 'datetime-local';
 
     private ?array $populate = [];
+    private array $details = [];
     private string $radioKey = 'data-checked';
 
     /**
@@ -53,6 +54,18 @@ class UssForm extends UssElement implements UssFormInterface
             $this->setAttribute('enctype', $enctype);
         };
         $this->setElementId("_ussf_" . $name, null, $this);
+    }
+
+    /**
+     * Provides an array of data for debugging purposes when this object is printed or var_dumped.
+     *
+     * @return array An array containing debug information about the UssForm object.
+     */
+    public function __debugInfo()
+    {
+        $info = parent::__debugInfo();
+        $info['details'] = $this->details;
+        return $info;
     }
 
     /**
@@ -115,7 +128,7 @@ class UssForm extends UssElement implements UssFormInterface
     }
 
     /**
-     * Get the list of elements added to a field.
+     * Get a collection of elements that makes up a field.
      *
      * @param string $name The name of the field.
      *
@@ -306,6 +319,46 @@ class UssForm extends UssElement implements UssFormInterface
             $row->appendChild($column);
         };
         return $row;
+    }
+
+    /**
+     * Add a detail to the UssForm object that will not be rendered with the form.
+     *
+     * @param string $key   The key for the detail.
+     * @param mixed  $value The value to associate with the key.
+     *
+     * @return bool True if the detail was added successfully, false otherwise.
+     */
+    public function addDetail(string $key, $value): bool
+    {
+        $this->details[$key] = $value;
+        return isset($this->details[$key]);
+    }
+
+    /**
+     * Get the value of a detail associated with the specified key.
+     *
+     * @param string $key The key of the detail to retrieve.
+     *
+     * @return mixed|null The value of the detail if found, or null if the key does not exist.
+     */
+    public function getDetail(string $key): mixed
+    {
+        return $this->details[$key] ?? null;
+    }
+    
+    /**
+     * Remove a detail with the specified key from the UssForm object.
+     *
+     * @param string $key The key of the detail to remove.
+     *
+     * @return void
+     */
+    public function removeDetail(string $key): void
+    {
+        if(isset($this->details[$key])) {
+            unset($this->details[$key]);
+        };
     }
 
     /**
