@@ -37,10 +37,10 @@ The Pairs class allows you to create a meta table that consists of key-value pai
 2. Extract the contents of the archive to your project directory.
 3. Include the `pairs.php` file in your PHP script:
 
-   ```php
-   require_once 'path/to/sQuery.php';
-   require_once 'path/to/pairs.php';
-   ```
+```php
+// Include SQuery Package Here
+require_once 'path/to/pairs.php';
+```
 
 ## Usage
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\Packages;
+namespace Ucscode\SQuery;
 
 /**
  * A simple SQL query builder class that provides methods for generating SQL statements.
@@ -13,64 +13,66 @@ namespace Ucscode\Packages;
  * @author ucscode
  * @link https://github.com/ucscode/sQuery
  */
-class SQuery
+class SQuery extends AbstractSQuery
 {
-    /**
-     * Format the column name by applying backticks if needed.
-     *
-     * This method takes a column name as input and checks if it requires formatting with backticks.
-     * If the column name does not start with '*' or is not already enclosed in backticks, it adds backticks to ensure proper formatting.
-     * The method supports column names with or without table aliases, handling them correctly.
-     *
-     * @param string|null $column The column name to format.
-     * @return string|null The formatted column name, or null if the input is null.
-     * @ignore
-     */
-    private static function backtick_data(?string $column)
-    {
-        if ($column) {
-            $division = array_map(function ($column) {
-                return !preg_match('/^\*|`.*`$/', $column) ? "`$column`" : $column;
-            }, explode('.', $column));
-            $column = implode(".", $division);
+    public function clear(): self {
+        $this->SQL = [];
+        $const = $this->getClassConstants('SECTION_');
+        foreach($const as $key => $const) {
+            $this->SQL[$const] = [];
         };
-        return $column;
+        return $this;
     }
 
-    /**
-     * Generate an aliased column syntax that follows SQL conventions.
-     *
-     * This method takes a column syntax as input and generates an aliased column syntax that adheres to SQL conventions.
-     * It trims the input column syntax and splits it by the "AS" keyword, preserving the aliases if present.
-     * Each part of the column syntax is checked against a regular expression pattern to ensure it matches the SQL convention.
-     * If a part is a valid column name, it is formatted using the `backtick_data` method to apply backticks if necessary.
-     * Finally, the parts are joined back together using " AS " as the separator, and the generated aliased column syntax is returned.
-     *
-     * @param string $column The column syntax to generate an alias for.
-     * @return string The aliased column syntax following SQL conventions.
-     * @ignore
-     */
-
-    private static function alias_column(string $column)
+    public function getQuery(): string
     {
+        $SQLSET = $this->SQL;
+        $SQL = [];
 
-        $column = trim($column);
-        $expr = "(?:\w+|`\w+`|\*)";
+        // INSERT STATEMENT
+        if($this->isType(self::TYPE_INSERT)) {
 
-        $alias = preg_split("/\s(?:as)\s/i", $column);
+            $SQL = $SQLSET[self::SECTION_INSERT];
+            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_COLUMNS]) . ")";
+            $SQL[] = "VALUES";
+            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_VALUES]) . ")";
 
-        array_walk($alias, function (&$identifier, $key) use ($expr) {
-            $is_column_name = preg_match("/^{$expr}(?:\.{$expr})?$/i", $identifier);
-            if($is_column_name) {
-                $identifier = self::backtick_data($identifier);
-            }
-            return $identifier;
-        });
+            // UPDATE STATEMENT
+        } elseif($this->isType(self::TYPE_UPDATE)) {
 
-        $alias = implode(' AS ', $alias);
+            $SQL = $SQLSET[self::SECTION_UPDATE];
+            $SQL[] = "SET";
 
-        return $alias;
+            $combination = array_combine(
+                $SQLSET[self::SECTION_COLUMNS],
+                $SQLSET[self::SECTION_VALUES]
+            );
 
+            foreach($combination as $key => $value) {
+                $combination[$key] = "{$key} = {$value}";
+            };
+
+            $SQL[] = implode(",\n", array_values($combination));
+
+            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
+
+            // DELETE STATEMENT
+        } elseif($this->isType(self::TYPE_DELETE)) {
+
+            $SQL = $SQLSET[self::SECTION_DELETE];
+            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
+
+            // SELECT STATEMENT
+        } else {
+            $SQLSET = array_filter($SQLSET);
+            foreach($SQLSET as $section => $queries) {
+                foreach($queries as $query) {
+                    $SQL[] = trim($query);
+                }
+            };
+        }
+
+        return implode("\n", $SQL);
     }
 
     /**
@@ -85,28 +87,162 @@ class SQuery
      * @param string $tablename The name of the table.
      * @param string|null $condition The condition for the WHERE clause. Defaults to `1` if not specified.
      * @param string|array|null $columns The columns to select. Defaults to `*` if not specified.
-     * @return string The generated SELECT SQL statement.
+     * @return self The generated SELECT SQL statement.
      */
-    public static function select(string $tablename, ?string $condition = null, $columns = '*')
+    public function select(string|array $columns = '*', ?string $from = null): self
     {
-
-        if(is_null($condition)) {
-            $condition = 1;
-        }
+        $this->demandForNewQuery(__METHOD__);
 
         if(!is_array($columns)) {
-            $columns = array($columns);
-        }
+            $columns = explode(',', $columns);
+        };
 
         $columns = implode(', ', array_map(function ($column) {
-            return self::alias_column($column);
+            return $this->alias_column($column);
         }, $columns));
 
-        $tablename = self::backtick_data($tablename);
+        $this->SQL[self::SECTION_SELECT][] = "SELECT {$columns}";
 
-        $SQL = "SELECT {$columns} FROM {$tablename} WHERE {$condition}";
+        if($from !== null) {
+            $this->from($from);
+        };
 
-        return $SQL;
+        return $this;
+    }
+
+    public function from(string $tablename, string $as = null): self
+    {
+        $keyword = $this->hasKeyword('FROM', self::SECTION_FROM) ? 'INNER JOIN' : 'FROM';
+        $this->blend($keyword, $tablename, $as, self::SECTION_FROM);
+        return $this;
+    }
+
+    public function where(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_BACKTICK,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $keyword = !$this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'WHERE' : 'AND';
+        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
+        return $this;
+    }
+
+    public function and(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_BACKTICK,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $keyword = $this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'AND' : 'WHERE';
+        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
+        return $this;
+    }
+
+    public function or(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_BACKTICK,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $keyword = $this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'OR' : 'WHERE';
+        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
+        return $this;
+    }
+
+    public function leftJoin($tablename, string $as = null): self
+    {
+        $this->blend('LEFT JOIN', $tablename, $as, self::SECTION_JOIN);
+        return $this;
+    }
+
+    public function rightJoin($tablename, string $as = null): self
+    {
+        $this->blend('RIGHT JOIN', $tablename, $as, self::SECTION_JOIN);
+        return $this;
+    }
+
+    public function innerJoin($tablename, string $as = null): self
+    {
+        $this->blend('INNER JOIN', $tablename, $as, self::SECTION_JOIN);
+        return $this;
+    }
+
+    public function fulljoin($tablename, string $as = null): self
+    {
+        $this->blend('FULL JOIN', $tablename, $as, self::SECTION_JOIN);
+        return $this;
+    }
+
+    public function crossJoin($tablename, string $as = null): self
+    {
+        $this->blend('CROSS JOIN', $tablename, $as, self::SECTION_JOIN);
+        return $this;
+    }
+
+    public function on(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_QUOTE,
+        int $valueTerm = self::FILTER_QUOTE
+    ) {
+        $query = $this->setCondition('', $key, $value, $operator, $keyTerm, $valueTerm);
+        $query = "ON (" . $query . ")";
+        $this->SQL[self::SECTION_JOIN][] = $query;
+        return $this;
+    }
+
+    public function orderBy(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_BACKTICK,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $this->setCondition("ORDER BY", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_ORDER_BY);
+        return $this;
+    }
+
+    public function groupBy(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_BACKTICK,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $this->setCondition("GROUP BY", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_GROUP_BY);
+        return $this;
+    }
+
+    public function having(
+        string $key,
+        mixed $value = null,
+        ?string $operator = null,
+        int $keyTerm = self::FILTER_QUOTE,
+        int $valueTerm = self::FILTER_QUOTE
+    ): self {
+        $this->setCondition("HAVING", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_HAVING);
+        return $this;
+    }
+
+    public function limit(int $from, int $max = null): self
+    {
+        if($max === null) {
+            $max = $from;
+            $from = 0;
+        }
+        $this->SQL['LIMIT'][] = "LIMIT {$from}, {$max}";
+        return $this;
+    }
+
+    public function raw(string $query, string $index = self::SECTION_WHERE): self
+    {
+        $this->SQL[$index][] = $query;
+        return $this;
     }
 
     /**
@@ -120,7 +256,7 @@ class SQuery
      * @return string The formatted value for use in an SQL statement.
      * @ignore
      */
-    public static function val($value)
+    public function val($value): string
     {
         if (is_null($value)) {
             return 'NULL';
@@ -138,26 +274,38 @@ class SQuery
      *
      * @param string $tablename The name of the table.
      * @param array $data The data to be inserted.
-     * @return string The generated INSERT SQL statement.
+     * @return self The generated INSERT SQL statement.
      */
-    public static function insert(string $tablename, array $data)
+    public function insert(string $tablename, array $data = []): self
+    {
+        $this->demandForNewQuery(__METHOD__);
+
+        $tablename = $this->backtick($tablename);
+
+        $this->SQL[self::SECTION_INSERT][] = "INSERT INTO {$tablename}";
+
+        foreach($data as $key => $value) {
+            $this->set($key, $value);
+        }
+
+        return $this;
+    }
+
+    public function set(string $key, ?string $value, int $valueTerm = self::FILTER_QUOTE): self
     {
 
-        $columns = implode(", ", array_map(function ($key) {
-            return self::backtick_data($key);
-        }, array_keys($data)));
+        // Only INSERT && UPDATE can use this method;
 
-        $values = array_map(function ($value) {
-            return self::val($value);
-        }, array_values($data));
+        if($this->isType(self::TYPE_INSERT) || $this->isType(self::TYPE_UPDATE)) {
 
-        $values = implode(", ", $values);
+            $key = $this->backtick($key);
 
-        $tablename = self::backtick_data($tablename);
+            $this->SQL[self::SECTION_COLUMNS][] = $key;
+            $this->SQL[self::SECTION_VALUES][] = $this->isolate($value, $valueTerm);
 
-        $SQL = "INSERT INTO {$tablename} ($columns) VALUES ($values)";
+        };
 
-        return $SQL;
+        return $this;
     }
 
     /**
@@ -169,26 +317,21 @@ class SQuery
      * @param string $tablename The name of the table.
      * @param array $data The data to be updated. The array keys represent column names, and the values represent the corresponding values to be updated.
      * @param string|null $condition The condition for the WHERE clause. If provided, it filters the rows to be updated. If `null`, a default condition of `1` will be used, updating all rows.
-     * @return string The generated UPDATE SQL statement.
+     * @return self The generated UPDATE SQL statement.
      */
-    public static function update(string $tablename, array $data, ?string $condition)
+    public function update(string $tablename, array $data = []): self
     {
+        $this->demandForNewQuery(__METHOD__);
 
-        $tablename = self::backtick_data($tablename);
+        $tablename = $this->backtick($tablename);
 
-        $fieldset = array_map(function ($key, $value) {
-            return self::backtick_data($key) . " = " . self::val($value);
-        }, array_keys($data), array_values($data));
+        $this->SQL[self::SECTION_UPDATE][] = "UPDATE {$tablename}";
 
-        $fieldset = implode(", ", $fieldset);
-
-        if(is_null($condition)) {
-            $condition = 1;
+        foreach($data as $key => $value) {
+            $this->set($key, $value);
         }
 
-        $SQL = "UPDATE {$tablename} SET {$fieldset} WHERE {$condition}";
-
-        return $SQL;
+        return $this;
 
     }
 
@@ -199,17 +342,14 @@ class SQuery
      *
      * @param string $tablename The name of the table from which to delete rows.
      * @param string $condition The condition for the WHERE clause. Specifies the rows to be deleted based on the condition.
-     * @return string The generated DELETE SQL statement.
+     * @return self The generated DELETE SQL statement.
      */
-    public static function delete(string $tablename, string $condition)
+    public function delete(string $tablename): self
     {
-
-        $tablename = self::backtick_data($tablename);
-
-        $SQL = "DELETE FROM {$tablename} WHERE {$condition}";
-
-        return $SQL;
-
+        $this->demandForNewQuery(__METHOD__);
+        $tablename = $this->backtick($tablename);
+        $this->SQL[self::SECTION_DELETE][] = "DELETE FROM {$tablename}";
+        return $this;
     }
 
 }

@@ -2,6 +2,8 @@
 
 namespace Ucscode\Packages;
 
+use Ucscode\SQuery\SQuery;
+
 /**
  * A Meta Data Storage System
  *
@@ -29,17 +31,11 @@ namespace Ucscode\Packages;
  */
 class Pairs
 {
-    /**
-     * @var string $tablename
-     */
+    /** @ignore */
     private $tablename;
 
-
-    /**
-     * @var string $mysqli
-     */
+    /** @ignore */
     private $mysqli;
-
 
     /**
      * Constructor Method
@@ -52,27 +48,21 @@ class Pairs
      *
      * @param MYSQLI $mysqli An instance of the MYSQLI class for database connection.
      * @param string $tablename The name of the meta table.
-     * @throws \Exception If the `sQuery` class is not found.
-     * @return void
      *
-     * @throws \Exception If sQuery class is not found.
+     * @throws \Exception If the `sQuery` class is not found.
+     *
+     * @return void
      */
     public function __construct(\MYSQLI $mysqli, string $tablename)
     {
-
-        // This class required sQuery to work;
-
-        if(!class_exists(__NAMESPACE__ . '\sQuery')) {
+        if(!class_exists(SQuery::class)) {
             throw new \Exception(__CLASS__ . "::__construct() relies on class `sQuery` to operate");
         }
 
         $this->tablename = $tablename;
         $this->mysqli = $mysqli;
 
-        // Create The Meta Table;
-
-        $created = $this->createTable();
-
+        $this->createTable();
     }
 
     /**
@@ -88,7 +78,6 @@ class Pairs
      */
     public function linkParentTable(string $parent_table, string $constraint, string $primary_key = 'id', string $action = 'CASCADE')
     {
-
         $SQL = "
 			IF NOT EXISTS (
 				SELECT NULL 
@@ -110,7 +99,6 @@ class Pairs
 		";
 
         return $this->mysqli->query($SQL);
-
     }
 
     /**
@@ -131,30 +119,33 @@ class Pairs
      */
     public function set(string $key, $value, ?int $ref = null)
     {
-
         $value = json_encode($value);
         $value = $this->mysqli->real_escape_string($value);
 
-        $SQL = sQuery::select($this->tablename, "_key = '{$key}' AND _ref " . $this->test($ref));
+        $SQL = (new SQuery())
+            ->select()
+            ->from($this->tablename)
+            ->where("_key", $key)
+            ->and("_ref", $this->valueOf($ref));
 
-        if(!$this->mysqli->query($SQL)->num_rows) {
-            $method = "insert";
-            $condition = null;
-        } else {
-            $method = "update";
-            $condition = "_key = '{$key}' AND _ref " . $this->test($ref);
-        };
-
-        $Query = sQuery::{$method}($this->tablename, array(
+        $data = [
             "_key" => $key,
             "_value" => $value,
             "_ref" => $ref
-        ), $condition);
+        ];
 
-        $result = $this->mysqli->query($Query);
+        if(!$this->mysqli->query($SQL)->num_rows) {
+            $SQL->clear()
+                ->insert($this->tablename, $data);
+        } else {
+            $SQL->clear()
+                ->update($this->tablename, $data)
+                ->where("_key", $key)
+                ->and("_ref", $this->valueOf($ref));
+        };
 
+        $result = $this->mysqli->query($SQL);
         return $result;
-
     }
 
     /**
@@ -173,8 +164,10 @@ class Pairs
      */
     public function get(string $key, ?int $ref = null, bool $epoch = false)
     {
-
-        $Query = sQuery::select($this->tablename, "_key = '{$key}' AND _ref " . $this->test($ref));
+        $Query = (new SQuery())->select()
+            ->from($this->tablename)
+            ->where("_key", $key) 
+            ->and("_ref", $this->valueOf($ref));
 
         $result = $this->mysqli->query($Query)->fetch_assoc();
 
@@ -182,7 +175,6 @@ class Pairs
             $value = json_decode($result[ $epoch ? 'epoch' : '_value' ], true);
             return $value;
         }
-
     }
 
     /**
@@ -197,13 +189,12 @@ class Pairs
      */
     public function remove(string $key, ?int $ref = null)
     {
+        $SQL = (new SQuery())->delete($this->tablename)
+            ->where("_key", $key)
+            ->and("_ref", $this->valueOf($ref));
 
-        $Query = "DELETE FROM `{$this->tablename}` WHERE _key = '{$key}' AND _ref " . $this->test($ref);
-
-        $result = $this->mysqli->query($Query);
-
+        $result = $this->mysqli->query($SQL);
         return $result;
-
     }
 
     /**
@@ -243,9 +234,7 @@ class Pairs
      */
     public function all($ref = null, ?string $regex = null)
     {
-
-        # Check if argument 1 is given;
-
+        // Check if argument 1 is given;
         if(!empty(func_get_args())) {
 
             $ref = func_get_arg(0);
@@ -266,7 +255,7 @@ class Pairs
 
                     $error = __METHOD__ . "(): Argument #1 (\$ref) must be of type ?int, {$type} given, called in {$callerPath} on line {$errorLine}";
 
-                    throw new TypeError($error);
+                    throw new \TypeError($error);
 
                 };
 
@@ -276,26 +265,28 @@ class Pairs
             $ref = false;
         }
 
-        # Prepare Reference;
+        // Prepare Query;
+        $SQL = (new SQuery())->select()
+            ->from($this->tablename);
 
-        $reference = ($ref === false) ? 1 : "_ref " . $this->test($ref);
-
-        # Prepare Regular Expression;
-
-        if(empty($regex)) {
-            $expression = null;
+        // Prepare Reference;
+        if($ref === false) {
+            $SQL->where(1);
         } else {
+            $SQL->where("_ref", $this->valueOf($ref));
+        }
+
+        // Prepare Regular Expression;
+        if(!empty($regex)) {
             $regex = str_replace("\\", "\\\\", $regex);
-            $expression = " AND _key REGEXP '{$regex}'";
+            $SQL->and("_key", $regex, 'REGEXP');
         };
 
-        # Prepare Query;
-
-        $Query = sQuery::select($this->tablename, $reference . $expression . " ORDER BY _ref");
+        // Order Query
+        $SQL->orderBy('_ref');
 
         # Execute Query;
-
-        $result = $this->mysqli->query($Query);
+        $result = $this->mysqli->query($SQL);
 
         if($result->num_rows) {
 
@@ -354,14 +345,9 @@ class Pairs
      * @return string Returns the comparison string for the reference ID. If the reference ID is null, it returns 'IS NULL', otherwise ' = [reference ID]'.
      * @ignore
      */
-    private function test(?int $ref = null)
+    private function valueOf(?int $ref = null)
     {
-        if(is_null($ref)) {
-            $test = " IS " . sQuery::val($ref);
-        } else {
-            $test = " = " . sQuery::val($ref);
-        }
-        return trim($test);
+        return is_null($ref) ? SQuery::IS_NULL : $ref;
     }
 
 }

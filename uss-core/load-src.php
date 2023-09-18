@@ -43,6 +43,8 @@ $dependencies = [
         ],
 
         'SQuery' => [
+            'SQueryInterface.php',
+            'AbstractSQuery.php',
             'SQuery.php'
         ],
 

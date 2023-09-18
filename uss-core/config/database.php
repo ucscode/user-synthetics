@@ -17,29 +17,35 @@ use Ucscode\Packages\Pairs;
 
 if(DB_ENABLED) {
 
-    $error = null;
-
     try {
 
         $this->mysqli = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
         if($this->mysqli->connect_errno) {
 
-            $error = $this->mysqli->connect_error;
+            throw new \Exception($this->mysqli->connect_error);
 
         } else {
 
-            $this->options = new Pairs($this->mysqli, DB_PREFIX . "options");
+            try {
 
-        };
+                $this->options = new Pairs($this->mysqli, DB_PREFIX . "options");
 
-    } catch(Exception $e) {
+            } catch(\Exception $e) {
 
+                $this->render('@Uss/error.html.twig', [
+                    'subject' => "Library Error",
+                    'message' => $e->getMessage()
+                ]);
+
+                die();
+            }
+            
+        }
+
+    } catch(\Exception $e) {
+        
         $error = $e->getMessage();
-
-    };
-
-    if($error) {
 
         $this->render('@Uss/db.error.html.twig', [
             'error' => $error,
@@ -47,9 +53,7 @@ if(DB_ENABLED) {
             'mail' => UssEnum::AUTHOR_EMAIL
         ]);
 
-        die();
-
-    }
+    };
 
 } else {
 
