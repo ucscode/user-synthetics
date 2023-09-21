@@ -15,64 +15,22 @@ namespace Ucscode\SQuery;
  */
 class SQuery extends AbstractSQuery
 {
-    public function clear(): self {
-        $this->SQL = [];
-        $const = $this->getClassConstants('SECTION_');
-        foreach($const as $key => $const) {
-            $this->SQL[$const] = [];
-        };
-        return $this;
-    }
+    use SQueryTrait {
 
-    public function getQuery(): string
-    {
-        $SQLSET = $this->SQL;
-        $SQL = [];
+        deriveFilterCondition as public where;
+        deriveFilterCondition as public and;
+        deriveFilterCondition as public or;
 
-        // INSERT STATEMENT
-        if($this->isType(self::TYPE_INSERT)) {
+        deriveInfluenceCondition as public orderBy;
+        deriveInfluenceCondition as public having;
 
-            $SQL = $SQLSET[self::SECTION_INSERT];
-            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_COLUMNS]) . ")";
-            $SQL[] = "VALUES";
-            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_VALUES]) . ")";
+        mergeTable as public from;
+        mergeTable as public leftJoin;
+        mergeTable as public rightJoin;
+        mergeTable as public innerJoin;
+        mergeTable as public fulljoin;
+        mergeTable as public crossJoin;
 
-            // UPDATE STATEMENT
-        } elseif($this->isType(self::TYPE_UPDATE)) {
-
-            $SQL = $SQLSET[self::SECTION_UPDATE];
-            $SQL[] = "SET";
-
-            $combination = array_combine(
-                $SQLSET[self::SECTION_COLUMNS],
-                $SQLSET[self::SECTION_VALUES]
-            );
-
-            foreach($combination as $key => $value) {
-                $combination[$key] = "{$key} = {$value}";
-            };
-
-            $SQL[] = implode(",\n", array_values($combination));
-
-            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
-
-            // DELETE STATEMENT
-        } elseif($this->isType(self::TYPE_DELETE)) {
-
-            $SQL = $SQLSET[self::SECTION_DELETE];
-            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
-
-            // SELECT STATEMENT
-        } else {
-            $SQLSET = array_filter($SQLSET);
-            foreach($SQLSET as $section => $queries) {
-                foreach($queries as $query) {
-                    $SQL[] = trim($query);
-                }
-            };
-        }
-
-        return implode("\n", $SQL);
     }
 
     /**
@@ -110,76 +68,13 @@ class SQuery extends AbstractSQuery
         return $this;
     }
 
-    public function from(string $tablename, string $as = null): self
-    {
-        $keyword = $this->hasKeyword('FROM', self::SECTION_FROM) ? 'INNER JOIN' : 'FROM';
-        $this->blend($keyword, $tablename, $as, self::SECTION_FROM);
-        return $this;
-    }
-
-    public function where(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_BACKTICK,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $keyword = !$this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'WHERE' : 'AND';
-        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
-        return $this;
-    }
-
-    public function and(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_BACKTICK,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $keyword = $this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'AND' : 'WHERE';
-        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
-        return $this;
-    }
-
-    public function or(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_BACKTICK,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $keyword = $this->hasKeyword('WHERE', self::SECTION_WHERE) ? 'OR' : 'WHERE';
-        $this->setCondition($keyword, $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_WHERE);
-        return $this;
-    }
-
-    public function leftJoin($tablename, string $as = null): self
-    {
-        $this->blend('LEFT JOIN', $tablename, $as, self::SECTION_JOIN);
-        return $this;
-    }
-
-    public function rightJoin($tablename, string $as = null): self
-    {
-        $this->blend('RIGHT JOIN', $tablename, $as, self::SECTION_JOIN);
-        return $this;
-    }
-
-    public function innerJoin($tablename, string $as = null): self
-    {
-        $this->blend('INNER JOIN', $tablename, $as, self::SECTION_JOIN);
-        return $this;
-    }
-
-    public function fulljoin($tablename, string $as = null): self
-    {
-        $this->blend('FULL JOIN', $tablename, $as, self::SECTION_JOIN);
-        return $this;
-    }
-
-    public function crossJoin($tablename, string $as = null): self
-    {
-        $this->blend('CROSS JOIN', $tablename, $as, self::SECTION_JOIN);
+    public function groupBy(string|array $values) {
+        if(gettype($values) === 'string') {
+            $values = array_map('trim', explode(",", $values));
+        };
+        $values = $this->refactor($values, self::FILTER_BACKTICK);
+        $query = 'GROUP BY ' . implode(", ", $values);
+        $this->SQL[self::SECTION_GROUP_BY][] = $query;
         return $this;
     }
 
@@ -190,42 +85,9 @@ class SQuery extends AbstractSQuery
         int $keyTerm = self::FILTER_QUOTE,
         int $valueTerm = self::FILTER_QUOTE
     ) {
-        $query = $this->setCondition('', $key, $value, $operator, $keyTerm, $valueTerm);
+        $query = $this->addCondition('', $key, $value, $operator, $keyTerm, $valueTerm);
         $query = "ON (" . $query . ")";
         $this->SQL[self::SECTION_JOIN][] = $query;
-        return $this;
-    }
-
-    public function orderBy(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_BACKTICK,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $this->setCondition("ORDER BY", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_ORDER_BY);
-        return $this;
-    }
-
-    public function groupBy(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_BACKTICK,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $this->setCondition("GROUP BY", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_GROUP_BY);
-        return $this;
-    }
-
-    public function having(
-        string $key,
-        mixed $value = null,
-        ?string $operator = null,
-        int $keyTerm = self::FILTER_QUOTE,
-        int $valueTerm = self::FILTER_QUOTE
-    ): self {
-        $this->setCondition("HAVING", $key, $value, $operator, $keyTerm, $valueTerm, self::SECTION_HAVING);
         return $this;
     }
 

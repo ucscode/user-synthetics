@@ -11,7 +11,7 @@
  * The idea is to ensure that PROTECTED properties can be accessed but can never be overwritten
  * While private properties can never be accessed
  */
-trait EncapsulatedPropertyAccessTrait
+trait PropertyAccessTrait
 {
     /**
     * Access Protected Properties

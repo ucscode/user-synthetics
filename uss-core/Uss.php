@@ -18,7 +18,7 @@ use Twig\Loader\FilesystemLoader;
 final class Uss
 {
     use SingletonTrait;
-    use EncapsulatedPropertyAccessTrait;
+    use PropertyAccessTrait;
 
     /** @ignore */
     #[Accessible]

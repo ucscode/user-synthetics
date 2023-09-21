@@ -19,7 +19,6 @@ interface SQueryInterface
     /**
      * The order of this constants below is important to render the correct SQL syntax
      * Please do not re-organize it to avoid undesirable error
-     * @ignore
      */
     public const SECTION_DELETE = 'DELETE';
     public const SECTION_UPDATE = 'UPDATE';
@@ -34,5 +33,6 @@ interface SQueryInterface
     public const SECTION_HAVING = 'HAVING';
     public const SECTION_ORDER_BY = 'ORDER BY';
     public const SECTION_LIMIT = 'LIMIT';
+    public const SECTION_FINAL = 'FINAL';
 
 }

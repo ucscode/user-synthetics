@@ -44,6 +44,7 @@ $dependencies = [
 
         'SQuery' => [
             'SQueryInterface.php',
+            'SQueryTrait.php',
             'AbstractSQuery.php',
             'SQuery.php'
         ],
@@ -63,7 +64,7 @@ $dependencies = [
 
         'trait' => [
             "SingletonTrait.php",
-            "EncapsulatedPropertyAccessTrait.php",
+            "PropertyAccessTrait.php",
         ],
 
         'abstract' => [],

@@ -4,9 +4,6 @@ namespace Ucscode\SQuery;
 
 abstract class AbstractSQuery implements SQueryInterface
 {
-    abstract public function getQuery(): string;
-    abstract public function clear(): self;
-
     /** @ignore */
     protected array $SQL = [];
 
@@ -20,13 +17,63 @@ abstract class AbstractSQuery implements SQueryInterface
         return $this->getQuery();
     }
 
-    protected function blend(string $keyword, string $tablename, ?string $as, $index)
-    {
-        $query = $keyword . " " . $this->backtick($tablename);
-        if($as !== null) {
-            $query .= " AS " . $this->backtick($as);
+    public function clear(): self {
+        $this->SQL = [];
+        $const = $this->getClassConstants('SECTION_');
+        foreach($const as $key => $const) {
+            $this->SQL[$const] = [];
         };
-        $this->SQL[$index][] = $query;
+        return $this;
+    }
+
+    public function getQuery() {
+        $SQLSET = $this->SQL;
+        $SQL = [];
+
+        // INSERT STATEMENT
+        if($this->isType(self::TYPE_INSERT)) {
+
+            $SQL = $SQLSET[self::SECTION_INSERT];
+            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_COLUMNS]) . ")";
+            $SQL[] = "VALUES";
+            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_VALUES]) . ")";
+
+            // UPDATE STATEMENT
+        } elseif($this->isType(self::TYPE_UPDATE)) {
+
+            $SQL = $SQLSET[self::SECTION_UPDATE];
+            $SQL[] = "SET";
+
+            $combination = array_combine(
+                $SQLSET[self::SECTION_COLUMNS],
+                $SQLSET[self::SECTION_VALUES]
+            );
+
+            foreach($combination as $key => $value) {
+                $combination[$key] = "{$key} = {$value}";
+            };
+
+            $SQL[] = implode(",\n", array_values($combination));
+
+            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
+
+            // DELETE STATEMENT
+        } elseif($this->isType(self::TYPE_DELETE)) {
+
+            $SQL = $SQLSET[self::SECTION_DELETE];
+            $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
+
+            // SELECT STATEMENT
+        } else {
+            $SQLSET = array_filter($SQLSET);
+            foreach($SQLSET as $section => $queries) {
+                foreach($queries as $query) {
+                    $SQL[] = trim($query);
+                }
+            };
+        }
+
+        return implode("\n", $SQL);
     }
 
     protected function isType(string $type): bool
@@ -57,7 +104,9 @@ abstract class AbstractSQuery implements SQueryInterface
         $division = array_map(function ($column) {
             if(!preg_match('/^\*|`.*`$/', $column)) {
                 $column = explode(" ", $column);
-                $column[0] = "`{$column[0]}`";
+                if(!is_numeric($column[0])) {
+                    $column[0] = "`{$column[0]}`";
+                };
                 $column = implode(" ", $column);
             };
             return $column;
@@ -93,7 +142,7 @@ abstract class AbstractSQuery implements SQueryInterface
     /**
      * Add a new condition
      */
-    protected function setCondition(
+    protected function addCondition(
         string $keyword,
         string $key,
         mixed $value,
