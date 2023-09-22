@@ -172,7 +172,9 @@ trait SQueryTrait
             'crossjoin' => 'CROSS JOIN'
         };
 
-        $this->addTableAlias($keyword, $tablename, $as, self::SECTION_JOIN);
+        $section = ($keyword === self::SECTION_FROM) ? self::SECTION_FROM : self::SECTION_JOIN;
+        
+        $this->addTableAlias($keyword, $tablename, $as, $section);
 
         return $this;
 

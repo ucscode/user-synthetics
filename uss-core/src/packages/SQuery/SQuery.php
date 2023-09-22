@@ -116,11 +116,14 @@ class SQuery extends AbstractSQuery
      *
      * @return self
      */
-    public function delete(string $tablename): self
+    public function delete(?string $tablename = null): self
     {
         $this->demandForNewQuery(__METHOD__);
-        $tablename = $this->backtick($tablename);
-        $this->SQL[self::SECTION_DELETE][] = "DELETE FROM {$tablename}";
+        $this->SQL[self::SECTION_DELETE][] = "DELETE";
+        if(!is_null($tablename)) {
+            $tablename = $this->backtick($tablename);
+            $this->SQL[self::SECTION_FROM][] = "FROM {$tablename}";
+        }
         return $this;
     }
 

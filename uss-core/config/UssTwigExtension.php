@@ -9,6 +9,7 @@
  */
 
 return new class ($this, $ussTwigBlockManager) {
+
     use SingletonTrait;
 
     public array $attr = [];

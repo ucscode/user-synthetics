@@ -73,6 +73,7 @@ abstract class AbstractSQuery implements SQueryInterface
         } elseif($this->isType(self::TYPE_DELETE)) {
 
             $SQL = $SQLSET[self::SECTION_DELETE];
+            $SQL = $this->importSection(self::SECTION_FROM, $SQL);
             $SQL = $this->importSection(self::SECTION_WHERE, $SQL);
 
             // SELECT STATEMENT

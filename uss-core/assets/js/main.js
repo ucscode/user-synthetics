@@ -1,14 +1,8 @@
 /**
- * User Synthetics JavaScript
- *
- * Author: Uchenna Ajah <Ucscode>
- * Version: 1.0.0
+ * User Synthetics by Uchenna Ajah
  * License: MIT
- * Last Updated: 02-May-2023
- *
- * Copyright (c) 2023
+ * Since 2023
  */
-
 "use strict";
 	
 new class {
