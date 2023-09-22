@@ -299,6 +299,7 @@ class Pairs
 
         # Execute Query;
         $result = $this->mysqli->query($SQL);
+        $group = [];
 
         if($result->num_rows) {
 
@@ -307,6 +308,7 @@ class Pairs
                 $refId = $pair['_ref'];
                 $refId = is_numeric($refId) ? (int)$refId : null;
 
+                // Create group for each reference
                 if(!isset($group[$refId])) {
                     $group[$refId] = array();
                 };
@@ -320,7 +322,7 @@ class Pairs
 
         };
 
-        return ($ref === false) ? $group : $group[$ref];
+        return ($ref === false) ? $group : ($group[$ref] ?? []);
 
     }
 
