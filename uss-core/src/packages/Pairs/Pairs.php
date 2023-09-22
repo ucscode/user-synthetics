@@ -166,7 +166,7 @@ class Pairs
     {
         $Query = (new SQuery())->select()
             ->from($this->tablename)
-            ->where("_key", $key) 
+            ->where("_key", $key)
             ->and("_ref", $this->valueOf($ref));
 
         $result = $this->mysqli->query($Query)->fetch_assoc();

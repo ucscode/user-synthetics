@@ -23,7 +23,6 @@ interface SQueryInterface
     public const SECTION_DELETE = 'DELETE';
     public const SECTION_UPDATE = 'UPDATE';
     public const SECTION_INSERT = 'INSERT';
-    public const SECTION_COLUMNS = 'COLUMNS';
     public const SECTION_VALUES = 'VALUES';
     public const SECTION_SELECT = 'SELECT';
     public const SECTION_FROM = 'FROM';

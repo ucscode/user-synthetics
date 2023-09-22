@@ -31,4 +31,13 @@ $query = (new SQuery())->select()
     ], null, 'RLIKE')
     ->groupBy(['f.user', 'port.code']);
 
-var_dump($query, $query->getQuery());
+$update = (new SQuery())->update("tablename", [
+    'username' => 'ucscode',
+    'password' => 'trust'
+]);
+
+$update->where('client', 'id');
+
+$update->set('self.cold', 'whort');
+
+var_dump($update->getQuery());

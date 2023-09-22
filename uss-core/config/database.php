@@ -40,11 +40,11 @@ if(DB_ENABLED) {
 
                 die();
             }
-            
+
         }
 
     } catch(\Exception $e) {
-        
+
         $error = $e->getMessage();
 
         $this->render('@Uss/db.error.html.twig', [

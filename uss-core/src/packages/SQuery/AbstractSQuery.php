@@ -12,12 +12,20 @@ abstract class AbstractSQuery implements SQueryInterface
         $this->clear();
     }
 
+    /**
+     * Use SQuery Object as a String
+     */
     public function __toString()
     {
         return $this->getQuery();
     }
 
-    public function clear(): self {
+    /**
+     * Reset the SQL container
+     * @return self
+     */
+    public function clear(): self
+    {
         $this->SQL = [];
         $const = $this->getClassConstants('SECTION_');
         foreach($const as $key => $const) {
@@ -26,7 +34,16 @@ abstract class AbstractSQuery implements SQueryInterface
         return $this;
     }
 
-    public function getQuery() {
+    /**
+     * Get the SQL query string after it has been constructed.
+     *
+     * This method retrieves the fully constructed SQL query string that has been built using the methods and parameters
+     * of this class. It provides access to the SQL query for further use or debugging.
+     *
+     * @return string The SQL query string.
+     */
+    public function getQuery(): string
+    {
         $SQLSET = $this->SQL;
         $SQL = [];
 
@@ -34,22 +51,17 @@ abstract class AbstractSQuery implements SQueryInterface
         if($this->isType(self::TYPE_INSERT)) {
 
             $SQL = $SQLSET[self::SECTION_INSERT];
-            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_COLUMNS]) . ")";
+            $SQL[] = "(" . implode(", ", array_keys($SQLSET[self::SECTION_VALUES])) . ")";
             $SQL[] = "VALUES";
-            $SQL[] = "(" . implode(", ", $SQLSET[self::SECTION_VALUES]) . ")";
+            $SQL[] = "(" . implode(", ", array_values($SQLSET[self::SECTION_VALUES])) . ")";
 
             // UPDATE STATEMENT
         } elseif($this->isType(self::TYPE_UPDATE)) {
 
             $SQL = $SQLSET[self::SECTION_UPDATE];
-            $SQL[] = "SET";
+            $combination = [];
 
-            $combination = array_combine(
-                $SQLSET[self::SECTION_COLUMNS],
-                $SQLSET[self::SECTION_VALUES]
-            );
-
-            foreach($combination as $key => $value) {
+            foreach($SQLSET[self::SECTION_VALUES] as $key => $value) {
                 $combination[$key] = "{$key} = {$value}";
             };
 
@@ -76,6 +88,16 @@ abstract class AbstractSQuery implements SQueryInterface
         return implode("\n", $SQL);
     }
 
+    /**
+     * Check the type of query being built.
+     *
+     * This method checks whether the query being constructed is of the specified type,
+     * which can be one of SELECT, INSERT, UPDATE, or DELETE.
+     *
+     * @param string $type The query type to check (e.g., SELECT, INSERT, UPDATE, DELETE).
+     *
+     * @return bool True if the query being built is of the specified type, otherwise false.
+     */
     protected function isType(string $type): bool
     {
         if(!in_array($type, $this->getClassConstants('TYPE_'))) {
@@ -84,7 +106,17 @@ abstract class AbstractSQuery implements SQueryInterface
         return !empty($this->SQL[$type]);
     }
 
-    protected function demandForNewQuery(string $method)
+    /**
+     * Ensure that the SQL builder container is either refreshed or represents a new instance.
+     *
+     * This method is responsible for ensuring that the SQL builder container is in a favorable state
+     * for usage.
+     *
+     * @throws Exception if the builder container has been previously occupied.
+     *
+     * @return void
+     */
+    protected function demandForNewQuery(string $method): void
     {
         $query = $this->getQuery();
         if(!empty($query)) {
@@ -93,10 +125,15 @@ abstract class AbstractSQuery implements SQueryInterface
     }
 
     /**
-     * Format the column name by applying backticks if needed.
+     * Enclose column names with backticks to ensure proper SQL formatting.
      *
-     * This method takes a column name as input and checks if it requires formatting with backticks.
-     * @ignore
+     * This method takes a column name as input and ensures that it is enclosed with backticks (`) to ensure
+     * proper formatting for SQL queries. It handles column names that may include table aliases and aliases
+     * that are not already enclosed in backticks.
+     *
+     * @param string $column The column name to be enclosed with backticks.
+     *
+     * @return string The column name enclosed with backticks.
      */
     protected function backtick(string $column): string
     {
@@ -140,7 +177,21 @@ abstract class AbstractSQuery implements SQueryInterface
     }
 
     /**
-     * Add a new condition
+     * Add a new condition to the SQL query.
+     *
+     * This method is used to construct and add a new condition to the SQL query being built. Conditions consist
+     * of keywords (e.g., WHERE, HAVING), keys (column or expression names), values, operators (e.g., '=', '<', 'LIKE'),
+     * and terms indicating whether keys and values should be treated as columns/variables or data types.
+     *
+     * @param string $keyword The keyword representing the type of condition (e.g., WHERE, HAVING).
+     * @param string $key The key (column or expression) for the condition.
+     * @param mixed $value The value to compare or use in the condition.
+     * @param string|null $operator The operator for comparing the key and value (optional, defaults to null).
+     * @param int $keyTerm Indicates how to treat the key:
+     * @param int $valueTerm Indicates how to treat the value:
+     * @param string|null $sqlIndex An optional index to define the position of the generated query.
+     *
+     * @return string|null The generated query condition if no $sqlIndex is provided, otherwise, it returns null.
      */
     protected function addCondition(
         string $keyword,
@@ -249,7 +300,18 @@ abstract class AbstractSQuery implements SQueryInterface
         return $input;
     }
 
-    protected function isolate($value, $term)
+    /**
+    * Modify a value based on the specified term.
+    *
+    * This method takes a value and a term as input and applies a modification to the value based on the
+    * specified term. The term can be one of the predefined constants:
+    *
+    * @param mixed $value The value to be modified.
+    * @param int $term The term that specifies the modification to be applied
+    *
+    * @return mixed The modified value based on the specified term.
+    */
+    protected function isolate($value, $term): mixed
     {
         if($term === self::FILTER_BACKTICK) {
             $value = $this->backtick($value);
