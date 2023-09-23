@@ -6,7 +6,7 @@ use Twig\Loader\FilesystemLoader;
 abstract class AbstractUss
 {
     use PropertyAccessTrait;
-    
+
     public static array $globals = [];
 
     #[Accessible]
@@ -110,7 +110,7 @@ abstract class AbstractUss
     {
         return new class ($this, $blockManager) {
 
-            public array $attr = [];
+            public string $jsElement;
             private bool $init = false;
 
             public function __construct(
@@ -121,11 +121,10 @@ abstract class AbstractUss
 
             public function init(): self
             {
-                if($this->init) {
+                if(!$this->init) {
                     $this->ussInstance->console('platform', UssEnum::PROJECT_NAME);
                     $jsonElement = json_encode($this->ussInstance->console());
-                    $jsElement = base64_encode($jsonElement);
-                    $this->attr['console64'] = $jsElement;
+                    $this->jsElement = base64_encode($jsonElement);
                     $this->init = true;
                 };
                 return $this;

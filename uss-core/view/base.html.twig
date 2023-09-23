@@ -3,9 +3,9 @@
 <!doctype html>
 <html>
 <head>
-
+    
     <title>{{ page_title|default('User Synthetics') }}</title>
-    <script>const Uss = JSON.parse(atob('{{ Uss.attr.console64 }}'));</script>
+    <script>const Uss = JSON.parse(atob('{{ Uss.jsElement }}'));</script>
 
     {% block head %}
 
