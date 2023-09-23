@@ -1,5 +1,5 @@
 {% macro renderExternalBlockContent(blockname) %}
-    {% set block_elements = Uss.twigBlockManager.get(blockname) %}
+    {% set block_elements = Uss.twigBlockManager.getBlocks(blockname) %}
     {% if  block_elements is not empty %}
         {% for content in block_elements %}
 {{ content|raw }}

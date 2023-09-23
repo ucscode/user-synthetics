@@ -1,34 +1,21 @@
 <?php
 /**
- * @package UserSynthetics
- * @author ucscode <uche23mail@gmail.com>
- * @license MIT
+ * User Synthetics
+ *
+ * A Powerful Modular Framework For Advance Web Development
+ *
+ * @package    Uss
+ * @version    3.0.3
+ * @since      2023-May-23
+ * @author     Uchenna Ajah
+ * @link       http://github.com/ucscode/user-synthetics
+ * @license    MIT
  */
-
 define('ROOT_DIR', realpath(__DIR__ . "/../"));
 
-// Uss Enumerations
 require_once __DIR__ . "/UssEnum.php";
 
-// Composer Autoload
 require_once UssEnum::CORE_DIR . "/vendors.php";
-
-// Database Connection
 require_once UssEnum::CORE_DIR . "/UssDB.php";
-
-// Local Classes
-require_once UssEnum::CORE_DIR . "/load-src.php";
-
-// Uss instance
-require_once UssEnum::CORE_DIR . "/Uss.php";
-
-# Modules Loader
+require_once UssEnum::CORE_DIR . "/compiler.php";
 require_once UssEnum::CORE_DIR . "/modules.php";
-
-// =========================================
-
-if(empty(Uss::instance()->getRouteInventory(true))) {
-    if($_SERVER['REQUEST_METHOD'] === 'GET') {
-        Uss::instance()->render('@Uss/error.html.twig');
-    }
-};

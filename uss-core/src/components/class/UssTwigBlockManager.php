@@ -16,7 +16,7 @@ class UssTwigBlockManager
 
     }
 
-    public function get(?string $name = null)
+    public function getBlocks(?string $name = null)
     {
         if($name === null) {
             return $this->blocks;

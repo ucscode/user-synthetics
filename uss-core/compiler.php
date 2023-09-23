@@ -67,31 +67,26 @@ $dependencies = [
             "PropertyAccessTrait.php",
         ],
 
-        'abstract' => [],
+        'abstract' => [
+            "AbstractUss.php"
+        ],
 
         "class" => [
             "UssTwigBlockManager.php",
             "Core.php",
+            "Uss.php",
         ]
 
     ]
 
 ];
 
-// components, services:
-foreach($dependencies as $directory => $container) {
 
-    // UssElement, UssForm, Interface...
-    foreach($container as $path => $array) {
-
-        // List of PHP Files
-        foreach($array as $filename) {
-
-            // Include PHP Files
-            require_once UssEnum::SRC_DIR . "/" . $directory . "/" . $path . "/" . $filename;
-
+foreach($dependencies as $category => $projects) {
+    foreach($projects as $container => $fileList) {
+        foreach($fileList as $filename) {
+            $__file = UssEnum::SRC_DIR . "/" . $category . "/" . $container . "/" . $filename;
+            require_once $__file;
         }
-
-    };
-
-};
+    }
+}
