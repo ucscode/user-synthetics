@@ -1,6 +1,6 @@
 <?php
 
-use Ucscode\Packages\Events;
+use Ucscode\Event\Event;
 
 defined('ROOT_DIR') || die('Illegal Access to Module Loader');
 
@@ -15,14 +15,14 @@ usort($directories, function ($a, $b) {
 foreach($directories as $sysIter) {
     $indexFile = $sysIter->getPathname() . "/index.php";
     if($sysIter->isDir() && file_exists($indexFile)) {
-        call_user_func(function() use($indexFile) {
+        call_user_func(function () use ($indexFile) {
             include_once $indexFile;
         });
     }
 };
 
 // Load Modules
-Events::instance()->exec("modules:loaded");
+(new Event())->dispatch("Modules:loaded");
 
 // Render 404 Error
 $matchingRoutes = Uss::instance()->getRouteInventory(true);

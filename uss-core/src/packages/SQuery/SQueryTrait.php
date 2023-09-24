@@ -173,7 +173,7 @@ trait SQueryTrait
         };
 
         $section = ($keyword === self::SECTION_FROM) ? self::SECTION_FROM : self::SECTION_JOIN;
-        
+
         $this->addTableAlias($keyword, $tablename, $as, $section);
 
         return $this;

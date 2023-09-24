@@ -13,7 +13,7 @@
 final class Uss extends AbstractUss
 {
     use SingletonTrait;
-    
+
     protected function __construct()
     {
         parent::__construct();
@@ -39,7 +39,7 @@ final class Uss extends AbstractUss
 
             $twig = new \Twig\Environment($this->twigLoader, ['debug' => true]);
             $twig->addExtension(new \Twig\Extension\DebugExtension());
-            
+
             $extension = $this->localTwigExtension($blockManager ?? UssTwigBlockManager::instance())->init();
             $twig->addGlobal('Uss', $extension);
 

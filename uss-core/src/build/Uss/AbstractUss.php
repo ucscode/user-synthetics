@@ -109,7 +109,6 @@ abstract class AbstractUss
     protected function localTwigExtension(UssTwigBlockManager $blockManager)
     {
         return new class ($this, $blockManager) {
-
             public string $jsElement;
             private bool $init = false;
 

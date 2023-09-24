@@ -22,8 +22,9 @@ $dependencies = [
             'UssForm.php'
         ],
 
-        'Events' => [
-            'Events.php'
+        'Event' => [
+            'EventInterface.php',
+            'Event.php'
         ],
 
         'DOMTable' => [
@@ -67,14 +68,21 @@ $dependencies = [
             "PropertyAccessTrait.php",
         ],
 
-        'abstract' => [
-            "AbstractUss.php"
-        ],
+        'abstract' => [],
 
         "class" => [
             "UssTwigBlockManager.php",
             "Core.php",
-            "Uss.php",
+        ]
+
+    ],
+
+    'build' => [
+
+        'Uss' => [
+            'UssRepository.php',
+            'AbstractUss.php',
+            'Uss.php'
         ]
 
     ]
