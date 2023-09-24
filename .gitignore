@@ -3,4 +3,6 @@ opt/
 /vendor/
 /composer.json
 /composer.lock
-**/.git/
+
+**/.git-*/
+**/git/
