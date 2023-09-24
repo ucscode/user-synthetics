@@ -130,7 +130,7 @@ final class Uss extends AbstractUss
                 $route = Uss::instance()->filterContext($this->route);
 
                 # The request
-                $this->request = Uss::instance()->filterContext(Uss::instance()->query());
+                $this->request = Uss::instance()->filterContext(Uss::instance()->splitUri());
 
                 # Compare the request path to the current URL
                 $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
