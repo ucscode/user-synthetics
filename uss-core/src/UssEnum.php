@@ -28,5 +28,5 @@ final class UssEnum
 
     public const CONFIG_DIR = self::CORE_DIR . "/config";
 
-    public const BUILD_PATH = self::SRC_DIR . "/kernel/build";
+    public const JSON_DIR = self::ASSETS_DIR . '/JSON';
 }

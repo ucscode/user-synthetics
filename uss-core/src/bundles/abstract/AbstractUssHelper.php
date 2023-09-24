@@ -9,23 +9,8 @@
  * @package core
  **/
 
-final class Core
+abstract class AbstractUssHelper
 {
-    /**
-     * Replaces backslashes with forward slashes in a given string.
-     *
-     * This method is useful for normalizing file paths or URLs by converting backslashes to forward slashes.
-     *
-     * @param string|null $PATH The string to be processed.
-     *
-     * @return string The processed string with backslashes replaced by forward slashes.
-     */
-    public static function rslash(?string $PATH)
-    {
-        return str_replace("\\", "/", $PATH);
-    }
-
-
     /**
      * Generate URL based on the given pathname and server configuration.
      *
@@ -35,38 +20,19 @@ final class Core
      *
      * @param string $pathname The pathname to be converted in the URL.
      * @param bool $hidebase Whether to hide the URL base or not. Default is `false`.
-     *
      * @return string The generated URL based on the server configuration and pathname.
      */
-    public static function url(string $pathname, bool $hidebase = false)
+    public function generateUrl(string $pathname, bool $hidebase = false): string
     {
-        /**
-         * Convert all slashes to forward slash
-         * Necessary in windows OS ( because it uses backslashes )
-         */
-        $pathname = self::rslash($pathname);
-
+        $pathname = $this->slash($pathname); // Necessary in windows OS 
         $port = $_SERVER['SERVER_PORT'];
-
-        /**
-         * Get the request scheme
-         * http or https
-         */
         $scheme = ($_SERVER['REQUEST_SCHEME'] ?? ($port != '80' ? 'https' : 'http'));
 
-        /**
-         * Set port number visibility
-         * To avoid broken links when port forwarding is used
-         */
-
+        // Set port number visibility: To avoid broken links when port forwarding is used
         $visiblePort = !in_array($port, ['80', '443']) ? ":{$port}" : null;
 
-        /**
-         * Create the URL
-         * Note: URL base will not be hidden if port number is not invisible
-         */
-
-        $relativePath = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", null, $pathname);
+        // Create the URL: Base will not be hidden if port number is not invisible
+        $relativePath = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", '', $pathname);
 
         if(!$hidebase || $visiblePort) {
             $url = $scheme . "://" . $_SERVER['SERVER_NAME'] . "{$visiblePort}" . $relativePath;
@@ -75,7 +41,6 @@ final class Core
         }
 
         return $url;
-
     }
 
     /**
@@ -85,10 +50,9 @@ final class Core
      *
      * @param array $array The array containing the key-value pairs to be converted.
      * @param bool $singleQuote Whether to use single quotes for attribute values. Default is `false`.
-     *
      * @return string The string representation of the HTML attribute key-value pairs.
      */
-    public static function array_to_html_attrs(array $array, bool $singleQuote = false)
+    public function arrayToHtmlAttrs(array $array, bool $singleQuote = false): string
     {
         return implode(" ", array_map(function ($key, $value) use ($singleQuote) {
             if(is_array($value)) {
@@ -108,10 +72,9 @@ final class Core
      *
      * @param int $length The length of the key to be generated. Default is 10.
      * @param bool $use_spec_char Whether to include special characters in the key. Default is `false`.
-     *
      * @return string The generated random key.
      */
-    public static function keygen($length = 10, bool $use_spec_char = false)
+    public function keygen($length = 10, bool $use_special_char = false): string
     {
         $data = range(0, 9);
         foreach([range('a', 'z'), range('A', 'Z')] as $array) {
@@ -119,7 +82,7 @@ final class Core
                 $data[] = $value;
             };
         };
-        if($use_spec_char) {
+        if($use_special_char) {
             $special = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '[', ']', '{', '}', '/', ':', '.', ';', '|', '>', '~', '_', '-'];
             foreach($special as $char) {
                 $data[] = $char;
@@ -142,10 +105,9 @@ final class Core
      *
      * @param string $string The string containing variables to replace.
      * @param array $data An associative array with variable-value pairs.
-     *
      * @return string The modified string with variables replaced by their values.
      */
-    public static function replace_var(string $string, array $data)
+    public function replaceVar(string $string, array $data): string
     {
         $chars = 'a-z0-9_\-\.\$\(\)\[\]:;@#';
         $new_string = preg_replace_callback("~%(?:\\\\)*\{([$chars]+)\}~i", function ($match) use ($data) {
@@ -171,40 +133,32 @@ final class Core
      *
      * @param string $name The name of the pattern for which to retrieve the regular expression.
      * @param bool $strict (Optional) Determines if the regular expression should be strict, i.e., match the entire string. Default is `false`.
-     *
      * @return string|null The regular expression pattern for the specified pattern name, or `null` if the pattern name is not recognized.
      */
-    public static function regex(string $name, $strict = false)
+    public function regex(string $name, $strict = false): string
     {
-
         if($strict) {
             $BEGIN = '^';
             $END = '$';
         } else {
             $BEGIN = $END = null;
         }
+        
+        return match(strtoupper($name)) {
 
-        ## ----- Create REGEX ------
+            'EMAIL' => '/' . $BEGIN . '(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))' . $END . '/',
 
-        switch(strtoupper($name)) {
+            "URL" => "/{$BEGIN}(?:https?:\/\/)?(?:[\w.-]+(?:(?:\.[\w\.-]+)+)|(?:localhost(:\d{1,4})?\/))[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.%]+{$END}/i",
 
-            case 'EMAIL':
-                return '/' . $BEGIN . '(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))' . $END . '/';
+            "NUMBER" => "/{$BEGIN}\-?\d+(?:\.\d+)?{$END}/",
 
-            case "URL":
-                return "/{$BEGIN}(?:https?:\/\/)?(?:[\w.-]+(?:(?:\.[\w\.-]+)+)|(?:localhost(:\d{1,4})?\/))[\w\-\._~:\/?#[\]@!\$&'\(\)\*\+,;=.%]+{$END}/i";
+            "DATE" => "/{$BEGIN}(0[1-9]|[1-2][0-9]|3[0-1])(?:\-|\/)(0[1-9]|1[0-2])(?:\-|\/)[0-9]{4}{$END}/i",
 
-            case "NUMBER":
-                return "/{$BEGIN}\-?\d+(?:\.\d+)?{$END}/";
+            "BTC" => "/{$BEGIN}[13][a-km-zA-HJ-NP-Z0-9]{26,33}{$END}/i",
 
-            case "DATE":
-                return "/{$BEGIN}(0[1-9]|[1-2][0-9]|3[0-1])(?:\-|\/)(0[1-9]|1[0-2])(?:\-|\/)[0-9]{4}{$END}/i";
+            default => null
 
-            case "BTC":
-                $regex = "/{$BEGIN}[13][a-km-zA-HJ-NP-Z0-9]{26,33}{$END}/i";
-                break;
-
-        }
+        };
 
     }
 
@@ -214,10 +168,9 @@ final class Core
      * Checks if a namespace exists by searching through the declared classes.
      *
      * @param string $namespace The namespace to check for existence.
-     *
      * @return bool `true` if the namespace exists, `false` otherwise.
      */
-    public static function namespace_exists($namespace)
+    public function namespaceExists($namespace): bool
     {
         // credit to stackoverflow
         $namespace .= '\\';
@@ -252,9 +205,8 @@ final class Core
      *
      * @return string The elapsed time in a human-readable format.
      */
-    public static function elapse($DateTime, bool $full = false)
+    public function elapse($DateTime, bool $full = false): string
     {
-
         $Now = new DateTime("now");
 
         if($DateTime instanceof DateTime) {
@@ -269,7 +221,6 @@ final class Core
         }
 
         $diff = $Now->diff($Time);
-
         $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
 
@@ -301,7 +252,6 @@ final class Core
         }
 
         return $string ? implode(', ', $string) . ' ago' : 'just now';
-
     }
 
 
@@ -309,24 +259,18 @@ final class Core
      * Check if User-Agent is a Robot
      *
      * This method checks if the User-Agent string provided by the client is associated with a robot or crawler.
-     *
      * > Please note that User-Agent information can be easily spoofed, so the result may not always be accurate.
      *
      * @return bool Returns true if the User-Agent is likely a robot, false otherwise.
      */
-    public static function robot()
+    public function userAgentIsRobot(): bool
     {
-
         if(isset($_SERVER['HTTP_USER_AGENT']) && !empty($_SERVER['HTTP_USER_AGENT'])) {
-
             $bot_regex = '/abacho|accona|AddThis|AdsBot|ahoy|AhrefsBot|AISearchBot|alexa|altavista|anthill|appie|applebot|arale|araneo|AraybOt|ariadne|arks|aspseek|ATN_Worldwide|Atomz|baiduspider|baidu|bbot|bingbot|bing|Bjaaland|BlackWidow|BotLink|bot|boxseabot|bspider|calif|CCBot|ChinaClaw|christcrawler|CMC\/0\.01|combine|confuzzledbot|contaxe|CoolBot|cosmos|crawler|crawlpaper|crawl|curl|cusco|cyberspyder|cydralspider|dataprovider|digger|DIIbot|DotBot|downloadexpress|DragonBot|DuckDuckBot|dwcp|EasouSpider|ebiness|ecollector|elfinbot|esculapio|ESI|esther|eStyle|Ezooms|facebookexternalhit|facebook|facebot|fastcrawler|FatBot|FDSE|FELIX IDE|fetch|fido|find|Firefly|fouineur|Freecrawl|froogle|gammaSpider|gazz|gcreep|geona|Getterrobo-Plus|get|girafabot|golem|googlebot|\-google|grabber|GrabNet|griffon|Gromit|gulliver|gulper|hambot|havIndex|hotwired|htdig|HTTrack|ia_archiver|iajabot|IDBot|Informant|InfoSeek|InfoSpiders|INGRID\/0\.1|inktomi|inspectorwww|Internet Cruiser Robot|irobot|Iron33|JBot|jcrawler|Jeeves|jobo|KDD\-Explorer|KIT\-Fireball|ko_yappo_robot|label\-grabber|larbin|legs|libwww-perl|linkedin|Linkidator|linkwalker|Lockon|logo_gif_crawler|Lycos|m2e|majesticsEO|marvin|mattie|mediafox|mediapartners|MerzScope|MindCrawler|MJ12bot|mod_pagespeed|moget|Motor|msnbot|muncher|muninn|MuscatFerret|MwdSearch|NationalDirectory|naverbot|NEC\-MeshExplorer|NetcraftSurveyAgent|NetScoop|NetSeer|newscan\-online|nil|none|Nutch|ObjectsSearch|Occam|openstat.ru\/Bot|packrat|pageboy|ParaSite|patric|pegasus|perlcrawler|phpdig|piltdownman|Pimptrain|pingdom|pinterest|pjspider|PlumtreeWebAccessor|PortalBSpider|psbot|rambler|Raven|RHCS|RixBot|roadrunner|Robbie|robi|RoboCrawl|robofox|Scooter|Scrubby|Search\-AU|searchprocess|search|SemrushBot|Senrigan|seznambot|Shagseeker|sharp\-info\-agent|sift|SimBot|Site Valet|SiteSucker|skymob|SLCrawler\/2\.0|slurp|snooper|solbot|speedy|spider_monkey|SpiderBot\/1\.0|spiderline|spider|suke|tach_bw|TechBOT|TechnoratiSnoop|templeton|teoma|titin|topiclink|twitterbot|twitter|UdmSearch|Ukonline|UnwindFetchor|URL_Spider_SQL|urlck|urlresolver|Valkyrie libwww\-perl|verticrawl|Victoria|void\-bot|Voyager|VWbot_K|wapspider|WebBandit\/1\.0|webcatcher|WebCopier|WebFindBot|WebLeacher|WebMechanic|WebMoose|webquest|webreaper|webspider|webs|WebWalker|WebZip|wget|whowhere|winona|wlm|WOLP|woriobot|WWWC|XGET|xing|yahoo|YandexBot|YandexMobileBot|yandex|yeti|Zeus/i';
-
             return !!preg_match($bot_regex, $_SERVER['HTTP_USER_AGENT']);
-
         } else {
             return true;
         }
-
     }
 
     /**
@@ -342,47 +286,33 @@ final class Core
      * @return string|false The converted string with HTML named entities replaced by XML entities, or `false` if the
      * conversion fails.
      */
-    public static function xmlentities(string $string = '')
+    public function xmlEntities(string $string = '')
     {
-
-        /*
-            The xhtml-entities.json file was modified after being retreived from W3C github library on Github
-
-            View link - https://github.com/w3c/html/blob/master/entities.json
-        */
-
-        /*
-            The XML entities data was moved to " xhtml-entities.json " file due to the large number of character it contains.
-            - Thus, absence of the file will result to false in converting HTML named entity to number entity;
-            The " xhtml-entities.json " must be in the same directory with "core.php" file
-        */
-
-        $file = __DIR__ . '/xhtml-entities.json';
+        /**
+         * The xhtml-entities.json file was modified after being retreived from W3C github library on Github
+         * View link - https://github.com/w3c/html/blob/master/entities.json
+         */
+        $file = UssEnum::JSON_DIR . '/xhtml-entities.json';
         if(!is_file($file)) {
             return false;
         }
 
         # Convert to JSON and validate the conversion;
-
         $content = json_decode(file_get_contents($file), true);
         if(json_last_error()) {
             return false;
         }
 
         $string = preg_replace("/&(?!(?:\w+|\#\d+);)/i", '&amp;', $string);
-
+        
         // Combine the name and the Entities;
-
         $entities = array_map(function ($value) {
             return "&#{$value};";
         }, array_column($content, 'entity'));
 
         $XMLEntities = array_combine(array_keys($content), $entities);
-
         // Replace HTML named entites in the string;
-
         return strtr($string, $XMLEntities);
-
     }
 
     /**
@@ -396,47 +326,36 @@ final class Core
      * @param string $path The path to resolve.
      * @return string|false The absolute path if successful, or `false` if unable to retrieve the absolute path.
      */
-    public static function abspath(string $path)
+    public function absPath(string $path)
     {
-
         $debug = debug_backtrace();
-
         $key = array_search(__FUNCTION__, array_column($debug, 'function'));
+
         if($debug[$key]['class'] != __CLASS__) {
             return false;
         }
-
-        /*
-         * The absolute directory of the file that called this method!
-         */
+        
+        // The absolute directory of the file that called this method!
         $absolutes = explode(DIRECTORY_SEPARATOR, dirname($debug[$key]['file']));
 
-        /*
-         * Use default system directory separator
-         */
+        // Use default system directory separator
         $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, trim($path));
 
-        /*
-         * Split path by separator and get different parts of the string
-         */
+        // Split path by separator and get different parts of the string
         $parts = array_values(array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen'));
 
-        /*
-         * Retrieve absolute path if "$path" starts with "/";
-         */
+        // Retrieve absolute path if "$path" starts with "/";
         if(substr($path, 0, 1) === DIRECTORY_SEPARATOR) {
             $absolutes = [$absolutes[0]];
         }
 
-        # Check if "$path" is already absolute;
-
+        // Check if "$path" is already absolute;
         if($absolutes[0] === ($parts[0] ?? null)) {
             // This empty array will be refilled with the absolute data from "$parts" variable
             $absolutes = [];
         };
 
-        # Create an absolute path;
-
+        // Create an absolute path;
         foreach ($parts as $part) {
             if ('.' == $part) {
                 continue;
@@ -458,7 +377,6 @@ final class Core
         }
 
         return implode(DIRECTORY_SEPARATOR, $absolutes);
-
     }
 
     /**
@@ -471,9 +389,8 @@ final class Core
      * @param string $path The path to check.
      * @return bool `true` if the path is an absolute path, `false` otherwise.
      */
-    public static function is_absolute_path(string $path)
+    public function isAbsolutePath(string $path): bool
     {
-
         // Check for wrapper path (e.g. file://)
         if (preg_match('#^[a-z][a-z\d+.-]*://#i', $path)) {
             return true;
@@ -491,6 +408,14 @@ final class Core
 
         return false;
 
+    }    
+    
+    /**
+     * Replaces backslashes with forward slashes in a given string.
+     */
+    protected function slash(?string $PATH)
+    {
+        return str_replace("\\", "/", $PATH);
     }
 
 }

@@ -3,24 +3,21 @@
 use Ucscode\Packages\Pairs;
 use Twig\Loader\FilesystemLoader;
 
-abstract class AbstractUss
+abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 {
     use PropertyAccessTrait;
-
+    
     public static array $globals = [];
 
-    #[Accessible]
-    protected ?Pairs $options;
+    public readonly ?Pairs $options;
+    public readonly ?\mysqli $mysqli;
 
-    #[Accessible]
-    protected ?MYSQLI $mysqli;
-
-    protected array $console = [];
-    protected array $routes = [];
+    protected readonly ?FilesystemLoader $twigLoader;
     protected string $namespace = 'Uss';
     protected bool $rendered = false;
 
-    protected ?FilesystemLoader $twigLoader;
+    protected array $console = [];
+    protected array $routes = [];
 
     protected function __construct()
     {
@@ -28,11 +25,14 @@ abstract class AbstractUss
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, $this->namespace);
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, '__main__');
 
-        $this->twigLoaderAssets();
+        $this->loadTwigAssets();
+        $this->loadUssDatabase();
+        $this->loadUssSession();
+        $this->loadUssVariables();
+    }
 
-        require_once UssEnum::CONFIG_DIR . "/database.php";
-        require_once UssEnum::CONFIG_DIR . "/variables.php";
-        require_once UssEnum::CONFIG_DIR . "/session.php";
+    public function getContext(string $name): mixed {
+        //return 
     }
 
     /**
@@ -109,23 +109,20 @@ abstract class AbstractUss
     protected function localTwigExtension(UssTwigBlockManager $blockManager)
     {
         return new class ($this, $blockManager) {
+
             public string $jsElement;
-            private bool $init = false;
 
             public function __construct(
-                private Uss $ussInstance,
-                public UssTwigBlockManager $twigBlockManager
+                private Uss $uss,
+                private UssTwigBlockManager $blockManager
             ) {
             }
 
             public function init(): self
             {
-                if(!$this->init) {
-                    $this->ussInstance->console('platform', UssEnum::PROJECT_NAME);
-                    $jsonElement = json_encode($this->ussInstance->console());
-                    $this->jsElement = base64_encode($jsonElement);
-                    $this->init = true;
-                };
+                $this->uss->console('platform', UssEnum::PROJECT_NAME);
+                $jsonElement = json_encode($this->uss->console());
+                $this->jsElement = base64_encode($jsonElement);
                 return $this;
             }
 
@@ -134,20 +131,22 @@ abstract class AbstractUss
             {
                 $args = func_get_args();
                 $callback = array_shift($args);
-                $result = call_user_func_array($callback, $args);
+                $result = call_user_func_array([$this->uss, $callback], $args);
                 return $result;
             }
 
-            # Convert Filesystem To Url
-            public function toUrl(string $absolutePath, bool $hidebase = false): ?string
-            {
-                return Core::url($absolutePath, $hidebase);
+            public function renderBlocks(string $name, int $indent = 1) {
+                $blocks = $this->blockManager->getBlocks($name);
+                if(is_array($blocks)) {
+                    $indent = str_repeat("\t", abs($indent));
+                    return implode("\n{$indent}", $blocks);
+                };
             }
 
             # Get an option
             public function getOption(string $name)
             {
-                return $this->ussInstance->options->get($name);
+                return $this->uss->options->get($name);
             }
 
         };
@@ -169,7 +168,7 @@ abstract class AbstractUss
     /**
     * @ignore
     */
-    private function twigLoaderAssets()
+    private function loadTwigAssets()
     {
         $vendors = [
             'head_css' => [
@@ -193,10 +192,12 @@ abstract class AbstractUss
             ]
         ];
 
+        $blockManager = new UssTwigBlockManager();
+        
         foreach($vendors as $block => $contents) {
             $contents = array_map(function ($value) {
                 $type = explode(".", $value);
-                $value = Core::url(UssEnum::ASSETS_DIR . "/" . $value);
+                $value = $this->generateUrl(UssEnum::ASSETS_DIR . "/" . $value);
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {
@@ -204,7 +205,78 @@ abstract class AbstractUss
                 };
                 return $element;
             }, $contents);
-            UssTwigBlockManager::instance()->appendTo($block, $contents);
+            $blockManager->appendTo($block, $contents);
+        };
+    }
+
+    private function loadUssDatabase(): void
+    {
+        if(DB_ENABLED) {
+            try {
+
+                // Initialize Mysqli
+                $this->mysqli = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+                if($this->mysqli->connect_errno) {
+                    throw new \Exception($this->mysqli->connect_error);
+                } else {
+                    try {
+                        // Initialize Pairs
+                        $this->options = new Pairs($this->mysqli, DB_PREFIX . "options");
+                    } catch(\Exception $e) {
+                        $this->render('@Uss/error.html.twig', [
+                            'subject' => "Library Error",
+                            'message' => $e->getMessage()
+                        ]);
+                        die();
+                    }
+                }
+
+            } catch(\Exception $e) {
+
+                $this->render('@Uss/db.error.html.twig', [
+                    'error' => $e->getMessage(),
+                    'url' => UssEnum::GITHUB_REPO,
+                    'mail' => UssEnum::AUTHOR_EMAIL
+                ]);
+
+            };
+
+        } else {
+            $this->mysqli = $this->options = null;
+        }
+    }
+
+    public function loadUssVariables()
+    {
+        self::$globals['icon'] = $this->generateUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
+        self::$globals['title'] = UssEnum::PROJECT_NAME;
+        self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
+        self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";
+    }
+
+    public function loadUssSession()
+    {
+        if(empty(session_id())) {
+            session_start();
+        }
+
+        $sidIndex = 'USSID';
+
+        if(empty($_SESSION[$sidIndex])) {
+            $_SESSION[$sidIndex] = $this->keygen(40, true);
+        };
+
+        $cookieIndex = 'USSCLIENTID';
+
+        if(empty($_COOKIE[$cookieIndex])) {
+
+            $time = (new \DateTime())->add((new \DateInterval("P3M")));
+
+            $_COOKIE[$cookieIndex] = uniqid($this->keygen(7));
+
+            $setCookie = setrawcookie($cookieIndex, $_COOKIE[$cookieIndex], $time->getTimestamp(), '/');
+
         };
     }
 

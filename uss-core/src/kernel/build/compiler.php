@@ -59,9 +59,7 @@ $dependencies = [
 
     'bundles' => [
 
-        'interface' => [
-            'UssInterface.php'
-        ],
+        'interface' => [],
 
         'enum' => [],
 
@@ -70,14 +68,11 @@ $dependencies = [
             "PropertyAccessTrait.php",
         ],
 
-        'abstract' => [
-            "AbstractUssHelper.php",
-            'AbstractUss.php',
-        ],
+        'abstract' => [],
 
         "class" => [
             "UssTwigBlockManager.php",
-            'Uss.php'
+            "Core.php",
         ]
 
     ],

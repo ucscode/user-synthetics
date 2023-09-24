@@ -20,13 +20,13 @@ trait PropertyAccessTrait
     public function __get($property)
     {
         if(!property_exists($this, $property)) {
-            throw new Exception("Undefined property: " . $this::class . "::\${$property}");
+            throw new \Exception("Undefined property: " . $this::class . "::\${$property}");
         };
         $reflectionProperty = new ReflectionProperty($this, $property);
         $attributes = $reflectionProperty->getAttributes("Accessible");
         if(empty($attributes)) {
             $scope = $reflectionProperty->isPrivate() ? 'private' : 'protected';
-            throw new Exception("Cannot access {$scope} property " . $this::class . "::\${$property}");
+            throw new \Exception("Cannot access {$scope} property " . $this::class . "::\${$property}");
         };
         return $this->{$property} ?? null;
     }

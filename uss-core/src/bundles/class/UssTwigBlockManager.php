@@ -7,26 +7,8 @@
  */
 class UssTwigBlockManager
 {
-    use SingletonTrait;
+    private static array $blocks = [];
 
-    private array $blocks = [];
-
-    public function __construct()
-    {
-
-    }
-
-    public function getBlocks(?string $name = null)
-    {
-        if($name === null) {
-            return $this->blocks;
-        };
-        return $this->blocks[$name] ?? null;
-    }
-
-    /**
-     *
-     */
     public function appendTo(string $blockName, $resolver, ?string $content = null)
     {
         if(!is_array($resolver)) {
@@ -56,9 +38,17 @@ class UssTwigBlockManager
 
     public function clear(string $blockName)
     {
-        if(isset($this->blocks[$blockName])) {
-            unset($this->blocks[$blockName]);
+        if(isset(self::$blocks[$blockName])) {
+            unset(self::$blocks[$blockName]);
         };
+    }
+
+    public function getBlocks(?string $name = null)
+    {
+        if($name === null) {
+            return self::$blocks;
+        };
+        return self::$blocks[$name] ?? null;
     }
 
     public function order(string $blockName, array $resolverNames)
@@ -68,22 +58,24 @@ class UssTwigBlockManager
 
     private function createBlock(string $name, array $data)
     {
-        if(!isset($this->blocks[$name])) {
-            $this->blocks[$name] = [];
+        $blocks = &self::$blocks;
+        if(!isset($blocks[$name])) {
+            $blocks[$name] = [];
         };
-        $this->blocks[$name] = array_merge($this->blocks[$name], $data);
+        $blocks[$name] = array_merge($blocks[$name], $data);
     }
 
     private function filterBlock(string $name, array $data)
     {
-        if(!isset($this->blocks[$name])) {
+        $blocks = &self::$blocks;
+        if(!isset($blocks[$name])) {
             return;
         };
-        $this->blocks[$name] = array_filter($this->blocks[$name], function ($value, $key) use ($data) {
+        $blocks[$name] = array_filter($blocks[$name], function ($value, $key) use ($data) {
             return !in_array($key, $data);
         }, ARRAY_FILTER_USE_BOTH);
-        if(empty($this->blocks[$name])) {
-            unset($this->blocks[$name]);
+        if(empty($blocks[$name])) {
+            unset($blocks[$name]);
         };
     }
 

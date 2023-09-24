@@ -35,11 +35,15 @@
 						{% block error_image %}
 
 							{% if image is defined or ( subject is empty and message is empty ) %}
-								<img src="{{ image|default(Uss.call('Core::url', constant('UssEnum::ASSETS_DIR') ~ '/images/errors/error-404.webp')) }}" 
+
+								{% set image404 = Uss.call('generateUrl', constant('UssEnum::ASSETS_DIR') ~ '/images/errors/error-404.webp') %}
+
+								<img src="{{ image|default(image404) }}" 
 									class="img-fluid user-select-none {{ image_class }}" 
 									alt="ERROR IMAGE" 
 									style='width: 40%; min-width: 220px; max-height: 100vh; {{ image_style|default('') }}' 
 									loading="lazy">
+
 							{% endif %}
 
 						{% endblock %}

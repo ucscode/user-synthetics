@@ -6,19 +6,18 @@
  *
  * > User Synthetics requires PHP version 7.4 or higher due to its reliance on typed properties, which are essential for maintaining the integrity of relevant properties and preventing structure changes.
  *
- * @package uss
- * @author ucscode
+ * @package Uss
+ * @author Ucscode
  */
-
 final class Uss extends AbstractUss
 {
     use SingletonTrait;
-
+    
     protected function __construct()
     {
         parent::__construct();
     }
-
+    
     /**
      * Render A Twig Template
      *
@@ -38,9 +37,13 @@ final class Uss extends AbstractUss
             $variables = array_merge($variables);
 
             $twig = new \Twig\Environment($this->twigLoader, ['debug' => true]);
+            
             $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-            $extension = $this->localTwigExtension($blockManager ?? UssTwigBlockManager::instance())->init();
+            $extension = $this->localTwigExtension(
+                $blockManager ?? new UssTwigBlockManager()
+            )->init();
+
             $twig->addGlobal('Uss', $extension);
 
             /**
@@ -171,8 +174,8 @@ final class Uss extends AbstractUss
      */
     public function query(?int $index = null)
     {
-        $documentRoot = Core::rslash($_SERVER['DOCUMENT_ROOT']);
-        $projectRoot = Core::rslash(ROOT_DIR);
+        $documentRoot = $this->slash($_SERVER['DOCUMENT_ROOT']);
+        $projectRoot = $this->slash(ROOT_DIR);
         $requestUri = explode("?", $_SERVER['REQUEST_URI']);
         $path = $requestUri[0] ?? '';
         $path = str_replace($projectRoot, '', $documentRoot . $path);
@@ -274,6 +277,4 @@ final class Uss extends AbstractUss
 
 };
 
-
-/** Instantiate The Uss Class */
 Uss::instance();
