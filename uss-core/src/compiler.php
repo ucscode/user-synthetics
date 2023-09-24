@@ -57,7 +57,7 @@ $dependencies = [
 
     ],
 
-    'components' => [
+    'bundles' => [
 
         'interface' => [],
 
@@ -68,24 +68,17 @@ $dependencies = [
             "PropertyAccessTrait.php",
         ],
 
-        'abstract' => [],
+        'abstract' => [
+            'AbstractUss.php',
+        ],
 
         "class" => [
             "UssTwigBlockManager.php",
             "Core.php",
-        ]
-
-    ],
-
-    'build' => [
-
-        'Uss' => [
-            'UssRepository.php',
-            'AbstractUss.php',
             'Uss.php'
         ]
 
-    ]
+    ],
 
 ];
 

@@ -1,33 +1,29 @@
 <?php
 
-/**
- * Enable or disable database connection
- */
+// Enable or disable database connection
+
 define('DB_ENABLED', true);
 
-/**
- * Database Table Prefix
- */
+// Database Table Prefix
+
 define('DB_PREFIX', 'uss_');
 
-/**
- * Local Server Only
- */
-if($_SERVER['SERVER_NAME'] === 'localhost') {
+// Local Development
+
+if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
     define('DB_PASSWORD', '');
-    define('DB_NAME', 'uss_test');
+    define('DB_NAME', DB_PREFIX . 'test');
 
 } else {
 
-    /**
-     * Web Server Only
-     */
+    // Remote Development
+    
     define('DB_HOST', 'localhost');
-    define('DB_USER', 'root');
+    define('DB_USER', '');
     define('DB_PASSWORD', '');
-    define('DB_NAME', '');
+    define('DB_NAME', DB_PREFIX . '');
 
 };

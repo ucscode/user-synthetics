@@ -2,12 +2,6 @@
 
 final class UssEnum
 {
-    /**
-     * Please change the secret key for security purpose
-     * You can use a custom key or generate a random secret key using the function below
-     *
-     * bin2hex(random_bytes(16))
-     */
     public const SECRET_KEY = 'any_secret_key';
 
     public const PROJECT_NAME = 'User Synthetics';
@@ -16,7 +10,7 @@ final class UssEnum
 
     public const AUTHOR = 'Ucscode';
 
-    public const AUTHOR_EMAIL = 'mailto:uche23mail@gmail.com';
+    public const AUTHOR_EMAIL = 'uche23mail@gmail.com';
 
     public const AUTHOR_WEBSITE = 'https://ucscode.me';
 
@@ -34,6 +28,5 @@ final class UssEnum
 
     public const CONFIG_DIR = self::CORE_DIR . "/config";
 
-    public const EVENT_ID = '_';
-
+    public const BUILD_PATH = self::SRC_DIR . "/kernel/build";
 }
