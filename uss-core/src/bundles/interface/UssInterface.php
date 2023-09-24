@@ -1,8 +1,6 @@
 <?php
 
 interface UssInterface {
-
-    public function getContext(string $name): mixed;
     
     public function generateUrl(string $pathname, bool $hidebase = false): string;
 

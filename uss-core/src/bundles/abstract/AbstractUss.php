@@ -16,8 +16,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     protected string $namespace = 'Uss';
     protected bool $rendered = false;
 
-    protected array $console = [];
-    protected array $routes = [];
+    protected array $consoleJS = [];
+    protected static array $routes = [];
 
     protected function __construct()
     {
@@ -30,37 +30,86 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         $this->loadUssSession();
         $this->loadUssVariables();
     }
-
-    public function getContext(string $name): mixed {
-        //return 
-    }
-
+    
     /**
-     * Register a template directory with in Uss
+     * Register a template directory in Uss
+     *
+     * This is probably the first method you need to call in your module to define your templates folder
+     * @param string $directory The template folder
+     * @param string $namespace Your custom unique twig namespace
      */
     public function addTwigFilesystem(string $directory, string $namespace): void
     {
         if(!preg_match("/\w+/i", $namespace)) {
-            throw new Exception(__METHOD__ . " #(Argument 1); Twig namespace may only contain letter, numbers and underscore");
+            throw new \Exception(
+                __METHOD__ . " #(Argument 1); Twig namespace may only contain letter, numbers and underscore"
+            );
         } elseif(strtolower($namespace) === strtolower($this->namespace)) {
-            throw new Exception(__METHOD__ . " #(Argument 1); Use of `{$namespace}` as namespace is not allowed");
+            throw new \Exception(
+                __METHOD__ . " #(Argument 1); Use of `{$namespace}` as namespace is not allowed"
+            );
         };
 
         $namespace = ucfirst($namespace);
 
         if(in_array($namespace, $this->twigLoader->getNamespaces())) {
-            throw new Exception(__METHOD__ . " #(Argument 1); `{$namespace}` namespace already exists");
+            throw new \Exception(
+                __METHOD__ . " #(Argument 1); `{$namespace}` namespace already exists"
+            );
         };
 
         $this->twigLoader->addPath($directory, $namespace);
     }
 
     /**
+     * Pass a variable from PHP to JavaScript.
+     *
+     * @param string $key  The key or identifier for the data to be passed.
+     * @param mixed $value The value to be associated with the given key.
+     * @return void
+     */
+    public function addJsProperty(string $key, mixed $value): void
+    {
+        $this->consoleJS[$key] = $value;
+    }
+    
+    /**
+     * Get a registered JavaScript variable
+     *
+     * @param string $key The key or identifier of the value to retrieve
+     * @return mixed
+     */
+    public function getJsProperty(?string $key = null): mixed
+    {
+        if(is_null($key)) {
+            return $this->consoleJS;
+        };
+        return $this->consoleJS[$key] ?? null;
+    }
+
+
+    /**
+     * Remove a value from the list of consoled data.
+     *
+     * @param string $key The key or identifier of the value to be removed
+     * @return mixed value of the removed property
+     */
+    public function removeJsProperty(string $key): mixed
+    {
+        $value = null;
+        if(isset($this->consoleJS[$key])) {
+            $value = $this->consoleJS[$key];
+            unset($this->consoleJS[$key]);
+        }
+        return $value;
+    }
+
+    /**
      * Get the current focus expression or list of focus expressions.
     */
-    public function getRouteInventory(bool $authentic = false)
+    public function getRouteInventory(bool $authentic = false): array
     {
-        $routes = $this->routes;
+        $routes = self::$routes;
         if($authentic) {
             $routes = array_filter($routes, function ($route) {
                 return $route->authentic;
@@ -73,7 +122,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
      * Exit the script and print a JSON response.
      * @return void
      */
-    public function exit(?string $message = null, ?bool $status = null, ?array $data = [])
+    public function exit(?string $message = null, ?bool $status = null, ?array $data = []): void
     {
         $args = func_get_args();
         if(empty($args)) {
@@ -91,6 +140,15 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     }
 
     /**
+    * Kill the script and print a JSON response.
+    * @return void
+    */
+    public function die(?bool $status = null, ?string $message = null, ?array $data = []): void
+    {
+        $this->exit($status, $message, $data);
+    }
+
+    /**
      * Explode a content by a seperator and rejoin the filtered value
      */
     public function filterContext(string|array $path, string $divider = '/'): string
@@ -99,52 +157,52 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             $path = implode($divider, $path);
         };
         return implode($divider, array_filter(
-            array_map('trim', explode($divider, $path))
+            array_map('trim', explode($divider, $path)),
+            function($value) {
+                return trim($value) !== '';
+            }
         ));
     }
 
     /**
      * @ignore
      */
-    protected function localTwigExtension(UssTwigBlockManager $blockManager)
+    protected function localTwigExtension(\UssTwigBlockManager $blockManager)
     {
-        return new class ($this, $blockManager) {
+        return new class ($this, $blockManager, $this->namespace) {
 
             public string $jsElement;
 
             public function __construct(
                 private Uss $uss,
-                private UssTwigBlockManager $blockManager
+                private UssTwigBlockManager $blockManager,
+                private string $namespace
             ) {
-            }
-
-            public function init(): self
-            {
-                $this->uss->console('platform', UssEnum::PROJECT_NAME);
-                $jsonElement = json_encode($this->uss->console());
+                $this->uss->addJsProperty('platform', UssEnum::PROJECT_NAME);
+                $jsonElement = json_encode($this->uss->getJsProperty());
                 $this->jsElement = base64_encode($jsonElement);
-                return $this;
             }
 
             # Equivalent to call_user_func
-            public function call(): mixed
-            {
-                $args = func_get_args();
-                $callback = array_shift($args);
-                $result = call_user_func_array([$this->uss, $callback], $args);
-                return $result;
+            public function generateUrl(string $path, bool $base = false): string {
+                return $this->uss->generateUrl($path, $base);
             }
 
-            public function renderBlocks(string $name, int $indent = 1) {
+            public function keygen(int $length, bool $chars = false) {
+                return $this->uss->keygen($length, $chars);
+            }
+
+            public function renderBlocks(string $name, int $indent = 1): string {
                 $blocks = $this->blockManager->getBlocks($name);
                 if(is_array($blocks)) {
                     $indent = str_repeat("\t", abs($indent));
                     return implode("\n{$indent}", $blocks);
                 };
+                return '';
             }
 
             # Get an option
-            public function getOption(string $name)
+            public function getOption(string $name): mixed
             {
                 return $this->uss->options->get($name);
             }
@@ -192,7 +250,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             ]
         ];
 
-        $blockManager = new UssTwigBlockManager();
+        $blockManager = new \UssTwigBlockManager();
         
         foreach($vendors as $block => $contents) {
             $contents = array_map(function ($value) {

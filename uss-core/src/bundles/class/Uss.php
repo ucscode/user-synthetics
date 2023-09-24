@@ -42,7 +42,7 @@ final class Uss extends AbstractUss
 
             $extension = $this->localTwigExtension(
                 $blockManager ?? new UssTwigBlockManager()
-            )->init();
+            );
 
             $twig->addGlobal('Uss', $extension);
 
@@ -69,12 +69,16 @@ final class Uss extends AbstractUss
     /**
      * Set the focus on a specific URL path and execute a function based on the URL match.
      */
-    public function route(string $route, callable $controller, $methods = null): bool|object
+    public static function route(string $route, callable|RouteInterface $controller, $methods = null): bool|object
     {
         $router = new class ($route, $controller, $methods) {
+
+            use PropertyAccessTrait;
+
+            #[Accessible]
+            protected $requestMatch;
             protected $request;
             private array|bool $authentic = [];
-            private $requestMatch;
             private $backtrace;
 
             public function __construct(
@@ -151,13 +155,14 @@ final class Uss extends AbstractUss
 
         };
 
-        $this->routes[] = $router;
+        self::$routes[] = $router;
 
         if($router->authentic) {
-
-            // Execute the controller and pass the matching request as argument
-            call_user_func($router->controller, $router->requestMatch);
-
+            if($router->controller instanceof RouteInterface) {
+                $router->controller->onload($router->requestMatch ?? []);
+            } else {
+                call_user_func($router->controller, $router->requestMatch ?? []);
+            };
             return $router;
 
         };
@@ -172,7 +177,7 @@ final class Uss extends AbstractUss
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
      * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
-    public function query(?int $index = null)
+    public function splitUri(?int $index = null)
     {
         $documentRoot = $this->slash($_SERVER['DOCUMENT_ROOT']);
         $projectRoot = $this->slash(ROOT_DIR);
@@ -213,67 +218,6 @@ final class Uss extends AbstractUss
         }
 
     }
-
-    /**
-     * Kill the script and print a JSON response.
-     * @return void
-     */
-    public function die(?bool $status = null, ?string $message = null, ?array $data = [])
-    {
-        parent::exit($status, $message, $data);
-    }
-
-    /**
-     * Pass a variable from PHP to JavaScript.
-     *
-     * The `Uss::instance()->console()` method facilitates the transfer of data from PHP to JavaScript in a convenient manner.
-     * It provides different functionalities based on the arguments passed:
-     *
-     * - If the first argument is `NULL`, it returns an array containing the list of data that will be forwarded to the browser.
-     * - If the first argument is a string and the second argument is not supplied, it returns the value associated with the string key.
-     * - If both the first and second arguments are supplied, it saves the value and prepares to forward it to the browser.
-     *
-     * > Avoid passing sensitive information to the console, as it can be easily accessed on the client browser.
-     *
-     * @param string|null $key  The key or identifier for the data to be passed.
-     * @param mixed $value The value to be associated with the given key.
-     *
-     * @return mixed If no key is specified, an array of data to be forwarded to the browser. If a key is provided, the associated value is returned.
-     */
-    public function console(?string $key = null, mixed $value = null)
-    {
-        // accepts 2 arguments
-        if(is_null($key)) {
-            return $this->console;
-        }
-        $key = trim($key);
-        $args = func_get_args();
-        if(func_num_args() === 1) {
-            return $this->console[$key] ?? null;
-        }
-        $this->console[$key] = $value;
-    }
-
-
-    /**
-     * Remove a value from the list of console data.
-     *
-     * The `Uss::instance()->remove_console()` method allows you to remove a specific value from the console data list.
-     *
-     * @param string $key The key or identifier of the value to be removed from the console data.
-     *
-     * @return mixed The value that was removed, or `null` if the key does not exist.
-     */
-    public function remove_console(string $key)
-    {
-        if(isset($this->console[$key])) {
-            $value = $this->console[ $key ];
-            unset($this->console[ $key ]);
-            return $value;
-        }
-    }
-
-
 
 };
 

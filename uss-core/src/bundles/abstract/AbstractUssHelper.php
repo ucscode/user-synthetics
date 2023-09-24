@@ -1,26 +1,13 @@
 <?php
 
-/**
- * A Powerful and Versatile Class with Cross-Platform Functionality
- *
- * This class contains a collection of methods that can be used across various platforms. It provides functionalities related to file path manipulation, URL transformation, array manipulation, string replacement, regular expressions, date/time calculations, and robot detection.
- *
- * @author ucscode
- * @package core
- **/
-
 abstract class AbstractUssHelper
 {
     /**
-     * Generate URL based on the given pathname and server configuration.
-     *
-     * This method converts all slashes in the pathname to forward slashes,
-     * determines the request scheme (http or https), handles port number visibility,
-     * and creates the URL using the server name, port, and relative path.
+     * Generate URL from absolute filesystem path.
      *
      * @param string $pathname The pathname to be converted in the URL.
      * @param bool $hidebase Whether to hide the URL base or not. Default is `false`.
-     * @return string The generated URL based on the server configuration and pathname.
+     * @return string The generated URL
      */
     public function generateUrl(string $pathname, bool $hidebase = false): string
     {
@@ -44,13 +31,11 @@ abstract class AbstractUssHelper
     }
 
     /**
-     * Convert Array to HTML Attributes
-     *
-     * Converts an array into a string of HTML attribute key-value pairs.
+     * Convert array to HTML Attributes
      *
      * @param array $array The array containing the key-value pairs to be converted.
      * @param bool $singleQuote Whether to use single quotes for attribute values. Default is `false`.
-     * @return string The string representation of the HTML attribute key-value pairs.
+     * @return string The HTML attribute string
      */
     public function arrayToHtmlAttrs(array $array, bool $singleQuote = false): string
     {
@@ -67,8 +52,6 @@ abstract class AbstractUssHelper
 
     /**
      * Generate a Random Key
-     *
-     * Generates a random key of specified length with optional special characters.
      *
      * @param int $length The length of the key to be generated. Default is 10.
      * @param bool $use_spec_char Whether to include special characters in the key. Default is `false`.
@@ -98,10 +81,7 @@ abstract class AbstractUssHelper
 
 
     /**
-     * Replace Variables in a String
-     *
-     * Replaces variables in the given string with corresponding values from the data array.
-     * The variables in the string must be in the format **%\\{variable_name}**.
+     * Replace %{variables} in a String
      *
      * @param string $string The string containing variables to replace.
      * @param array $data An associative array with variable-value pairs.
@@ -129,8 +109,6 @@ abstract class AbstractUssHelper
     /**
      * Get Regular Expression for a Specific Pattern
      *
-     * Returns the regular expression pattern for the specified pattern name.
-     *
      * @param string $name The name of the pattern for which to retrieve the regular expression.
      * @param bool $strict (Optional) Determines if the regular expression should be strict, i.e., match the entire string. Default is `false`.
      * @return string|null The regular expression pattern for the specified pattern name, or `null` if the pattern name is not recognized.
@@ -156,7 +134,7 @@ abstract class AbstractUssHelper
 
             "BTC" => "/{$BEGIN}[13][a-km-zA-HJ-NP-Z0-9]{26,33}{$END}/i",
 
-            default => null
+            default => $name
 
         };
 
@@ -164,8 +142,6 @@ abstract class AbstractUssHelper
 
     /**
      * Check if Namespace Exists
-     *
-     * Checks if a namespace exists by searching through the declared classes.
      *
      * @param string $namespace The namespace to check for existence.
      * @return bool `true` if the namespace exists, `false` otherwise.
@@ -186,23 +162,10 @@ abstract class AbstractUssHelper
      * Calculate Elapsed Time
      *
      * Calculates the elapsed time between a given DateTime and the current time.
+     * Example: "3 months, 1 week ago"
      *
-     * This method takes a DateTime object, a timestamp string, or a Unix timestamp as input and calculates the amount of time that has passed between that point in time and the current time. The elapsed time is then returned as a string in a human-readable format.
-     *
-     * The string includes units such as `years`, `months`, `weeks`, `days`, `hours`, `minutes`, and `seconds`, depending on the duration of the elapsed time. If the elapsed time is less than a minute, the string will be "`just now`".
-     *
-     * Example usage:
-     * ```
-     * $dateTime = new DateTime('2023-01-15 12:00:00');
-     * echo Core::elapse($dateTime); // Output: "3 months, 1 week ago"
-     *
-     * $timestamp = '1645728000';
-     * echo Core::elapse($timestamp, false); // Output: "3 months"
-     * ```
-     *
-     * @param DateTime|int|string $DateTime The DateTime object, timestamp string, or Unix timestamp to calculate the elapsed time from.
-     * @param bool $full Determines the level of detail in the elapsed time string. If `true`, returns the full elapsed time. If `false` (default), returns the most significant unit of elapsed time.
-     *
+     * @param DateTime|int|string $DateTime The DateTime object, timestamp string, or Unix timestamp
+     * @param bool $full Determines the level of detail in the elapsed time string. 
      * @return string The elapsed time in a human-readable format.
      */
     public function elapse($DateTime, bool $full = false): string
@@ -276,7 +239,7 @@ abstract class AbstractUssHelper
     /**
      * Convert HTML Named Entities to XML Entities
      *
-     * This method converts HTML named entities in a given string to XML entities.
+     * This method converts HTML named entities to XML entities.
      *
      * <!-- Note: The conversion relies on the "xhtml-entities.json" file, which contains the mapping of HTML named entities
      * to their corresponding XML entities. Make sure the "xhtml-entities.json" file is present in the same directory as
@@ -381,10 +344,6 @@ abstract class AbstractUssHelper
 
     /**
      * Check if the given path is an absolute path.
-     *
-     * This method determines whether the provided path is an absolute path or not.
-     * It checks for various patterns including wrapper paths (e.g., `file://`), Windows absolute paths (e.g., `C:\`),
-     * and Unix/Linux absolute paths (e.g., `/` or `~/`).
      *
      * @param string $path The path to check.
      * @return bool `true` if the path is an absolute path, `false` otherwise.

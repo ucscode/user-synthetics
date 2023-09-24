@@ -60,6 +60,7 @@ $dependencies = [
     'bundles' => [
 
         'interface' => [
+            'RouteInterface.php',
             'UssInterface.php'
         ],
 
