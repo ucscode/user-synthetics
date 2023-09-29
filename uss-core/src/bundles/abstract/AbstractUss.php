@@ -184,8 +184,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             }
 
             # Equivalent to call_user_func
-            public function generateUrl(string $path, bool $base = false): string {
-                return $this->uss->generateUrl($path, $base);
+            public function pathToUrl(string $path, bool $base = false): string {
+                return $this->uss->pathToUrl($path, $base);
             }
 
             public function keygen(int $length, bool $chars = false) {
@@ -255,7 +255,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         foreach($vendors as $block => $contents) {
             $contents = array_map(function ($value) {
                 $type = explode(".", $value);
-                $value = $this->generateUrl(UssEnum::ASSETS_DIR . "/" . $value);
+                $value = $this->pathToUrl(UssEnum::ASSETS_DIR . "/" . $value);
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {
@@ -307,7 +307,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
     public function loadUssVariables()
     {
-        self::$globals['icon'] = $this->generateUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
+        self::$globals['icon'] = $this->pathToUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
         self::$globals['title'] = UssEnum::PROJECT_NAME;
         self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
         self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";

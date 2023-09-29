@@ -9,7 +9,7 @@ abstract class AbstractUssHelper
      * @param bool $hidebase Whether to hide the URL base or not. Default is `false`.
      * @return string The generated URL
      */
-    public function generateUrl(string $pathname, bool $hidebase = false): string
+    public function pathToUrl(string $pathname, bool $hidebase = false): string
     {
         $pathname = $this->slash($pathname); // Necessary in windows OS 
         $port = $_SERVER['SERVER_PORT'];

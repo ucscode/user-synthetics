@@ -2,7 +2,7 @@
 
 interface UssInterface {
     
-    public function generateUrl(string $pathname, bool $hidebase = false): string;
+    public function pathToUrl(string $pathname, bool $hidebase = false): string;
 
     public function render(string $templatePath, array $variables, ?UssTwigBlockManager $blockManager = null): void;
 
