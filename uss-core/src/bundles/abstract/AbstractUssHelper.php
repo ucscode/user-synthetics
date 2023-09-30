@@ -441,7 +441,6 @@ abstract class AbstractUssHelper
         }
 
         return false;
-
     }    
     
     /**

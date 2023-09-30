@@ -183,7 +183,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         $vendors = [
             'head_css' => [
                 'bootstrap' => 'css/bootstrap.min.css',
-                'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.css',
+                'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.min.css',
                 'animate' => 'css/animate.min.css',
                 'glightbox' => "vendor/glightbox/glightbox.min.css",
                 'izitoast' => 'vendor/izitoast/css/iziToast.min.css',

@@ -23,12 +23,19 @@ final class UssTwigGlobalExtension {
     /**
      * Uss Methods
      */
-    public function getUrl(string $path, bool $base = false) {
+    public function getUrl(string $path, bool $base = false): string 
+    {
         return Uss::instance()->getUrl($path, $base);
     }
 
-    public function keygen(int $length = 10, bool $use_spec_chars = false) {
+    public function keygen(int $length = 10, bool $use_spec_chars = false): string 
+    {
         return Uss::instance()->keygen($length);
+    }
+
+    public function elapse($time, bool $full = false): string 
+    {
+        return Uss::instance()->elapse($time, $full);
     }
 
     /**
