@@ -4,6 +4,40 @@ use Ucscode\SQuery\SQuery;
 
 abstract class AbstractUssHelper
 {
+    public const SANITIZE_ENTITIES = 1;
+    public const SANITIZE_SQL = 2;
+
+    /**
+     * Take a value and sanitize it
+     *
+     * if the value is iterable, the leaf values will be sanitized
+     */
+    public function sanitize(mixed $data, int $alpha = self::SANITIZE_ENTITIES|self::SANITIZE_SQL): mixed {
+        if(is_iterable($data)) {
+            foreach($data as $key => $value) {
+                $value = $this->sanitize($value, $alpha);
+                if(is_object($data)) {
+                    $data->{$key} = $value;
+                } else {
+                    $data[$key] = $value;
+                };
+            }
+        } else {
+            if(!is_bool($data) && !is_null($data)) {
+                $data = trim($data);
+                if($alpha & self::SANITIZE_ENTITIES) {
+                    $data = htmlentities($data, ENT_QUOTES|ENT_SUBSTITUTE);
+                };
+                if($alpha & self::SANITIZE_SQL) {
+                    if(isset($this->mysqli) && $this->mysqli instanceof \mysqli) {
+                        $data = $this->mysqli->real_escape_string($data);
+                    };
+                };
+            }
+        };
+        return $data;
+    }
+
     /**
      * Generate URL from absolute filesystem path.
      *
