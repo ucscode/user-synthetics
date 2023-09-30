@@ -7,6 +7,8 @@
  */
 class UssTwigBlockManager
 {
+    use SingletonTrait;
+
     private static array $blocks = [];
 
     public function appendTo(string $blockName, $resolver, ?string $content = null)

@@ -40,11 +40,7 @@ final class Uss extends AbstractUss
             
             $twig->addExtension(new \Twig\Extension\DebugExtension());
 
-            $extension = $this->localTwigExtension(
-                $blockManager ?? new UssTwigBlockManager()
-            );
-
-            $twig->addGlobal('Uss', $extension);
+            $twig->addGlobal('Uss', new \UssTwigGlobalExtension($this->namespace));
 
             /**
             * To add twig extension from a module, create a class that implement the '\Twig\Extension\ExtensionInterface'

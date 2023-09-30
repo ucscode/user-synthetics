@@ -165,52 +165,6 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     }
 
     /**
-     * @ignore
-     */
-    protected function localTwigExtension(\UssTwigBlockManager $blockManager)
-    {
-        return new class ($this, $blockManager, $this->namespace) {
-
-            public string $jsElement;
-
-            public function __construct(
-                private Uss $uss,
-                private UssTwigBlockManager $blockManager,
-                private string $namespace
-            ) {
-                $this->uss->addJsProperty('platform', UssEnum::PROJECT_NAME);
-                $jsonElement = json_encode($this->uss->getJsProperty());
-                $this->jsElement = base64_encode($jsonElement);
-            }
-
-            # Equivalent to call_user_func
-            public function pathToUrl(string $path, bool $base = false): string {
-                return $this->uss->pathToUrl($path, $base);
-            }
-
-            public function keygen(int $length, bool $chars = false) {
-                return $this->uss->keygen($length, $chars);
-            }
-
-            public function renderBlocks(string $name, int $indent = 1): string {
-                $blocks = $this->blockManager->getBlocks($name);
-                if(is_array($blocks)) {
-                    $indent = str_repeat("\t", abs($indent));
-                    return implode("\n{$indent}", $blocks);
-                };
-                return '';
-            }
-
-            # Get an option
-            public function getOption(string $name): mixed
-            {
-                return $this->uss->options->get($name);
-            }
-
-        };
-    }
-
-    /**
     * @ignore
     */
     protected function refactorNamespace(string $templatePath): string
@@ -249,13 +203,13 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                 'main-js' => 'js/main.js'
             ]
         ];
-
-        $blockManager = new \UssTwigBlockManager();
+        
+        $blockManager = UssTwigBlockManager::instance();
         
         foreach($vendors as $block => $contents) {
             $contents = array_map(function ($value) {
                 $type = explode(".", $value);
-                $value = $this->pathToUrl(UssEnum::ASSETS_DIR . "/" . $value);
+                $value = $this->getUrl(UssEnum::ASSETS_DIR . "/" . $value);
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {
@@ -307,7 +261,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
     public function loadUssVariables()
     {
-        self::$globals['icon'] = $this->pathToUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
+        self::$globals['icon'] = $this->getUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
         self::$globals['title'] = UssEnum::PROJECT_NAME;
         self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
         self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";

@@ -77,6 +77,7 @@ $dependencies = [
         ],
 
         "class" => [
+            "UssTwigGlobalExtension.php",
             "UssTwigBlockManager.php",
             'Uss.php'
         ]
