@@ -15,6 +15,7 @@ abstract class AbstractUssHelper
     public function sanitize(mixed $data, int $alpha = self::SANITIZE_ENTITIES|self::SANITIZE_SQL): mixed {
         if(is_iterable($data)) {
             foreach($data as $key => $value) {
+                $key = $this->sanitize($key, $alpha);
                 $value = $this->sanitize($value, $alpha);
                 if(is_object($data)) {
                     $data->{$key} = $value;
@@ -281,6 +282,15 @@ abstract class AbstractUssHelper
         };
 
         return $columns;
+    }
+
+    public function mysqli_result_to_array(\mysqli_result $result): array
+    {
+        $data = [];
+        while($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        };
+        return $data;
     }
 
     /**
