@@ -1,5 +1,7 @@
 <?php
 
+use Ucscode\SQuery\SQuery;
+
 abstract class AbstractUssHelper
 {
     /**
@@ -217,6 +219,35 @@ abstract class AbstractUssHelper
         return $string ? implode(', ', $string) . ' ago' : 'just now';
     }
 
+    /**
+     * Get the availabe columns of a table
+     *
+     * This method scans a table in the database schema and return all available columns associated with the table
+     *
+     * @param string $tableName: The name of the table to retrive the columns
+     * @return array: A list of all the columns
+     */
+    public function getTableColumns(string $tableName): array
+    {
+        $columns = [];
+
+        $SQL = (new SQuery())
+            ->select('column_name')
+            ->from('information_schema.columns')
+            ->where('table_schema', DB_NAME)
+            ->and('table_name', $tableName);
+
+        $result = Uss::instance()->mysqli->query($SQL);
+        
+        if($result->num_rows) {
+            while($column = $result->fetch_assoc()) {
+                $value = $column['column_name'];
+                $columns[$value] = $value;
+            }
+        };
+
+        return $columns;
+    }
 
     /**
      * Check if User-Agent is a Robot

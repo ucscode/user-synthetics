@@ -68,7 +68,6 @@ $dependencies = [
 
         'trait' => [
             "SingletonTrait.php",
-            "PropertyAccessTrait.php",
         ],
 
         'abstract' => [

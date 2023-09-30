@@ -2,8 +2,6 @@
 
 namespace Ucscode\Packages;
 
-use Reflection;
-
 class TreeNode
 {
     /**
@@ -29,7 +27,7 @@ class TreeNode
     /**
      * The depth or level of the TreeNode object
      */
-    protected ?int $level = null;
+    protected ?int $level = 0;
 
     /**
      * The attributes of the TreeNode object
@@ -55,7 +53,7 @@ class TreeNode
     public function __construct(?string $name = null, array $attrs = [])
     {
         $this->nodeId = self::$lastId;
-        $this->name = $name ?? __CLASS__;
+        $this->name = $name ?? (__CLASS__ . "\\" . $this->nodeId);
         foreach($attrs as $key => $value) {
             $this->setAttr($key, $value);
         }
@@ -86,8 +84,10 @@ class TreeNode
             $child = new self($name, $node_or_attrs);
         };
 
-        $child->level = is_null($this->level) ? 0 : ($this->level + 1);
         $child->parentNode = $this;
+        $child->level = $this->level + 1;
+
+        $this->updateChildren($child, $child->children);
 
         return $this->children[$name] = $child;
     }
@@ -153,6 +153,13 @@ class TreeNode
     }
 
     /**
+     * Sort The children based on "order" attribute
+     */
+    public function sortChildren(callable $func) {
+        usort($this->children, $func);
+    }
+
+    /**
      * Remove Attribute
      *
      * Removes a specified attribute from the current TreeNode object.
@@ -193,9 +200,10 @@ class TreeNode
      * @return mixed|null The value of the property, or `null` if the property does not exist.
      * @ignore
      */
-    public function __get($key)
+    public function &__get($key)
     {
-        return $this->{$key} ?? null;
+        $reference = $this->{$key} ?? null;
+        return $reference;
     }
 
     /**
@@ -246,7 +254,7 @@ class TreeNode
                     'parentNode' => $parentInfo,
                     default => $this->{$name}
                 };
-                if(!$this->nodeId) {
+                if($this->parentNode === null) {
                     if(empty($value) && $name != 'children') {
                         continue;
                     }
@@ -257,6 +265,15 @@ class TreeNode
 
         return $debugger;
 
+    }
+
+    private function updateChildren(TreeNode $parent, array $children) {
+        foreach($children as $child) {
+            $child->level = $parent->level + 1;
+            if(!empty($child->children)) {
+                $this->updateChildren($child, $child->children);
+            }
+        }
     }
 
 }

@@ -65,14 +65,12 @@ final class Uss extends AbstractUss
     /**
      * Set the focus on a specific URL path and execute a function based on the URL match.
      */
-    public static function route(string $route, callable|RouteInterface $controller, $methods = null): bool|object
+    public function route(string $route, callable|RouteInterface $controller, $methods = null): bool|object
     {
         $router = new class ($route, $controller, $methods) {
 
-            use PropertyAccessTrait;
-
-            #[Accessible]
-            protected $requestMatch;
+            public readonly array $requestMatch;
+            
             protected $request;
             private array|bool $authentic = [];
             private $backtrace;
@@ -129,7 +127,8 @@ final class Uss extends AbstractUss
                 $this->request = Uss::instance()->filterContext(Uss::instance()->splitUri());
 
                 # Compare the request path to the current URL
-                $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $this->requestMatch);
+                $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $result);
+                $this->requestMatch = $result;
 
                 /** Execute routing event */
                 $this->debugRouter();

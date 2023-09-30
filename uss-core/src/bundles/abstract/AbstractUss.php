@@ -5,8 +5,6 @@ use Twig\Loader\FilesystemLoader;
 
 abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 {
-    use PropertyAccessTrait;
-    
     public static array $globals = [];
 
     public readonly ?Pairs $options;
