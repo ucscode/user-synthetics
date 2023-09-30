@@ -35,8 +35,8 @@ $dependencies = [
             'DataMemo.php'
         ],
 
-        'FamilyTree' => [
-            'FamilyTree.php'
+        'TreeNode' => [
+            'TreeNode.php'
         ],
 
         'Pairs' => [
