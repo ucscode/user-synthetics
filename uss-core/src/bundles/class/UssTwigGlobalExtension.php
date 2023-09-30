@@ -1,13 +1,14 @@
 <?php
 
+/**
+ * This extension is a minified version of Uss class for twig
+ * It provides only limited properties and methods from the Uss class to the twig template
+ */
 final class UssTwigGlobalExtension {
 
     public string $jsElement;
 
-    private $availMethods = [
-        'getUrl',
-        'keygen'
-    ];
+    public array $globals;
 
     public function __construct(
         private string $namespace
@@ -16,15 +17,23 @@ final class UssTwigGlobalExtension {
         $uss->addJsProperty('platform', UssEnum::PROJECT_NAME);
         $jsonElement = json_encode($uss->getJsProperty());
         $this->jsElement = base64_encode($jsonElement);
+        $this->globals = Uss::$globals;
+    }
+    
+    /**
+     * Uss Methods
+     */
+    public function getUrl(string $path, bool $base = false) {
+        return Uss::instance()->getUrl($path, $base);
     }
 
-    public function __call($name, $args) {
-        if(!in_array($name, $this->availMethods)) {
-            throw new \Exception("Permission to call `Uss::{$name}()` method within Twig Template is denied");
-        }
-        return call_user_func_array([Uss::instance(), $name], $args);
+    public function keygen(int $length = 10, bool $use_spec_chars = false) {
+        return Uss::instance()->keygen($length);
     }
 
+    /**
+     * Self Methods
+     */
     public function renderBlocks(string $name, int $indent = 1): ?string {
         $blockManager = UssTwigBlockManager::instance();
         $blocks = $blockManager->getBlocks($name);
@@ -38,9 +47,7 @@ final class UssTwigGlobalExtension {
     # Get an option
     public function getOption(string $name): mixed
     {
-        $uss = Uss::instance();
-        return $uss->options->get($name);
+        return Uss::instance()->options->get($name);
     }
-
 
 }
