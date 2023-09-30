@@ -54,12 +54,12 @@ class TreeNode
      */
     public function __construct(?string $name = null, array $attrs = [])
     {
-        self::$lastId++;
         $this->nodeId = self::$lastId;
         $this->name = $name ?? __CLASS__;
         foreach($attrs as $key => $value) {
             $this->setAttr($key, $value);
         }
+        self::$lastId++;
     }
 
 
@@ -180,7 +180,7 @@ class TreeNode
     public function __set($key, $value)
     {
         $_class = __CLASS__;
-        throw new \Exception("Do not set '{$_class}::\${$key}' property directly. Use the {$_class}::set_attr() method");
+        throw new \Exception("{$_class}: Not allowed to set `\${$key}` property directly; Use `set_attr()` method instead");
     }
 
 
@@ -246,6 +246,11 @@ class TreeNode
                     'parentNode' => $parentInfo,
                     default => $this->{$name}
                 };
+                if(!$this->nodeId) {
+                    if(empty($value) && $name != 'children') {
+                        continue;
+                    }
+                }
                 $debugger[$name] = $value;
             }
         };
