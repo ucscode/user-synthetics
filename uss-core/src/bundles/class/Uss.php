@@ -12,14 +12,14 @@
 final class Uss extends AbstractUss
 {
     use SingletonTrait;
-    
+
     protected bool $rendered = false;
-    
+
     protected function __construct()
     {
         parent::__construct();
     }
-    
+
     /**
      * Render A Twig Template
      *
@@ -41,7 +41,7 @@ final class Uss extends AbstractUss
             if(UssEnum::DEBUG) {
                 $twig->addExtension(new \Twig\Extension\DebugExtension());
             };
-            
+
             $twig->addGlobal($this->namespace, new \UssTwigGlobalExtension($this->namespace));
 
             foreach($this->twigExtensions as $extension) {
@@ -59,9 +59,8 @@ final class Uss extends AbstractUss
     public function route(string $route, callable|RouteInterface $controller, $methods = null): bool|object
     {
         $router = new class ($route, $controller, $methods) {
-
             public readonly array $requestMatch;
-            
+
             protected $request;
             private array|bool $authentic = [];
             private $backtrace;
@@ -163,7 +162,7 @@ final class Uss extends AbstractUss
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
      * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
-    public function splitUri(?int $index = null)
+    public function splitUri(?int $index = null): array|string|null
     {
         $documentRoot = $this->slash($_SERVER['DOCUMENT_ROOT']);
         $projectRoot = $this->slash(ROOT_DIR);
@@ -181,7 +180,7 @@ final class Uss extends AbstractUss
      * @param string|null $token The token to verify. If not provided, a new token is generated.
      * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
      */
-    public function nonce($input = '1', ?string $receivedNonce = null)
+    public function nonce($input = '1', ?string $receivedNonce = null): string|bool
     {
         $secretKey = UssEnum::SECRET_KEY . md5($_SESSION['USSID']);
         $algorithm = 'ripemd160';
@@ -206,5 +205,3 @@ final class Uss extends AbstractUss
     }
 
 };
-
-Uss::instance();

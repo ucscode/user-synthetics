@@ -1,7 +1,7 @@
 <?php
 
-interface UssInterface {
-    
+interface UssInterface
+{
     public function addTwigFilesystem(string $directory, string $namespace): void;
 
     public function addTwigExtension(string $fullyQualifiedClassName): void;

@@ -13,4 +13,3 @@ if(!is_file($vendorAutoLoader)) {
 };
 
 require_once $vendorAutoLoader;
-  

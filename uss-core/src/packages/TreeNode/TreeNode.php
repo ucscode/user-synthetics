@@ -155,7 +155,8 @@ class TreeNode
     /**
      * Sort The children based on "order" attribute
      */
-    public function sortChildren(callable $func) {
+    public function sortChildren(callable $func)
+    {
         usort($this->children, $func);
     }
 
@@ -176,7 +177,7 @@ class TreeNode
     }
 
     /**
-     * Throws an exception if a property is attempted to be set directly. 
+     * Throws an exception if a property is attempted to be set directly.
      * Recommended to use the `setAttr()` method instead.
      *
      * @param string $key The name of the property.
@@ -225,7 +226,8 @@ class TreeNode
      *
      * Render the most relevant node information for debugging purpose
      */
-    public function __debuginfo() {
+    public function __debuginfo()
+    {
 
         $parentInfo = null;
 
@@ -267,7 +269,8 @@ class TreeNode
 
     }
 
-    private function updateChildren(TreeNode $parent, array $children) {
+    private function updateChildren(TreeNode $parent, array $children)
+    {
         foreach($children as $child) {
             $child->level = $parent->level + 1;
             if(!empty($child->children)) {

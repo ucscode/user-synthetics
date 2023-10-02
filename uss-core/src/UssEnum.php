@@ -3,7 +3,7 @@
 final class UssEnum
 {
     public const DEBUG = true;
-    
+
     public const SECRET_KEY = 'any_secret_key';
 
     public const PROJECT_NAME = 'User Synthetics';

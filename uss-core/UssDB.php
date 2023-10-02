@@ -20,7 +20,7 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 } else {
 
     // Remote Development
-    
+
     define('DB_HOST', 'localhost');
     define('DB_USER', '');
     define('DB_PASSWORD', '');

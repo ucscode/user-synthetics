@@ -21,13 +21,13 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         $this->twigLoader = new FilesystemLoader();
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, $this->namespace);
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, '__main__');
-        
+
         $this->loadTwigAssets();
         $this->loadUssDatabase();
         $this->loadUssSession();
         $this->loadUssVariables();
     }
-    
+
     /**
     * Add a Twig filesystem path with a specified namespace.
     *
@@ -57,7 +57,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     *
     * @throws \Exception If the provided class does not implement Twig\Extension\ExtensionInterface.
     */
-    public function addTwigExtension(string $fullyQualifiedClassName): void 
+    public function addTwigExtension(string $fullyQualifiedClassName): void
     {
         $interfaceName = "Twig\\Extension\\ExtensionInterface";
         $fullyQualifiedClassName = trim($fullyQualifiedClassName);
@@ -90,7 +90,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     {
         $this->consoleJS[$key] = $value;
     }
-    
+
     /**
      * Get a registered JavaScript variable
      *
@@ -152,7 +152,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                 "status" => $status,
                 "message" => $message,
                 "data" => $data
-            ]);
+            ], JSON_PRETTY_PRINT);
         };
         exit($output);
     }
@@ -176,7 +176,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         };
         return implode($divider, array_filter(
             array_map('trim', explode($divider, $path)),
-            function($value) {
+            function ($value) {
                 return trim($value) !== '';
             }
         ));
@@ -194,7 +194,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         };
         return $templatePath;
     }
-    
+
     /**
     * Validate the provided Twig namespace.
     *
@@ -215,7 +215,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                 sprintf('%s: Use of `%s` as a namespace is not allowed.', __METHOD__, $namespace)
             );
         }
-        
+
         return ucfirst($namespace);
     }
 
@@ -245,9 +245,9 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                 'main-js' => 'js/main.js'
             ]
         ];
-        
+
         $blockManager = UssTwigBlockManager::instance();
-        
+
         foreach($vendors as $block => $contents) {
 
             $contents = array_map(function ($value) {
@@ -266,7 +266,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             }, $contents);
 
             $blockManager->appendTo($block, $contents);
-            
+
         };
     }
 

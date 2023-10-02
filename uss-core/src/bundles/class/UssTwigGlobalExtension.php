@@ -4,8 +4,8 @@
  * This extension is a minified version of Uss class for twig
  * It provides only limited properties and methods from the Uss class to the twig template
  */
-final class UssTwigGlobalExtension {
-
+final class UssTwigGlobalExtension
+{
     public string $jsElement;
 
     public array $globals;
@@ -19,21 +19,21 @@ final class UssTwigGlobalExtension {
         $this->jsElement = base64_encode($jsonElement);
         $this->globals = Uss::$globals;
     }
-    
+
     /**
      * Uss Methods
      */
-    public function getUrl(string $path, bool $base = false): string 
+    public function getUrl(string $path, bool $base = false): string
     {
         return Uss::instance()->getUrl($path, $base);
     }
 
-    public function keygen(int $length = 10, bool $use_spec_chars = false): string 
+    public function keygen(int $length = 10, bool $use_spec_chars = false): string
     {
         return Uss::instance()->keygen($length);
     }
 
-    public function elapse($time, bool $full = false): string 
+    public function elapse($time, bool $full = false): string
     {
         return Uss::instance()->elapse($time, $full);
     }
@@ -41,7 +41,8 @@ final class UssTwigGlobalExtension {
     /**
      * Self Methods
      */
-    public function renderBlocks(string $name, int $indent = 1): ?string {
+    public function renderBlocks(string $name, int $indent = 1): ?string
+    {
         $blockManager = UssTwigBlockManager::instance();
         $blocks = $blockManager->getBlocks($name);
         if(is_array($blocks)) {

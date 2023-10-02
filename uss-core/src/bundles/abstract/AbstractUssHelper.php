@@ -12,7 +12,8 @@ abstract class AbstractUssHelper
      *
      * if the value is iterable, the leaf values will be sanitized
      */
-    public function sanitize(mixed $data, int $alpha = self::SANITIZE_ENTITIES|self::SANITIZE_SQL): mixed {
+    public function sanitize(mixed $data, int $alpha = self::SANITIZE_ENTITIES | self::SANITIZE_SQL): mixed
+    {
         if(is_iterable($data)) {
 
             foreach($data as $key => $value) {
@@ -33,7 +34,7 @@ abstract class AbstractUssHelper
                 $data = trim($data);
 
                 if($alpha & self::SANITIZE_ENTITIES) {
-                    $data = htmlentities($data, ENT_QUOTES|ENT_SUBSTITUTE);
+                    $data = htmlentities($data, ENT_QUOTES | ENT_SUBSTITUTE);
                 };
 
                 if($alpha & self::SANITIZE_SQL) {
@@ -57,7 +58,7 @@ abstract class AbstractUssHelper
      */
     public function getUrl(string $pathname, bool $hidebase = false): string
     {
-        $pathname = $this->slash($pathname); // Necessary in windows OS 
+        $pathname = $this->slash($pathname); // Necessary in windows OS
         $port = $_SERVER['SERVER_PORT'];
         $scheme = ($_SERVER['REQUEST_SCHEME'] ?? ($port != '80' ? 'https' : 'http'));
 
@@ -171,7 +172,7 @@ abstract class AbstractUssHelper
         } else {
             $BEGIN = $END = null;
         }
-        
+
         return match(strtoupper($name)) {
 
             'EMAIL' => '/' . $BEGIN . '(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))' . $END . '/',
@@ -215,7 +216,7 @@ abstract class AbstractUssHelper
      * Example: "3 months, 1 week ago"
      *
      * @param DateTime|int|string $DateTime The DateTime object, timestamp string, or Unix timestamp
-     * @param bool $full Determines the level of detail in the elapsed time string. 
+     * @param bool $full Determines the level of detail in the elapsed time string.
      * @return string The elapsed time in a human-readable format.
      */
     public function elapse($DateTime, bool $full = false): string
@@ -286,7 +287,7 @@ abstract class AbstractUssHelper
             ->and('table_name', $tableName);
 
         $result = Uss::instance()->mysqli->query($SQL);
-        
+
         if($result->num_rows) {
             while($column = $result->fetch_assoc()) {
                 $value = $column['column_name'];
@@ -355,7 +356,7 @@ abstract class AbstractUssHelper
         }
 
         $string = preg_replace("/&(?!(?:\w+|\#\d+);)/i", '&amp;', $string);
-        
+
         // Combine the name and the Entities;
         $entities = array_map(function ($value) {
             return "&#{$value};";
@@ -385,7 +386,7 @@ abstract class AbstractUssHelper
         if($debug[$key]['class'] != __CLASS__) {
             return false;
         }
-        
+
         // The absolute directory of the file that called this method!
         $absolutes = explode(DIRECTORY_SEPARATOR, dirname($debug[$key]['file']));
 
@@ -454,8 +455,8 @@ abstract class AbstractUssHelper
         }
 
         return false;
-    }    
-    
+    }
+
     /**
      * Replaces backslashes with forward slashes in a given string.
      */
