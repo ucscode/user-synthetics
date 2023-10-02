@@ -13,6 +13,8 @@ final class Uss extends AbstractUss
 {
     use SingletonTrait;
     
+    protected bool $rendered = false;
+    
     protected function __construct()
     {
         parent::__construct();
@@ -23,42 +25,31 @@ final class Uss extends AbstractUss
      *
      * @param string $templateFile: Reference to the twig template.
      * @param array $variables: A list of variables that will be passed to the template
-     * @param UssTwigBlockManager $ussTwigBlockManager: A Block manager that enables you write or remove content from template blocks without editing the template file
      *
      * @return void
      */
-    public function render(string $templateFile, array $variables = [], ?UssTwigBlockManager $blockManager = null): void
+    public function render(string $templateFile, array $variables = []): void
     {
         if(!$this->rendered) {
 
-            # Make namespace case insensitive;
             $templateFile = $this->refactorNamespace($templateFile);
 
-            $variables = array_merge($variables);
+            $twig = new \Twig\Environment($this->twigLoader, [
+                'debug' => UssEnum::DEBUG
+            ]);
 
-            $twig = new \Twig\Environment($this->twigLoader, ['debug' => true]);
-            
-            $twig->addExtension(new \Twig\Extension\DebugExtension());
-
-            $twig->addGlobal('Uss', new \UssTwigGlobalExtension($this->namespace));
-
-            /**
-            * To add twig extension from a module, create a class that implement the '\Twig\Extension\ExtensionInterface'
-            * It will automatically be added to twig extension. E.G
-            * class MyTwigExtension extends \Twig\Extension\AbstractExtension {}
-            * The '\Twig\Extension\AbstractExtension' already implements the '\Twig\Extension\ExtensionInterface'
-            */
-            foreach(get_declared_classes() as $class) {
-                $reflection = new ReflectionClass($class);
-                if($reflection->implementsInterface('\\Twig\\Extension\\ExtensionInterface')) {
-                    $isModular = preg_match("#^" . UssEnum::MOD_DIR . "#i", $reflection->getFileName());
-                    if(!$twig->hasExtension($class) && $reflection->isInstantiable() && $isModular) {
-                        $twig->addExtension(new $class());
-                    };
-                };
+            if(UssEnum::DEBUG) {
+                $twig->addExtension(new \Twig\Extension\DebugExtension());
             };
+            
+            $twig->addGlobal($this->namespace, new \UssTwigGlobalExtension($this->namespace));
+
+            foreach($this->twigExtensions as $extension) {
+                $twig->addExtension(new $extension());
+            }
 
             $this->rendered = print($twig->render($templateFile, $variables));
+
         }
     }
 

@@ -9,11 +9,10 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
     public readonly ?Pairs $options;
     public readonly ?\mysqli $mysqli;
-
     protected readonly ?FilesystemLoader $twigLoader;
     protected string $namespace = 'Uss';
-    protected bool $rendered = false;
 
+    protected array $twigExtensions = [];
     protected array $consoleJS = [];
     protected static array $routes = [];
 
@@ -22,7 +21,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         $this->twigLoader = new FilesystemLoader();
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, $this->namespace);
         $this->twigLoader->addPath(UssEnum::VIEW_DIR, '__main__');
-
+        
         $this->loadTwigAssets();
         $this->loadUssDatabase();
         $this->loadUssSession();
@@ -30,34 +29,55 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     }
     
     /**
-     * Register a template directory in Uss
-     *
-     * This is probably the first method you need to call in your module to define your templates folder
-     * @param string $directory The template folder
-     * @param string $namespace Your custom unique twig namespace
-     */
+    * Add a Twig filesystem path with a specified namespace.
+    *
+    * @param string $directory The directory path to add.
+    * @param string $namespace The namespace for the Twig filesystem path.
+    *
+    * @throws \Exception If the namespace contains invalid characters, is already in use, or matches the current namespace.
+    */
     public function addTwigFilesystem(string $directory, string $namespace): void
     {
-        if(!preg_match("/\w+/i", $namespace)) {
-            throw new \Exception(
-                __METHOD__ . " #(Argument 1); Twig namespace may only contain letter, numbers and underscore"
-            );
-        } elseif(strtolower($namespace) === strtolower($this->namespace)) {
-            throw new \Exception(
-                __METHOD__ . " #(Argument 1); Use of `{$namespace}` as namespace is not allowed"
-            );
-        };
+        $namespace = $this->validateNamespace($namespace);
 
-        $namespace = ucfirst($namespace);
-
-        if(in_array($namespace, $this->twigLoader->getNamespaces())) {
+        if (in_array($namespace, $this->twigLoader->getNamespaces())) {
             throw new \Exception(
-                __METHOD__ . " #(Argument 1); `{$namespace}` namespace already exists"
+                sprintf('%s: `%s` namespace already exists.', __METHOD__, $namespace)
             );
-        };
+        }
 
         $this->twigLoader->addPath($directory, $namespace);
     }
+
+
+    /**
+    * Adds a Twig extension to the environment.
+    *
+    * @param string $fullyQualifiedClassName The fully qualified class name of the Twig extension.
+    *
+    * @throws \Exception If the provided class does not implement Twig\Extension\ExtensionInterface.
+    */
+    public function addTwigExtension(string $fullyQualifiedClassName): void 
+    {
+        $interfaceName = "Twig\\Extension\\ExtensionInterface";
+        $fullyQualifiedClassName = trim($fullyQualifiedClassName);
+
+        if (!in_array($interfaceName, class_implements($fullyQualifiedClassName))) {
+            throw new \Exception(
+                sprintf(
+                    'The class "%s" provided to %s() must implement "%s".',
+                    $fullyQualifiedClassName,
+                    __METHOD__,
+                    $interfaceName
+                )
+            );
+        };
+
+        if(!in_array($fullyQualifiedClassName, $this->twigExtensions)) {
+            $this->twigExtensions[] = $fullyQualifiedClassName;
+        };
+    }
+
 
     /**
      * Pass a variable from PHP to JavaScript.
@@ -120,7 +140,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
      * Exit the script and print a JSON response.
      * @return void
      */
-    public function exit(?string $message = null, ?bool $status = null, ?array $data = []): void
+    public function exit(bool|int|null $status, ?string $message = null, array $data = []): void
     {
         $args = func_get_args();
         if(empty($args)) {
@@ -129,8 +149,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             $output = $message;
         } else {
             $output = json_encode([
+                "status" => $status,
                 "message" => $message,
-                "status" => (bool)$status,
                 "data" => $data
             ]);
         };
@@ -141,7 +161,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     * Kill the script and print a JSON response.
     * @return void
     */
-    public function die(?bool $status = null, ?string $message = null, ?array $data = []): void
+    public function die(bool|int|null $status, ?string $message = null, array $data = []): void
     {
         $this->exit($status, $message, $data);
     }
@@ -174,6 +194,30 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         };
         return $templatePath;
     }
+    
+    /**
+    * Validate the provided Twig namespace.
+    *
+    * @param string $namespace The Twig namespace to validate.
+    *
+    * @throws \Exception If the namespace contains invalid characters or matches the current namespace.
+    */
+    private function validateNamespace(string $namespace): string
+    {
+        if (!preg_match("/^\w+$/i", $namespace)) {
+            throw new \Exception(
+                sprintf('%s: Twig namespace may only contain letters, numbers, and underscores.', __METHOD__)
+            );
+        }
+
+        if (strtolower($namespace) === strtolower($this->namespace)) {
+            throw new \Exception(
+                sprintf('%s: Use of `%s` as a namespace is not allowed.', __METHOD__, $namespace)
+            );
+        }
+        
+        return ucfirst($namespace);
+    }
 
     /**
     * @ignore
@@ -205,17 +249,24 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         $blockManager = UssTwigBlockManager::instance();
         
         foreach($vendors as $block => $contents) {
+
             $contents = array_map(function ($value) {
+
                 $type = explode(".", $value);
                 $value = $this->getUrl(UssEnum::ASSETS_DIR . "/" . $value);
+
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
                 } else {
                     $element = "<script type='text/javascript' src='" . $value . "'></script>";
                 };
+
                 return $element;
+
             }, $contents);
+
             $blockManager->appendTo($block, $contents);
+            
         };
     }
 
@@ -250,6 +301,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                     'mail' => UssEnum::AUTHOR_EMAIL
                 ]);
 
+                die();
+
             };
 
         } else {
@@ -257,7 +310,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         }
     }
 
-    public function loadUssVariables()
+    private function loadUssVariables()
     {
         self::$globals['icon'] = $this->getUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
         self::$globals['title'] = UssEnum::PROJECT_NAME;
@@ -265,7 +318,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
         self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";
     }
 
-    public function loadUssSession()
+    private function loadUssSession()
     {
         if(empty(session_id())) {
             session_start();

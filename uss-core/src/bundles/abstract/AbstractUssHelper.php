@@ -14,28 +14,37 @@ abstract class AbstractUssHelper
      */
     public function sanitize(mixed $data, int $alpha = self::SANITIZE_ENTITIES|self::SANITIZE_SQL): mixed {
         if(is_iterable($data)) {
+
             foreach($data as $key => $value) {
+
                 $key = $this->sanitize($key, $alpha);
                 $value = $this->sanitize($value, $alpha);
+
                 if(is_object($data)) {
                     $data->{$key} = $value;
                 } else {
                     $data[$key] = $value;
                 };
             }
+
         } else {
+
             if(!is_bool($data) && !is_null($data)) {
                 $data = trim($data);
+
                 if($alpha & self::SANITIZE_ENTITIES) {
                     $data = htmlentities($data, ENT_QUOTES|ENT_SUBSTITUTE);
                 };
+
                 if($alpha & self::SANITIZE_SQL) {
                     if(isset($this->mysqli) && $this->mysqli instanceof \mysqli) {
                         $data = $this->mysqli->real_escape_string($data);
                     };
                 };
             }
+
         };
+
         return $data;
     }
 
@@ -77,12 +86,16 @@ abstract class AbstractUssHelper
     public function arrayToHtmlAttrs(array $array, bool $singleQuote = false): string
     {
         return implode(" ", array_map(function ($key, $value) use ($singleQuote) {
+
             if(is_array($value)) {
                 $value = json_encode($value);
             }
+
             $value = htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             $quote = $singleQuote ? "'" : '"';
+
             return "{$key}={$quote}{$value}{$quote}";
+
         }, array_keys($array), array_values($array)));
     }
 
@@ -207,7 +220,7 @@ abstract class AbstractUssHelper
      */
     public function elapse($DateTime, bool $full = false): string
     {
-        $Now = new DateTime("now");
+        $now = new DateTime("now");
 
         if($DateTime instanceof DateTime) {
             // Object;
@@ -220,7 +233,7 @@ abstract class AbstractUssHelper
             $Time = (new DateTime("now"))->setTimestamp($DateTime);
         }
 
-        $diff = $Now->diff($Time);
+        $diff = $now->diff($Time);
         $diff->w = floor($diff->d / 7);
         $diff->d -= $diff->w * 7;
 

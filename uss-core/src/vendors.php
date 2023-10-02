@@ -1,14 +1,10 @@
 <?php
 
-defined('ROOT_DIR') || die('Illegal Vendor Compiler Access');
+defined('ROOT_DIR') || die('@VENDOR');
 
-// Require the compose autoload.php file
+$vendorAutoLoader = ROOT_DIR . "/vendor/autoload.php";
 
-$vendorLoader = ROOT_DIR . "/vendor/autoload.php";
-
-if(!is_file($vendorLoader)) {
-
-    // If the file is missing, display error and die
+if(!is_file($vendorAutoLoader)) {
 
     $vendorError = require_once UssEnum::VIEW_DIR . "/vendor-error.php";
 
@@ -16,4 +12,5 @@ if(!is_file($vendorLoader)) {
 
 };
 
-require_once $vendorLoader;
+require_once $vendorAutoLoader;
+  
