@@ -39,9 +39,9 @@
 								{% set image404 = Uss.getUrl(constant('UssEnum::ASSETS_DIR') ~ '/images/errors/error-404.webp') %}
 
 								<img src="{{ image|default(image404) }}" 
-									class="img-fluid user-select-none {{ image_class }}" 
+									class="img-fluid user-select-none error-image {{ image_class }}" 
 									alt="ERROR IMAGE" 
-									style='width: 40%; min-width: 220px; max-height: 100vh; {{ image_style|default('') }}' 
+									style='{{ image_style|default('') }}' 
 									loading="lazy">
 
 							{% endif %}

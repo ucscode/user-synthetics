@@ -195,7 +195,60 @@
     font-family: monospace !important;
 }
 
-/* =========== [ Loading Ellipsis ] ============ */
+.--required::after {
+    content: '*';
+    display: inline-block;
+    margin-left: 0.3rem;
+    color: var(--bs-pink);
+}
+
+.resize-none {
+    resize: none !important;
+}
+
+.line-clamp {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.clamp-1 {
+    -webkit-line-clamp: 1;
+}
+
+.clamp-2 {
+    -webkit-line-clamp: 2;
+}
+
+.clamp-3 {
+    -webkit-line-clamp: 3;
+}
+
+.clamp-4 {
+    -webkit-line-clamp: 4;
+}
+
+.clamp-5 {
+    -webkit-line-clamp: 5;
+}
+
+.clamp-6 {
+    -webkit-line-clamp: 6;
+}
+
+.clamp-7 {
+    -webkit-line-clamp: 7;
+}
+
+.clamp-8 {
+    -webkit-line-clamp: 8;
+}
+
+.clamp-9 {
+    -webkit-line-clamp: 9;
+}
+
+/* =========== [ ANIMATIONS ] ============ */
 
 @keyframes ellipsis {
     0% {
@@ -211,27 +264,13 @@
 
 .uss-ellipsis-loading::after {
     content: "";
-    animation: ellipsis 1s infinite;
+    animation: ellipsis 2s infinite;
 }
 
-/* ============ [ GENERAL STYLE ] ============= */
+/* ============= [ STYLE ] ================ */
 
-.--required::after {
-    content: '*';
-    display: inline-block;
-    margin-left: 0.3rem;
-    color: var(--bs-pink);
-}
-
-.resize-none {
-    resize: none !important;
-}
-
-.line-clamp {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.error-image {
+    width: 280px;
 }
   
 /* =================================*/
