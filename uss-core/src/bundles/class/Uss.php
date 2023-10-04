@@ -13,8 +13,6 @@ final class Uss extends AbstractUss
 {
     use SingletonTrait;
 
-    protected bool $rendered = false;
-
     protected function __construct()
     {
         parent::__construct();
@@ -30,27 +28,25 @@ final class Uss extends AbstractUss
      */
     public function render(string $templateFile, array $variables = []): void
     {
-        if(!$this->rendered) {
+        $templateFile = $this->refactorNamespace($templateFile);
 
-            $templateFile = $this->refactorNamespace($templateFile);
+        $twig = new \Twig\Environment($this->twigLoader, [
+            'debug' => UssEnum::DEBUG
+        ]);
 
-            $twig = new \Twig\Environment($this->twigLoader, [
-                'debug' => UssEnum::DEBUG
-            ]);
+        if(UssEnum::DEBUG) {
+            $twig->addExtension(new \Twig\Extension\DebugExtension());
+        };
 
-            if(UssEnum::DEBUG) {
-                $twig->addExtension(new \Twig\Extension\DebugExtension());
-            };
+        $twig->addGlobal($this->namespace, new \UssTwigGlobalExtension($this->namespace));
 
-            $twig->addGlobal($this->namespace, new \UssTwigGlobalExtension($this->namespace));
-
-            foreach($this->twigExtensions as $extension) {
-                $twig->addExtension(new $extension());
-            }
-
-            $this->rendered = print($twig->render($templateFile, $variables));
-
+        foreach($this->twigExtensions as $extension) {
+            $twig->addExtension(new $extension());
         }
+
+        print($twig->render($templateFile, $variables));
+
+        die();
     }
 
     /**

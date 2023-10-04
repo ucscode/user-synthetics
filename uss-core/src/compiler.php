@@ -23,8 +23,6 @@ $dependencies = [
         ],
 
         'Event' => [
-            'EventInterface.php',
-            'Event.php'
         ],
 
         'DOMTable' => [
@@ -76,6 +74,8 @@ $dependencies = [
         ],
 
         "class" => [
+            'EventInterface.php',
+            'Event.php',
             "UssTwigGlobalExtension.php",
             "UssTwigBlockManager.php",
             'Uss.php'

@@ -22,7 +22,7 @@ foreach($directories as $sysIter) {
 };
 
 // Load Modules
-(new Event())->dispatch("Modules:loaded");
+Event::instance()->dispatch("Modules:loaded");
 
 // Render 404 Error
 $matchingRoutes = Uss::instance()->getRouteInventory(true);

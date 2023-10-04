@@ -2,10 +2,13 @@
 
 namespace Ucscode\Event;
 
+use SingletonTrait;
 use Ucscode\Event\EventInterface;
 
 final class Event
 {
+    use SingletonTrait;
+    
     private static $eventList = [];
 
     public function dispatch(string $name, array $data = [])
