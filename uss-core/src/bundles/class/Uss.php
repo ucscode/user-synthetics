@@ -52,104 +52,10 @@ final class Uss extends AbstractUss
     /**
      * Set the focus on a specific URL path and execute a function based on the URL match.
      */
-    public function route(string $route, callable|RouteInterface $controller, $methods = null): bool|object
+    public function route(string $route, callable|RouteInterface $controller, $methods = null): void
     {
-        $router = new class ($route, $controller, $methods) {
-            public readonly array $requestMatch;
-
-            protected $request;
-            private array|bool $authentic = [];
-            private $backtrace;
-
-            public function __construct(
-                protected string $route,
-                public $controller,
-                protected array|string|null $methods
-            ) {
-                $this->filterMethods();
-                $this->resolveRoute();
-                $this->authentic = !in_array(false, $this->authentic);
-            }
-
-            public function __get($key)
-            {
-                return $this->{$key} ?? null;
-            }
-
-            protected function filterMethods()
-            {
-                # PHP Default Request Methods
-                $requestMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
-
-                # Configure Methods
-                if(!is_array($this->methods)) {
-                    if(is_null($this->methods)) {
-                        $this->methods = $requestMethods;
-                    } else {
-                        $this->methods = [$this->methods];
-                    };
-                };
-
-                # Map Methods
-                $this->methods = array_map(function ($value) {
-                    return is_string($value) ? strtoupper($value) : $value;
-                }, $this->methods);
-
-                # Filter Methods
-                $this->methods = array_unique(array_filter($this->methods, function ($value) use ($requestMethods) {
-                    return in_array($value, $requestMethods);
-                }));
-
-                # Resolve Method
-                $this->authentic[] = in_array($_SERVER['REQUEST_METHOD'], $this->methods);
-            }
-
-            protected function resolveRoute()
-            {
-                # The route
-                $route = Uss::instance()->filterContext($this->route);
-
-                # The request
-                $this->request = Uss::instance()->filterContext(Uss::instance()->splitUri());
-
-                # Compare the request path to the current URL
-                $this->authentic[] = !!preg_match('~^' . $route . '$~i', $this->request, $result);
-                $this->requestMatch = $result;
-
-                /** Execute routing event */
-                $this->debugRouter();
-            }
-
-            protected function debugRouter()
-            {
-                $debugBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-                foreach($debugBacktrace as $key => $currentTrace) {
-                    if($key > 255) {
-                        break;
-                    } elseif(($currentTrace['class'] ?? null) === Uss::instance()::class) {
-                        if(strtolower($currentTrace['function']) === 'route') {
-                            $this->backtrace = $currentTrace;
-                        };
-                    };
-                };
-            }
-
-        };
-
-        self::$routes[] = $router;
-
-        if($router->authentic) {
-            if($router->controller instanceof RouteInterface) {
-                $router->controller->onload($router->requestMatch ?? []);
-            } else {
-                call_user_func($router->controller, $router->requestMatch ?? []);
-            };
-            return $router;
-
-        };
-
-        return false;
-
+        $routeInstance = new Route($route, $controller, $methods);
+        $routeInstance->loadController();
     }
 
     /**

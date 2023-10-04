@@ -74,6 +74,7 @@ $dependencies = [
         ],
 
         "class" => [
+            'Route.php',
             'EventInterface.php',
             'Event.php',
             "UssTwigGlobalExtension.php",
