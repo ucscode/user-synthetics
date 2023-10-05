@@ -2,20 +2,23 @@
 
 class Route {
 
+    private static array $inventories = [];
     private string $route;
     private array $methods;
+    private string $path;
+    private string $query;
     private string $request;
     private array $regexMatches;
     private bool $isAuthentic;
-    private RouteInterface|string $controller;
-    private $backtrace;
+    private RouteInterface $controller;
+    private ?array $backtrace;
 
-    public function __construct(string $route, RouteInterface|string $controller, array|string $methods = 'GET'
+    public function __construct(string $route, RouteInterface $controller, array|string $methods = 'GET'
     ) {
         $this->route = $route;
-        $this->resolveController($controller, __METHOD__);
-        $relianceArray =  $this->regulateMethods($methods);
-        $this->isAuthentic = !in_array(false, $this->resolveRoute($relianceArray));
+        $this->controller = $controller;
+        $confidence =  $this->regulateMethods($methods);
+        $this->configureRoute($confidence);
     }
 
     public function __get($key)
@@ -23,36 +26,36 @@ class Route {
         return $this->{$key} ?? null;
     }
 
-    public function loadController(mixed ...$args): void
+    /**
+     * Get the current focus expression or list of focus expressions.
+    */
+    public static function getInventories(bool $authentic = false): array
+    {
+        $routes = self::$inventories;
+        if($authentic) {
+            $routes = array_filter($routes, function ($route) {
+                return $route->isAuthentic;
+            });
+        };
+        return $routes;
+    }
+
+    private function configureRoute(array $confidence): void 
+    {
+        $this->isAuthentic = !in_array(false, $this->resolveRoute($confidence));
+        $this->debugRouter();
+        self::$inventories[] = $this;
+        $this->loadController();
+    }
+
+    private function loadController(): void
     {
         if($this->isAuthentic) 
         {
-            $controller = $this->controller;
-
-            if(is_string($controller)) {
-                $controller = new $controller(...$args);
-            }
-
-            $controller->onload(
+            $this->controller->onload(
                 $this->regexMatches ?? []
             );
         };
-    }
-
-    private function resolveController(RouteInterface|string $controller, string $constructor): void
-    {
-        if(is_string($controller)) {
-            if(!in_array(RouteInterface::class, class_implements($controller))) {
-                throw new \Exception(
-                    sprintf(
-                        "%s Error: Controller in argument 2 must implement '%s'",
-                        $constructor,
-                        RouteInterface::class
-                    )
-                );
-            };
-        };
-        $this->controller = $controller;
     }
 
     private function regulateMethods(array|string $methods): array
@@ -85,17 +88,15 @@ class Route {
     {   
         $uss = Uss::instance();
 
-        $route = $uss->filterContext($this->route);
-
-        $this->request = $uss->filterContext($uss->splitUri());
+        $this->route = $uss->filterContext($this->route);
+        $this->path = $uss->filterContext($uss->splitUri());
+        $this->query = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ?? '';
+        $this->request = $this->path . '?' . $this->query;
 
         # Compare the request path to the current URL
-        $relianceArray[] = !!preg_match('~^' . $route . '$~i', $this->request, $result);
+        $relianceArray[] = !!preg_match('~^' . $this->route . '$~i', $this->path, $result);
 
         $this->regexMatches = $result;
-
-        /** Execute routing event */
-        $this->debugRouter();
 
         return $relianceArray;
     }
@@ -104,10 +105,10 @@ class Route {
     {
         $debugBacktrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         foreach($debugBacktrace as $key => $currentTrace) {
-            if($key > 255) {
+            if($key > 75) {
                 break;
-            } elseif(($currentTrace['class'] ?? null) === Uss::instance()::class) {
-                if(strtolower($currentTrace['function']) === 'route') {
+            } else if(($currentTrace['class'] ?? null) === self::class) {
+                if(strtolower($currentTrace['function']) === '__construct') {
                     $this->backtrace = $currentTrace;
                 };
             };

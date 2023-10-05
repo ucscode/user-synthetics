@@ -123,20 +123,6 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     }
 
     /**
-     * Get the current focus expression or list of focus expressions.
-    */
-    public function getRouteInventory(bool $authentic = false): array
-    {
-        $routes = self::$routes;
-        if($authentic) {
-            $routes = array_filter($routes, function ($route) {
-                return $route->authentic;
-            });
-        };
-        return $routes;
-    }
-
-    /**
      * Exit the script and print a JSON response.
      * @return void
      */

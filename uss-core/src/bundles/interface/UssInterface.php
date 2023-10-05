@@ -12,8 +12,6 @@ interface UssInterface
 
     public function removeJsProperty(string $key): mixed;
 
-    public function getRouteInventory(bool $authentic = false): array;
-
     public function exit(bool|int|null $status, ?string $message, array $data): void;
 
     public function die(bool|int|null $status, ?string $message, array $data): void;

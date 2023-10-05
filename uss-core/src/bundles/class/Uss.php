@@ -50,15 +50,6 @@ final class Uss extends AbstractUss
     }
 
     /**
-     * Set the focus on a specific URL path and execute a function based on the URL match.
-     */
-    public function route(string $route, callable|RouteInterface $controller, $methods = null): void
-    {
-        $routeInstance = new Route($route, $controller, $methods);
-        $routeInstance->loadController();
-    }
-
-    /**
      * Retrieve URL request path segments.
      *
      * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.

@@ -25,7 +25,7 @@ foreach($directories as $sysIter) {
 Event::instance()->dispatch("Modules:loaded");
 
 // Render 404 Error
-$matchingRoutes = Uss::instance()->getRouteInventory(true);
+$matchingRoutes = Route::getInventories(true);
 
 if(empty($matchingRoutes)) {
     if($_SERVER['REQUEST_METHOD'] === 'GET') {
