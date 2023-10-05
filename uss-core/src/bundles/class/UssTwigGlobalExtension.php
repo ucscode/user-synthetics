@@ -21,21 +21,35 @@ final class UssTwigGlobalExtension
     }
 
     /**
-     * Uss Methods
+     * Conver absolute path to Url
      */
     public function abspathToUrl(string $path, bool $base = false): string
     {
         return Uss::instance()->abspathToUrl($path, $base);
     }
 
+    /**
+     * Generate random unique character
+     */
     public function keygen(int $length = 10, bool $use_spec_chars = false): string
     {
         return Uss::instance()->keygen($length);
     }
 
+    /**
+     * Convert time to elapse string
+     */
     public function elapse($time, bool $full = false): string
     {
         return Uss::instance()->elapse($time, $full);
+    }
+
+    /**
+     * Call a function within twig
+     */
+    public function call_user_func(string|array $callback, ...$args): mixed
+    {
+        return call_user_func($callback, ...$args);
     }
 
     /**

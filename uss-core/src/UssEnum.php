@@ -22,6 +22,8 @@ final class UssEnum
 
     public const MOD_DIR = ROOT_DIR . '/uss-modules';
 
+    public const VENDOR_DIR = ROOT_DIR . '/vendor';
+
     public const ASSETS_DIR = self::CORE_DIR . '/assets';
 
     public const VIEW_DIR = self::CORE_DIR . '/view';
