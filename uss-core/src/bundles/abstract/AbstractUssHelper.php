@@ -6,6 +6,7 @@ abstract class AbstractUssHelper
 {
     public const SANITIZE_ENTITIES = 1;
     public const SANITIZE_SQL = 2;
+    public const SANITIZE_SCRIPT_TAGS = 4;
 
     /**
      * Take a value and sanitize it
@@ -33,6 +34,11 @@ abstract class AbstractUssHelper
             if(!is_bool($data) && !is_null($data)) {
                 $data = trim($data);
 
+                if($alpha & self::SANITIZE_SCRIPT_TAGS) {
+                    $data = preg_replace('/<script\b[^>]*>/is', '', $data);
+                    $data = preg_replace('/<\/script>/is', '', $data);
+                }
+
                 if($alpha & self::SANITIZE_ENTITIES) {
                     $data = htmlentities($data, ENT_QUOTES | ENT_SUBSTITUTE);
                 };
@@ -56,7 +62,7 @@ abstract class AbstractUssHelper
      * @param bool $hidebase Whether to hide the URL base or not. Default is `false`.
      * @return string The generated URL
      */
-    public function getUrl(string $pathname, bool $hidebase = false): string
+    public function abspathToUrl(string $pathname, bool $hidebase = false): string
     {
         $pathname = $this->slash($pathname); // Necessary in windows OS
         $port = $_SERVER['SERVER_PORT'];

@@ -4,7 +4,7 @@
 
 	<div class='px-3 py-2 my-2 text-center'>
 		
-		{% set logo = Uss.getUrl(constant('UssEnum::ASSETS_DIR') ~ '/images/origin.png') %}
+		{% set logo = Uss.abspathToUrl(constant('UssEnum::ASSETS_DIR') ~ '/images/origin.png') %}
 		
 		<img class='d-block mx-auto mb-4' src="{{ logo }}" alt='user synthetics logo' height='76'>
 		

@@ -239,7 +239,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             $contents = array_map(function ($value) {
 
                 $type = explode(".", $value);
-                $value = $this->getUrl(UssEnum::ASSETS_DIR . "/" . $value);
+                $value = $this->abspathToUrl(UssEnum::ASSETS_DIR . "/" . $value);
 
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
@@ -298,7 +298,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
     private function loadUssVariables()
     {
-        self::$globals['icon'] = $this->getUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
+        self::$globals['icon'] = $this->abspathToUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
         self::$globals['title'] = UssEnum::PROJECT_NAME;
         self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
         self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";

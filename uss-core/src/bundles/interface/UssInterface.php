@@ -18,7 +18,7 @@ interface UssInterface
 
     public function filterContext(string|array $path, string $divider = '/'): string;
 
-    public function getUrl(string $pathname, bool $hidebase = false): string;
+    public function abspathToUrl(string $pathname, bool $hidebase = false): string;
 
     public function render(string $templatePath, array $variables): void;
 

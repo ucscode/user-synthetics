@@ -23,9 +23,9 @@ final class UssTwigGlobalExtension
     /**
      * Uss Methods
      */
-    public function getUrl(string $path, bool $base = false): string
+    public function abspathToUrl(string $path, bool $base = false): string
     {
-        return Uss::instance()->getUrl($path, $base);
+        return Uss::instance()->abspathToUrl($path, $base);
     }
 
     public function keygen(int $length = 10, bool $use_spec_chars = false): string

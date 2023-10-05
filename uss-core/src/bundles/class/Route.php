@@ -1,7 +1,7 @@
 <?php
 
-class Route {
-
+class Route
+{
     private static array $inventories = [];
     private string $route;
     private array $methods;
@@ -13,7 +13,10 @@ class Route {
     private RouteInterface $controller;
     private ?array $backtrace;
 
-    public function __construct(string $route, RouteInterface $controller, array|string $methods = 'GET'
+    public function __construct(
+        string $route,
+        RouteInterface $controller,
+        array|string $methods = 'GET'
     ) {
         $this->route = $route;
         $this->controller = $controller;
@@ -40,7 +43,7 @@ class Route {
         return $routes;
     }
 
-    private function configureRoute(array $confidence): void 
+    private function configureRoute(array $confidence): void
     {
         $this->isAuthentic = !in_array(false, $this->resolveRoute($confidence));
         $this->debugRouter();
@@ -50,8 +53,7 @@ class Route {
 
     private function loadController(): void
     {
-        if($this->isAuthentic) 
-        {
+        if($this->isAuthentic) {
             $this->controller->onload(
                 $this->regexMatches ?? []
             );
@@ -85,7 +87,7 @@ class Route {
     }
 
     private function resolveRoute(array $relianceArray): array
-    {   
+    {
         $uss = Uss::instance();
 
         $this->route = $uss->filterContext($this->route);
@@ -107,7 +109,7 @@ class Route {
         foreach($debugBacktrace as $key => $currentTrace) {
             if($key > 75) {
                 break;
-            } else if(($currentTrace['class'] ?? null) === self::class) {
+            } elseif(($currentTrace['class'] ?? null) === self::class) {
                 if(strtolower($currentTrace['function']) === '__construct') {
                     $this->backtrace = $currentTrace;
                 };
