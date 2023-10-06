@@ -128,18 +128,11 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
      */
     public function exit(bool|int|null $status, ?string $message = null, array $data = []): void
     {
-        $args = func_get_args();
-        if(empty($args)) {
-            $output = '';
-        } elseif(count($args) === 1) {
-            $output = $message;
-        } else {
-            $output = json_encode([
-                "status" => $status,
-                "message" => $message,
-                "data" => $data
-            ], JSON_PRETTY_PRINT);
-        };
+        $output = json_encode([
+            "status" => $status,
+            "message" => $message,
+            "data" => $data
+        ], JSON_PRETTY_PRINT);
         exit($output);
     }
 
