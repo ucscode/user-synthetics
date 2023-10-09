@@ -55,7 +55,7 @@ The Event Class is a powerful tool that enables efficient event handling and exe
 #### Dispatching Events
 
 ```php
-(new Event())->dispatch('myEvent');
+(new Event())->emit('myEvent');
 ```
 
 In the above example, two event listeners are registered for the event named `myEvent`. <br>
@@ -112,7 +112,7 @@ $data = array( /* some form data */ );
 
 // Trigger events
 
-(new Event())->dispatch('user.registered', $data);
+(new Event())->emit('user.registered', $data);
 ```
 
 In the example above, we've set an order of `-10` for second `user.registration` Event. <br>

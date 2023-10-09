@@ -17,10 +17,10 @@ trait SingletonTrait
      * @ignore
      * @return self
      */
-    public static function instance()
+    public static function instance(...$args)
     {
         if(self::$instance === null) {
-            self::$instance = new self();
+            self::$instance = new self(...$args);
         };
         return self::$instance;
     }
@@ -30,8 +30,12 @@ trait SingletonTrait
      *
      * This should be updated within the class that inherits this trait
      */
-    protected function __construct()
+    protected function __construct(...$args)
     {
+        $parent = get_parent_class($this);
+        if($parent && method_exists($parent, '__construct')) {
+            parent::__construct(...$args);
+        }
     }
 
 }

@@ -22,7 +22,7 @@ trait SQueryTrait
      * }
      * ```
      *
-     * @param array|string $column: A column name (string) or an array containing columns and their associate values
+     * @param array|iterable $column: A column name (string) or an array containing columns and their associate values
      * @param mixed $value: If parameter 1 is a column name (string), this becomes the column value
      * @param ?string $operator: By default, equal to symbol (`=`) is used for comparism (e.g column = value), this parameter
      * allows you to set custom operator (e.g column LIKE value)
@@ -32,7 +32,7 @@ trait SQueryTrait
      * @return self: An instance of SQuery
      */
     private function deriveFilterCondition(
-        string|array $column,
+        string|iterable $column,
         mixed $value = null,
         ?string $operator = null,
         int $keyTerm = self::FILTER_BACKTICK,
@@ -43,9 +43,7 @@ trait SQueryTrait
         $__FUNCTION__ = strtoupper(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['function']);
 
         // Group conditions into an array
-        if(!is_array($column)) {
-            $column = array($column => $value);
-        };
+        $column = $this->columnAsArray($column, $value);
 
         // For each condition in the array
         foreach($column as $key => $value) {
@@ -102,7 +100,7 @@ trait SQueryTrait
      * @see SQuery::deriveFilterCondition()    For method parameter documentation.
      */
     private function deriveInfluenceCondition(
-        string|array $column,
+        string|iterable $column,
         mixed $value = null,
         ?string $operator = null,
         int $keyTerm = self::FILTER_BACKTICK,
@@ -113,9 +111,7 @@ trait SQueryTrait
         $__FUNCTION__ = strtolower(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0]['function']);
 
         // Group conditions into an array
-        if(is_string($column)) {
-            $column = [$column => $value];
-        };
+        $column = $this->columnAsArray($column, $value);
 
         // For each condition in the array
         foreach($column as $key => $value) {
@@ -147,6 +143,16 @@ trait SQueryTrait
 
         return $this;
 
+    }
+
+    public function columnAsArray(string|iterable $column, mixed $value): array
+    {
+        if(!is_iterable($column)) {
+            $column = array($column => $value);
+        } elseif(!is_array($column)) {
+            $column = iterator_to_array($column);
+        }
+        return $column;
     }
 
     /**

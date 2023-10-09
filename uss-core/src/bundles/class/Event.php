@@ -11,7 +11,7 @@ final class Event
 
     private static $eventList = [];
 
-    public function dispatch(string $name, array $data = [])
+    public function emit(string $name, array $data = [])
     {
         $this->execAll(self::$eventList[$name] ?? [], $data);
     }
