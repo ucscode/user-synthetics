@@ -1,0 +1,33 @@
+{
+    "name": "module-name",
+    "version": "1.3.7",
+    "meta": {
+        "title": "Your advanced module title",
+        "description": "A detailed and comprehensive description of your module.",
+        "image": "./screenshot.png",
+        "language": "en",
+        "keywords": ["module", "advanced", "tasks", "..."]
+    },
+    "social": {
+        "github": "https://github.com/username/your-module",
+        "facebook": "https://facebook.com/module-page",
+        "youtube": "https://youtube.com/module-page",
+        "linkedin": "https://linkedin.com/in/module-page",
+        "twitter": "https://linkedin.com/module-page"
+    },
+    "author": {
+        "name": "Your Name",
+        "email": "youremail@gmail.com",
+        "url": "https://yourdomain.com"
+    },
+    "support": {
+        "url": "https://module-url.com",
+        "docs": "https://example.com/documentation",
+        "email": "support@email.com"
+    },
+    "license": "MIT",
+    "dependencies": [
+        "another-module-name",
+        "a-different-module-name"
+    ]
+}
