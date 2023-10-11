@@ -1,4 +1,7 @@
 <?php
+
+namespace Uss;
+
 /**
  * The central class for managing User Synthetics application
  *

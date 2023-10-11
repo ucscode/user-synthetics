@@ -1,5 +1,7 @@
 <?php
 
+namespace Uss;
+
 use Ucscode\SQuery\SQuery;
 
 abstract class AbstractUssHelper

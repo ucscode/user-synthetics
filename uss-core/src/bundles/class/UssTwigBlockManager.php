@@ -1,4 +1,7 @@
 <?php
+
+namespace Uss;
+
 /**
  * Extend the content within a twig block from outside the twig template
  *
@@ -16,7 +19,7 @@ class UssTwigBlockManager
         if(!is_array($resolver)) {
             if(!is_string($resolver)) {
                 $type = gettype($resolver);
-                throw new Exception(__METHOD__ . " #(Argument 2): Must be a string or array, {$type} given");
+                throw new \Exception(__METHOD__ . " #(Argument 2): Must be a string or array, {$type} given");
             };
             $resolver = [ $resolver => $content ];
         };
@@ -29,7 +32,7 @@ class UssTwigBlockManager
         if(!is_array($resolver)) {
             if(!is_string($resolver)) {
                 $type = gettype($resolver);
-                throw new Exception(__METHOD__ . " #(Argument 2): Must be a string or array, {$type} given");
+                throw new \Exception(__METHOD__ . " #(Argument 2): Must be a string or array, {$type} given");
             };
             $resolver = [ $resolver ];
         }

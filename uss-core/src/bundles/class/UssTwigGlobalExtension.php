@@ -1,5 +1,7 @@
 <?php
 
+namespace Uss;
+
 /**
  * This extension is a minified version of Uss class for twig
  * It provides only limited properties and methods from the Uss class to the twig template

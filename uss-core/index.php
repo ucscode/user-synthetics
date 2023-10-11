@@ -11,6 +11,9 @@
  * @link       http://github.com/ucscode/user-synthetics
  * @license    MIT
  */
+
+namespace Uss;
+
 define('ROOT_DIR', realpath(__DIR__ . "/../"));
 
 require_once __DIR__ . "/UssDB.php";

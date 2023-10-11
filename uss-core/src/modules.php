@@ -1,6 +1,6 @@
 <?php
 
-use Ucscode\Event\Event;
+namespace Uss;
 
 defined('ROOT_DIR') || die('@CORE:MODULE');
 
@@ -22,7 +22,7 @@ new class {
 
     private function iterateModules(): void
     {
-        $iterator = new FileSystemIterator(UssEnum::MOD_DIR);
+        $iterator = new \FileSystemIterator(UssEnum::MOD_DIR);
         
         foreach($iterator as $system) {
             if($system->isDir()) {
@@ -34,7 +34,7 @@ new class {
         }
     }
 
-    private function processJSON(string $configFile, SplFileInfo $system): void
+    private function processJSON(string $configFile, \SplFileInfo $system): void
     {
         $config = json_decode(file_get_contents($configFile), true);
 

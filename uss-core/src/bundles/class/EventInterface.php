@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\Event;
+namespace Uss;
 
 interface EventInterface
 {

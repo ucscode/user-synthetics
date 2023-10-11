@@ -1,9 +1,6 @@
 <?php
 
-namespace Ucscode\Event;
-
-use SingletonTrait;
-use Ucscode\Event\EventInterface;
+namespace Uss;
 
 final class Event
 {

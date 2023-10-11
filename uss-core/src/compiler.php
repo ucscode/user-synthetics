@@ -1,5 +1,7 @@
 <?php
 
+namespace Uss;
+
 defined('ROOT_DIR') || die;
 
 /**
