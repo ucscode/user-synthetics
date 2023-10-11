@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 interface UssInterface
 {
     public function addTwigFilesystem(string $directory, string $namespace): void;

@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 class Route
 {
     private static array $inventories = [];

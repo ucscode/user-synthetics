@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 /**
  * Extend the content within a twig block from outside the twig template
  *

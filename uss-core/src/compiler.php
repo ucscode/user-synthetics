@@ -1,13 +1,5 @@
 <?php
 
-namespace Uss;
-
-defined('ROOT_DIR') || die;
-
-/**
- * The Main Classes
- * Retrieve built-in and external Classes, Enum or Traits that are not managed by composer
- */
 $dependencies = [
 
     'packages' => [

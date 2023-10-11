@@ -36,7 +36,7 @@
 
 							{% if image is defined or ( subject is empty and message is empty ) %}
 
-								{% set image404 = Uss.abspathToUrl(constant('Uss\\UssEnum::ASSETS_DIR') ~ '/images/errors/error-404.webp') %}
+								{% set image404 = Uss.abspathToUrl(constant('UssEnum::ASSETS_DIR') ~ '/images/errors/error-404.webp') %}
 
 								<img src="{{ image|default(image404) }}" 
 									class="img-fluid user-select-none error-image {{ image_class }}" 

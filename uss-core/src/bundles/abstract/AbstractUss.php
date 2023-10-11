@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 use Ucscode\Packages\Pairs;
 use Twig\Loader\FilesystemLoader;
 

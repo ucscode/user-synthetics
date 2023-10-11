@@ -1,17 +1,5 @@
 <?php
 
-namespace Uss;
-
-/**
- * The central class for managing User Synthetics application
- *
- * User Synthetics is a web development system or framework designed to facilitate the efficient and effective building of professional web applications. It aims to streamline the development process by combining the flexibility of PHP programming language with pre-built components and extensive library integration.
- *
- * > User Synthetics requires PHP version 7.4 or higher due to its reliance on typed properties, which are essential for maintaining the integrity of relevant properties and preventing structure changes.
- *
- * @package Uss
- * @author Ucscode
- */
 final class Uss extends AbstractUss
 {
     use SingletonTrait;

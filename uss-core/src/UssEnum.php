@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 final class UssEnum
 {
     public const DEBUG = true;

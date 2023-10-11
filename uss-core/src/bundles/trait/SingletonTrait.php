@@ -1,10 +1,5 @@
 <?php
 
-namespace Uss;
-
-/**
- * @ignore
- */
 trait SingletonTrait
 {
     /**

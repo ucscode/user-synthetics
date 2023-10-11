@@ -1,7 +1,5 @@
 <?php
 
-defined('ROOT_DIR') || die('@VENDOR');
-
 $vendorAutoLoader = ROOT_DIR . "/vendor/autoload.php";
 
 if(!is_file($vendorAutoLoader)) {

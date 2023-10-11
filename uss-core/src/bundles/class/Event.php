@@ -1,7 +1,5 @@
 <?php
 
-namespace Uss;
-
 final class Event
 {
     use SingletonTrait;
