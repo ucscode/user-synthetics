@@ -1,5 +1,7 @@
 <?php
 
+namespace Uss;
+
 // Enable or disable database connection
 
 define('DB_ENABLED', true);
