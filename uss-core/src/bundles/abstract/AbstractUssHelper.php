@@ -229,17 +229,17 @@ abstract class AbstractUssHelper
      */
     public function elapse($DateTime, bool $full = false): string
     {
-        $now = new DateTime("now");
+        $now = new \DateTime("now");
 
-        if($DateTime instanceof DateTime) {
+        if($DateTime instanceof \DateTime) {
             // Object;
             $Time = $DateTime;
         } elseif(!is_numeric($DateTime)) {
             // Timestamp String
-            $Time = new DateTime($DateTime);
+            $Time = new \DateTime($DateTime);
         } else {
             // Unix Timestamp;
-            $Time = (new DateTime("now"))->setTimestamp($DateTime);
+            $Time = (new \DateTime("now"))->setTimestamp($DateTime);
         }
 
         $diff = $now->diff($Time);
