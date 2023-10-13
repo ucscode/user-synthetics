@@ -1,27 +1,18 @@
 <?php
 
-use Ucscode\Packages\Pairs;
 use Twig\Loader\FilesystemLoader;
 
-abstract class AbstractUss extends AbstractUssHelper implements UssInterface
+abstract class AbstractUss extends AbstractUssUtils
 {
-    public static array $globals = [];
-
-    public readonly ?Pairs $options;
-    public readonly ?\mysqli $mysqli;
     protected readonly ?FilesystemLoader $twigLoader;
-    protected string $namespace = 'Uss';
-
-    protected array $twigExtensions = [];
     protected array $consoleJS = [];
-    protected static array $routes = [];
+    protected array $twigExtensions = [];
 
     protected function __construct()
     {
         $this->twigLoader = new FilesystemLoader();
         $this->twigLoader->addPath(UssImmutable::VIEW_DIR, $this->namespace);
         $this->twigLoader->addPath(UssImmutable::VIEW_DIR, '__main__');
-
         $this->loadTwigAssets();
         $this->loadUssDatabase();
         $this->loadUssSession();
@@ -159,167 +150,6 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
                 return trim($value) !== '';
             }
         ));
-    }
-
-    /**
-    * @ignore
-    */
-    protected function refactorNamespace(string $templatePath): string
-    {
-        if(substr($templatePath, 0, 1) === '@') {
-            $split = explode("/", $templatePath);
-            $split[0][1] = strtoupper($split[0][1]);
-            $templatePath = implode("/", $split);
-        };
-        return $templatePath;
-    }
-
-    /**
-    * Validate the provided Twig namespace.
-    *
-    * @param string $namespace The Twig namespace to validate.
-    *
-    * @throws \Exception If the namespace contains invalid characters or matches the current namespace.
-    */
-    private function validateNamespace(string $namespace): string
-    {
-        if (!preg_match("/^\w+$/i", $namespace)) {
-            throw new \Exception(
-                sprintf('%s: Twig namespace may only contain letters, numbers, and underscores.', __METHOD__)
-            );
-        }
-
-        if (strtolower($namespace) === strtolower($this->namespace)) {
-            throw new \Exception(
-                sprintf('%s: Use of `%s` as a namespace is not allowed.', __METHOD__, $namespace)
-            );
-        }
-
-        return ucfirst($namespace);
-    }
-
-    /**
-    * @ignore
-    */
-    private function loadTwigAssets()
-    {
-        $vendors = [
-            'head_css' => [
-                'bootstrap' => 'css/bootstrap.min.css',
-                'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.min.css',
-                'animate' => 'css/animate.min.css',
-                'glightbox' => "vendor/glightbox/glightbox.min.css",
-                'izitoast' => 'vendor/izitoast/css/iziToast.min.css',
-                'font-size' => "css/font-size.min.css",
-                'main-css' => 'css/main.css'
-            ],
-            'body_js' => [
-                'jquery' => 'js/jquery-3.7.1.min.js',
-                'bootstrap' => 'js/bootstrap.bundle.min.js',
-                'bootbox' => 'js/bootbox.all.min.js',
-                'glightbox' => "vendor/glightbox/glightbox.min.js",
-                'izitoast' => 'vendor/izitoast/js/iziToast.min.js',
-                'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.6.min.js',
-                'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.6.min.js',
-                'main-js' => 'js/main.js'
-            ]
-        ];
-
-        $blockManager = UssTwigBlockManager::instance();
-
-        foreach($vendors as $block => $contents) {
-
-            $contents = array_map(function ($value) {
-
-                $type = explode(".", $value);
-                $value = $this->abspathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
-
-                if(strtolower(end($type)) === 'css') {
-                    $element = "<link rel='stylesheet' href='" . $value . "'>";
-                } else {
-                    $element = "<script type='text/javascript' src='" . $value . "'></script>";
-                };
-
-                return $element;
-
-            }, $contents);
-
-            $blockManager->appendTo($block, $contents);
-
-        };
-    }
-
-    private function loadUssDatabase(): void
-    {
-        if(DB_ENABLED) {
-            try {
-
-                // Initialize Mysqli
-                $this->mysqli = @new \mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-
-                if($this->mysqli->connect_errno) {
-                    throw new \Exception($this->mysqli->connect_error);
-                } else {
-                    try {
-                        // Initialize Pairs
-                        $this->options = new Pairs($this->mysqli, DB_PREFIX . "options");
-                    } catch(\Exception $e) {
-                        $this->render('@Uss/error.html.twig', [
-                            'subject' => "Library Error",
-                            'message' => $e->getMessage()
-                        ]);
-                        die();
-                    }
-                }
-
-            } catch(\Exception $e) {
-
-                $this->render('@Uss/db.error.html.twig', [
-                    'error' => $e->getMessage(),
-                    'url' => UssImmutable::GITHUB_REPO,
-                    'mail' => UssImmutable::AUTHOR_EMAIL
-                ]);
-
-                die();
-
-            };
-
-        } else {
-            $this->mysqli = $this->options = null;
-        }
-    }
-
-    private function loadUssVariables()
-    {
-        self::$globals['icon'] = $this->abspathToUrl(UssImmutable::ASSETS_DIR . '/images/origin.png');
-        self::$globals['title'] = UssImmutable::PROJECT_NAME;
-        self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
-        self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";
-    }
-
-    private function loadUssSession()
-    {
-        if(empty(session_id())) {
-            session_start();
-        }
-
-        $sidIndex = 'USSID';
-
-        if(empty($_SESSION[$sidIndex])) {
-            $_SESSION[$sidIndex] = $this->keygen(40, true);
-        };
-
-        $cookieIndex = 'USSCLIENTID';
-
-        if(empty($_COOKIE[$cookieIndex])) {
-
-            $time = (new \DateTime())->add((new \DateInterval("P3M")));
-
-            $_COOKIE[$cookieIndex] = uniqid($this->keygen(7));
-
-            $setCookie = setrawcookie($cookieIndex, $_COOKIE[$cookieIndex], $time->getTimestamp(), '/');
-
-        };
     }
 
 }

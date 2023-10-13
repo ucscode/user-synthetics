@@ -63,7 +63,7 @@ $dependencies = [
         ],
 
         'abstract' => [
-            "AbstractUssHelper.php",
+            "AbstractUssUtils.php",
             'AbstractUss.php',
         ],
 
@@ -73,7 +73,7 @@ $dependencies = [
             'Event.php',
             "UssTwigGlobalExtension.php",
             "UssTwigBlockManager.php",
-            'Uss.php'
+            'Uss.php',
         ]
 
     ],
