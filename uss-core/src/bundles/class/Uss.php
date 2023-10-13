@@ -22,10 +22,10 @@ final class Uss extends AbstractUss
         $templateFile = $this->refactorNamespace($templateFile);
 
         $twig = new \Twig\Environment($this->twigLoader, [
-            'debug' => UssEnum::DEBUG
+            'debug' => UssImmutable::DEBUG
         ]);
 
-        if(UssEnum::DEBUG) {
+        if(UssImmutable::DEBUG) {
             $twig->addExtension(new \Twig\Extension\DebugExtension());
         };
 
@@ -66,7 +66,7 @@ final class Uss extends AbstractUss
      */
     public function nonce($input = '1', ?string $receivedNonce = null): string|bool
     {
-        $secretKey = UssEnum::SECRET_KEY . md5($_SESSION['USSID']);
+        $secretKey = UssImmutable::SECRET_KEY . md5($_SESSION['USSID']);
         $algorithm = 'ripemd160';
         $salt = bin2hex(random_bytes(3));
         $dataToHash = $input . $salt . $secretKey;

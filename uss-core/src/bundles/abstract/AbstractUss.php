@@ -19,8 +19,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
     protected function __construct()
     {
         $this->twigLoader = new FilesystemLoader();
-        $this->twigLoader->addPath(UssEnum::VIEW_DIR, $this->namespace);
-        $this->twigLoader->addPath(UssEnum::VIEW_DIR, '__main__');
+        $this->twigLoader->addPath(UssImmutable::VIEW_DIR, $this->namespace);
+        $this->twigLoader->addPath(UssImmutable::VIEW_DIR, '__main__');
 
         $this->loadTwigAssets();
         $this->loadUssDatabase();
@@ -232,7 +232,7 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
             $contents = array_map(function ($value) {
 
                 $type = explode(".", $value);
-                $value = $this->abspathToUrl(UssEnum::ASSETS_DIR . "/" . $value);
+                $value = $this->abspathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
 
                 if(strtolower(end($type)) === 'css') {
                     $element = "<link rel='stylesheet' href='" . $value . "'>";
@@ -276,8 +276,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
                 $this->render('@Uss/db.error.html.twig', [
                     'error' => $e->getMessage(),
-                    'url' => UssEnum::GITHUB_REPO,
-                    'mail' => UssEnum::AUTHOR_EMAIL
+                    'url' => UssImmutable::GITHUB_REPO,
+                    'mail' => UssImmutable::AUTHOR_EMAIL
                 ]);
 
                 die();
@@ -291,8 +291,8 @@ abstract class AbstractUss extends AbstractUssHelper implements UssInterface
 
     private function loadUssVariables()
     {
-        self::$globals['icon'] = $this->abspathToUrl(UssEnum::ASSETS_DIR . '/images/origin.png');
-        self::$globals['title'] = UssEnum::PROJECT_NAME;
+        self::$globals['icon'] = $this->abspathToUrl(UssImmutable::ASSETS_DIR . '/images/origin.png');
+        self::$globals['title'] = UssImmutable::PROJECT_NAME;
         self::$globals['headline'] = "Modular PHP Framework for Customizable Platforms";
         self::$globals['description'] = "Empowering Web Developers with a Modular PHP Framework for Customizable and Extensible Web Platforms.";
     }

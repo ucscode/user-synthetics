@@ -84,7 +84,7 @@ $dependencies = [
 foreach($dependencies as $category => $projects) {
     foreach($projects as $container => $fileList) {
         foreach($fileList as $filename) {
-            $__file = UssEnum::SRC_DIR . "/" . $category . "/" . $container . "/" . $filename;
+            $__file = UssImmutable::SRC_DIR . "/" . $category . "/" . $container . "/" . $filename;
             require_once $__file;
         }
     }

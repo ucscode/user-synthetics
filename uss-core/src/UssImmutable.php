@@ -1,6 +1,6 @@
 <?php
 
-final class UssEnum
+final class UssImmutable
 {
     public const DEBUG = true;
 

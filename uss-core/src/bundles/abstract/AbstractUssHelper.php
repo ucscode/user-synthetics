@@ -350,7 +350,7 @@ abstract class AbstractUssHelper
          * The xhtml-entities.json file was modified after being retreived from W3C github library on Github
          * View link - https://github.com/w3c/html/blob/master/entities.json
          */
-        $file = UssEnum::JSON_DIR . '/xhtml-entities.json';
+        $file = UssImmutable::JSON_DIR . '/xhtml-entities.json';
         if(!is_file($file)) {
             return false;
         }

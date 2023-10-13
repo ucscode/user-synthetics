@@ -20,7 +20,7 @@ new class {
 
     private function iterateModules(): void
     {
-        $iterator = new \FileSystemIterator(UssEnum::MOD_DIR);
+        $iterator = new \FileSystemIterator(UssImmutable::MOD_DIR);
         
         foreach($iterator as $system) {
             if($system->isDir()) {

@@ -14,7 +14,7 @@ final class UssTwigGlobalExtension
         private string $namespace
     ) {
         $uss = Uss::instance();
-        $uss->addJsProperty('platform', UssEnum::PROJECT_NAME);
+        $uss->addJsProperty('platform', UssImmutable::PROJECT_NAME);
         $uss->addJsProperty('url', $uss->abspathToUrl(ROOT_DIR));
         $jsonElement = json_encode($uss->getJsProperty());
         $this->jsElement = base64_encode($jsonElement);
