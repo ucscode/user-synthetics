@@ -37,18 +37,16 @@ class UssForm extends UssElement implements UssFormInterface
     private array $details = [];
     private string $radioKey = 'data-checked';
 
-    /**
-     * [PUBLIC] METHODS
-     *
-     * This methods can be called publicly
-     *
-     * @ignore
-     */
-    public function __construct(string $name, ?string $route = null, string $method = 'GET', string $enctype = null)
+    public function __construct(
+        string $name, 
+        ?string $action = null, 
+        string $method = 'GET', 
+        string $enctype = null
+    )
     {
-        parent::__construct(self::NODE_FORM);
+        parent::__construct(parent::NODE_FORM);
         $this->setAttribute('name', $name);
-        $this->setAttribute('action', $route);
+        $this->setAttribute('action', $action);
         $this->setAttribute('method', strtoupper($method));
         if(!empty($enctype)) {
             $this->setAttribute('enctype', $enctype);
@@ -58,7 +56,6 @@ class UssForm extends UssElement implements UssFormInterface
 
     /**
      * Provides an array of data for debugging purposes when this object is printed or var_dumped.
-     *
      * @return array An array containing debug information about the UssForm object.
      */
     public function __debugInfo()
@@ -72,17 +69,13 @@ class UssForm extends UssElement implements UssFormInterface
      * Add Input Field
      *
      * @param string $name The name of the field
-     *
      * @param string $fieldType The type of field; UssForm::INPUT, UssForm::SELECT, UssForm::TEXTAREA, UssForm::BUTTON"
-     *
      * @param string|array|null $context
      * - UssForm::INPUT - Context is a string that defines the field type e.g UssForm::TYPE_TEXT, UssForm::TYPE_NUMBER...
      * - UssForm::SELECT - Context is an array that defines the field options
      * - UssForm::TEXTAREA - Context is not used
      * - UssForm::BUTTON - Context defines submit button of type UssForm::BUTTON or UssForm::INPUT
-     *
      * @param array $data An array of configurations
-     *
      * @return UssElement The added field element
      */
     public function add(
@@ -90,8 +83,8 @@ class UssForm extends UssElement implements UssFormInterface
         string $fieldType,
         array|string|null $context = null,
         array $config = []
-    ): UssElement {
-
+    ): UssElement 
+    {
         /**
          * Build Different Widget Base On Provided Field Type
          * Context In Different Area
@@ -101,13 +94,9 @@ class UssForm extends UssElement implements UssFormInterface
          * BUTTON - Context is either "button" or "input"
          * INPUT - Context is any input type such as "input, number, date, url..."
          */
-
         $fieldColumn = $this->buildFieldElements($name, $fieldType, $context, $config);
-
         $this->appendField($fieldColumn);
-
         return $fieldColumn;
-
     }
 
     /**
@@ -552,7 +541,7 @@ class UssForm extends UssElement implements UssFormInterface
         $field['group'] = (new UssElement(self::NODE_DIV))->setAttribute('class', $groupclass);
 
         $field['label'] = (new UssElement(self::NODE_LABEL))
-            ->setAttribute('class', 'form-check-label')
+            ->setAttribute('class', $data['label_class'] ?? 'form-check-label')
             ->setContent($label);
 
         $field['column']->appendChild($field['group']);
