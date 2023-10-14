@@ -1,6 +1,7 @@
 <?php
 
 use Twig\Loader\FilesystemLoader;
+use Twig\Extension\ExtensionInterface;
 
 abstract class AbstractUss extends AbstractUssUtils
 {
@@ -48,24 +49,28 @@ abstract class AbstractUss extends AbstractUssUtils
     *
     * @throws \Exception If the provided class does not implement Twig\Extension\ExtensionInterface.
     */
-    public function addTwigExtension(string $fullyQualifiedClassName): void
+    public function addTwigExtension(string|ExtensionInterface $extension): void
     {
-        $interfaceName = "Twig\\Extension\\ExtensionInterface";
-        $fullyQualifiedClassName = trim($fullyQualifiedClassName);
+        if(is_string($extension)) {
+            $interfaceName = ExtensionInterface::class;
+            $key = $extension;
 
-        if (!in_array($interfaceName, class_implements($fullyQualifiedClassName))) {
-            throw new \Exception(
-                sprintf(
-                    'The class "%s" provided to %s() must implement "%s".',
-                    $fullyQualifiedClassName,
-                    __METHOD__,
-                    $interfaceName
-                )
-            );
-        };
+            if (!in_array($interfaceName, class_implements($extension))) {
+                throw new \Exception(
+                    sprintf(
+                        'The class "%s" provided to %s() must implement "%s".',
+                        $extension,
+                        __METHOD__,
+                        $interfaceName
+                    )
+                );
+            };
+        } else {
+            $key = $extension::class;
+        }
 
-        if(!in_array($fullyQualifiedClassName, $this->twigExtensions)) {
-            $this->twigExtensions[] = $fullyQualifiedClassName;
+        if(!array_key_exists($key, $this->twigExtensions)) {
+            $this->twigExtensions[] = $extension;
         };
     }
 

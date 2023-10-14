@@ -74,6 +74,7 @@ $dependencies = [
             "UssTwigGlobalExtension.php",
             "UssTwigBlockManager.php",
             'Uss.php',
+            'UrlGenerator.php',
         ]
 
     ],
