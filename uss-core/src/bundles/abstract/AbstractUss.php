@@ -25,7 +25,6 @@ abstract class AbstractUss extends AbstractUssUtils
     *
     * @param string $directory The directory path to add.
     * @param string $namespace The namespace for the Twig filesystem path.
-    *
     * @throws \Exception If the namespace contains invalid characters, is already in use, or matches the current namespace.
     */
     public function addTwigFilesystem(string $directory, string $namespace): void
@@ -46,7 +45,6 @@ abstract class AbstractUss extends AbstractUssUtils
     * Adds a Twig extension to the environment.
     *
     * @param string $fullyQualifiedClassName The fully qualified class name of the Twig extension.
-    *
     * @throws \Exception If the provided class does not implement Twig\Extension\ExtensionInterface.
     */
     public function addTwigExtension(string|ExtensionInterface $extension): void
@@ -54,7 +52,6 @@ abstract class AbstractUss extends AbstractUssUtils
         if(is_string($extension)) {
             $interfaceName = ExtensionInterface::class;
             $key = $extension;
-
             if (!in_array($interfaceName, class_implements($extension))) {
                 throw new \Exception(
                     sprintf(
