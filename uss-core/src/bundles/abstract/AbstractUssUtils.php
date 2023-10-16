@@ -337,7 +337,7 @@ abstract class AbstractUssUtils implements UssInterface
             ]
         ];
 
-        $blockManager = UssTwigBlockManager::instance();
+        $blockManager = BlockManager::instance();
 
         foreach($vendors as $block => $contents) {
 

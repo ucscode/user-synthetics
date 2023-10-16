@@ -72,7 +72,7 @@ $dependencies = [
             'EventInterface.php',
             'Event.php',
             "UssTwigGlobalExtension.php",
-            "UssTwigBlockManager.php",
+            "BlockManager.php",
             'Uss.php',
             'UrlGenerator.php',
         ]

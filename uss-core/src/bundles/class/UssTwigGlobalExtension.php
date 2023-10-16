@@ -34,15 +34,15 @@ final class UssTwigGlobalExtension
      */
     public function keygen(int $length = 10, bool $use_spec_chars = false): string
     {
-        return Uss::instance()->keygen($length);
+        return Uss::instance()->keygen($length, $use_spec_chars);
     }
 
     /**
      * Convert time to elapse string
      */
-    public function elapse($time, bool $full = false): string
+    public function relativeTime($time, bool $full = false): string
     {
-        return Uss::instance()->elapse($time, $full);
+        return Uss::instance()->relativeTime($time, $full);
     }
 
     /**
@@ -58,7 +58,7 @@ final class UssTwigGlobalExtension
      */
     public function renderBlocks(string $name, int $indent = 1): ?string
     {
-        $blockManager = UssTwigBlockManager::instance();
+        $blockManager = BlockManager::instance();
         $blocks = $blockManager->getBlocks($name);
         if(is_array($blocks)) {
             $indent = str_repeat("\t", abs($indent));
