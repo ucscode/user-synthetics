@@ -2,15 +2,14 @@
 
 defined('ROOT_DIR') || die('@CORE:MODULE');
 
-new class {
-
+new class () {
     private string $jsonFile = 'config.json';
     private string $baseFile = 'index.php';
     private array $modules = [];
     private array $pending = [];
     private array $loaded = [];
 
-    public function __construct() 
+    public function __construct()
     {
         $this->iterateModules();
         $this->loadActiveModules();
@@ -21,7 +20,7 @@ new class {
     private function iterateModules(): void
     {
         $iterator = new \FileSystemIterator(UssImmutable::MOD_DIR);
-        
+
         foreach($iterator as $system) {
             if($system->isDir()) {
                 $configFile = $system->getPathname() . "/" . $this->jsonFile;
@@ -37,7 +36,7 @@ new class {
         $config = json_decode(file_get_contents($configFile), true);
 
         if(!json_last_error()) {
-            array_walk_recursive($config, function(&$value) {
+            array_walk_recursive($config, function (&$value) {
                 $value = trim($value);
             });
             if(empty($config['name'])) {
@@ -48,7 +47,7 @@ new class {
                         $this->jsonFile
                     ),
                     E_USER_WARNING
-            );
+                );
             } else {
                 $path = $system->getPathname();
                 $baseFile = $path . "/" . $this->baseFile;
@@ -120,7 +119,7 @@ new class {
         };
     }
 
-    private function findModule(string $name): ?array 
+    private function findModule(string $name): ?array
     {
         foreach($this->modules as $path => $config) {
             if($config['name'] === $name) {
@@ -138,7 +137,7 @@ new class {
         return in_array($path, $this->loaded);
     }
 
-    private function isPending(string $path): bool 
+    private function isPending(string $path): bool
     {
         return in_array($path, $this->pending);
     }
@@ -154,5 +153,3 @@ new class {
     }
 
 };
-
-
