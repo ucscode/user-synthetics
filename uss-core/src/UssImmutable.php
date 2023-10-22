@@ -5,6 +5,7 @@ final class UssImmutable
     public const DEBUG = true;
     public const SECRET_KEY = 'any_secret_key';
     public const PROJECT_NAME = 'User Synthetics';
+    public const PROJECT_WEBSITE = 'https://usersynthetics.com';
     public const GITHUB_REPO = 'https://github.com/ucscode/user-synthetics';
     public const AUTHOR = 'Ucscode';
     public const AUTHOR_EMAIL = 'uche23mail@gmail.com';
