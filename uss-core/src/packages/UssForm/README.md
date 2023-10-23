@@ -48,13 +48,13 @@ use Ucscode\UssForm\UssForm;
 $ussForm = new UssForm("form-name", "/action", "POST");
 
 // Add a text input
-$ussForm->add('name', UssForm::INPUT, UssForm::TYPE_TEXT);
+$ussForm->add('name', UssForm::NODE_INPUT, UssForm::TYPE_TEXT);
 
 // Add an email input
-$ussForm->add('email', UssForm::INPUT, UssForm::TYPE_EMAIL);
+$ussForm->add('email', UssForm::NODE_INPUT, UssForm::TYPE_EMAIL);
 
 // Add a selct input
-$ussForm->add('currency', UssForm::SELECT, [
+$ussForm->add('currency', UssForm::NODE_SELECT, [
     "NGN" => "Naira",
     "USD" => "US Dollar",
     "GBP" => "Pound Sterling"
@@ -88,19 +88,19 @@ The `UssForm::add()` method allows you to append new field to your form. It acce
 
 - `$fieldType`: This is the type of field to be created, which can be one of the following:
 
-    1. `UssForm::INPUT`
-    3. `UssForm::SELECT`
-    2. `UssForm::TEXTAREA`
-    4. `UssForm::BUTTON`
+    1. `UssForm::NODE_INPUT`
+    3. `UssForm::NODE_SELECT`
+    2. `UssForm::NODE_TEXTAREA`
+    4. `UssForm::NODE_BUTTON`
 
 ---
 
 - `$context`: The context associated with the field types, explained as follows:
 
-    1. `UssForm::INPUT`: In this case, context is the input type such as `text`, `number`, `date` etc
-    2. `UssForm::SELECT`: In this case, context is an `array` of options for the input. The array key is the input value while the array value is what will display to the user
-    3. `UssForm::TEXTAREA`: In this case, context is not used an can be set to `null`
-    4. `UssForm::BUTTON`: In this case, context represents the button tag name which can be either `input` or `button`
+    1. `UssForm::NODE_INPUT`: In this case, context is the input type such as `text`, `number`, `date` etc
+    2. `UssForm::NODE_SELECT`: In this case, context is an `array` of options for the input. The array key is the input value while the array value is what will display to the user
+    3. `UssForm::NODE_TEXTAREA`: In this case, context is not used an can be set to `null`
+    4. `UssForm::NODE_BUTTON`: In this case, context represents the button tag name which can be either `input` or `button`
 
 ---
 
@@ -115,14 +115,14 @@ The `UssForm::add()` method allows you to append new field to your form. It acce
 #### Adding a simple field
 
 ```php
-$form->add("name", UssForm::INPUT);
+$form->add("name", UssForm::NODE_INPUT);
 ```
 
 #### Adding a fully configured field
 
 ```php
 # Configured Field
-$form->add("email", UssForm::INPUT, UssForm::TYPE_TEXT, [
+$form->add("email", UssForm::NODE_INPUT, UssForm::TYPE_TEXT, [
     "label" => "Enter your email address", // use a custom label
     "label_class" => "custom_label_class", // set custom label class
     "value" => "uche23mail@gmail.com", // add a default value
@@ -200,7 +200,7 @@ $countries = [
     "GBP" => "Pounds Sterling"
 ];
 
-$form->add("country", UssForm::SELECT, $countries, [
+$form->add("country", UssForm::NODE_SELECT, $countries, [
     'value' => 'EUR', // select as default value
     'label' => "Please select your country"
 ]);
@@ -211,7 +211,7 @@ $form->add("country", UssForm::SELECT, $countries, [
 Textarea field works similar to input field
 
 ```php
-$form->add("product[description]", UssForm::TEXTAREA, null, [
+$form->add("product[description]", UssForm::NODE_TEXTAREA, null, [
     'value' => "This is a context you cannot believe",
     'label' => "What are your thoughts?",
     "column" => "col-lg-7 mb-3",
@@ -225,13 +225,13 @@ Similiar to the input field, the checkbox field category has a range of settings
 
 ```php
 // Adding a basic checkbox
-$form->add('mycheckbox', UssForm::INPUT, UssForm::TYPE_CHECKBOX);
+$form->add('mycheckbox', UssForm::NODE_INPUT, UssForm::TYPE_CHECKBOX);
 
 // Adding a radio button
-$form->add('myradio', UssForm::INPUT, UssForm::TYPE_RADIO);
+$form->add('myradio', UssForm::NODE_INPUT, UssForm::TYPE_RADIO);
 
 // Adding a switch with an initial checked state
-$form->add("myswitch", UssForm::INPUT, UssForm::TYPE_SWITCH, [
+$form->add("myswitch", UssForm::NODE_INPUT, UssForm::TYPE_SWITCH, [
     'checked' => true
 ]);
 ```
@@ -244,7 +244,7 @@ Thus, they don't have much options to configure such as label and column. <br>
 However, they can still be configured and customized based on specific requirement by using a callback in the `field` index
 
 ```php
-$form->add("secretkey", UssForm::INPUT, UssForm::TYPE_HIDDEN, [
+$form->add("secretkey", UssForm::NODE_INPUT, UssForm::TYPE_HIDDEN, [
     'value' => "dd947da3-1e85-4e17-a0ff-520c1664763c"
 ]);
 ```
@@ -254,14 +254,14 @@ Before rending your form in HTML, you need to add a submit button. <br>
 This is not done automatically, so you need to specify where you want the submit button to appear
 
 ```php
-$form->add('submit', UssForm::BUTTON, null, [
+$form->add('submit', UssForm::NODE_BUTTON, null, [
     'class' => 'btn btn-danger',
     'use_name' => true,
     'content' => "Custom Display Text"
 ]);
 ```
 
-If you want to use `<input type='submit'>` instead of `<button type='submit'></button>`, you should pass `UssForm::INPUT` as the third parameter
+If you want to use `<input type='submit'>` instead of `<button type='submit'></button>`, you should pass `UssForm::NODE_INPUT` as the third parameter
 
 ### Rendering Your Form
 
