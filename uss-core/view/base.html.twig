@@ -9,11 +9,9 @@
     {% block head %}
 
         {% block head_metas %}
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-        <meta name="generator" content="User Synthetics" />
-        <meta name='description' content='{{ page_description|default('') }}'>
+            <meta charset="utf-8">
+            <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+            <meta name='description' content='{{ page_description|default('') }}'>
         {% endblock head_metas %}
 
         {% block head_css %}
@@ -31,11 +29,15 @@
 
     {% block body %}
         
+        {{ Uss.renderBlocks('body_intro', 1)|raw }}
+
         {% block body_main %}{% endblock body_main %}
 
         {% block body_js %}
             {{ Uss.renderBlocks('body_js', 2)|raw }}
         {% endblock body_js %}
+
+        {{ Uss.renderBlocks('body_outro', 1)|raw }}
 
     {% endblock body %}
 
