@@ -17,7 +17,7 @@ final class Uss extends AbstractUss
      *
      * @return void
      */
-    public function render(string $templateFile, array $variables = []): void
+    public function render(string $templateFile, array $variables = [], $return = false): ?string
     {
         $templateFile = $this->refactorNamespace($templateFile);
 
@@ -34,13 +34,18 @@ final class Uss extends AbstractUss
         foreach($this->twigExtensions as $extension) {
             if(is_string($extension)) {
                 $extension = new $extension();
-            }   
+            }
             $twig->addExtension($extension);
         }
 
-        print($twig->render($templateFile, $variables));
+        $result = $twig->render($templateFile, $variables);
 
-        die();
+        if(!$return) {
+            print($result);
+            die();
+        }
+
+        return $result;
     }
 
     /**
