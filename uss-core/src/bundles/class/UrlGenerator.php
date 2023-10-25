@@ -2,7 +2,7 @@
 
 class UrlGenerator
 {
-    private string $url;
+    private string $host;
     private string $base;
     private string $path;
     private array $query = [];
@@ -12,7 +12,7 @@ class UrlGenerator
     {
         $uss = Uss::instance();
         $this->base = $uss->filterContext($base);
-        $this->url = $uss->abspathToUrl(ROOT_DIR);
+        $this->host = $uss->abspathToUrl(ROOT_DIR);
         $this->polyfill($path);        
         foreach($query as $key => $value) {
             $this->setQuery($key, $value);
@@ -46,7 +46,7 @@ class UrlGenerator
 
     public function getResult()
     {
-        $result = $this->url;
+        $result = $this->host;
         if(!empty($this->base)) {
             $result .= '/' . $this->base;
         }

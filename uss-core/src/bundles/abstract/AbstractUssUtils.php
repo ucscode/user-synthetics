@@ -272,8 +272,8 @@ abstract class AbstractUssUtils implements UssInterface
     protected function slash(?string $path): string
     {
         return str_replace("\\", "/", $path);
-    } 
-    
+    }
+
     /**
     * @method refactorNamespace
     */
@@ -299,13 +299,11 @@ abstract class AbstractUssUtils implements UssInterface
             throw new \Exception(
                 sprintf('%s: Twig namespace may only contain letters, numbers, and underscores.', __METHOD__)
             );
-        }
-
-        if (strtolower($namespace) === strtolower($this->namespace)) {
+        } elseif (strtolower($namespace) === strtolower($this->namespace)) {
             throw new \Exception(
                 sprintf('%s: Use of `%s` as a namespace is not allowed.', __METHOD__, $namespace)
             );
-        }
+        };
 
         return ucfirst($namespace);
     }
