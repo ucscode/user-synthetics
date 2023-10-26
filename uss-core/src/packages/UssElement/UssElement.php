@@ -143,7 +143,7 @@ class UssElement extends AbstractUssElementParser
      * @param string $content The HTML content to set.
      * @return self
      */
-    public function setContent(string $content): self
+    public function setContent(?string $content): self
     {
         array_walk($this->children, function ($child) {
             $child->setParent(null);

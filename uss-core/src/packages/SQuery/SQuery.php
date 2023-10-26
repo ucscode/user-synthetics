@@ -43,7 +43,7 @@ class SQuery extends AbstractSQuery
      */
     public function select(string|array $columns = '*', ?string $from = null): self
     {
-        $this->demandForNewQuery(__METHOD__);
+        $this->demandForNewQuery(self::TYPE_SELECT, __METHOD__);
 
         if(!is_array($columns)) {
             $columns = explode(',', $columns);
@@ -53,7 +53,7 @@ class SQuery extends AbstractSQuery
             return $this->alias_column($column);
         }, $columns));
 
-        $this->SQL[self::SECTION_SELECT][] = "SELECT {$columns}";
+        $this->SQL[self::SECTION_SELECT][0] = "SELECT {$columns}";
 
         if($from !== null) {
             $this->from($from);
@@ -72,11 +72,11 @@ class SQuery extends AbstractSQuery
      */
     public function insert(string $tablename, array $data = []): self
     {
-        $this->demandForNewQuery(__METHOD__);
+        $this->demandForNewQuery(self::TYPE_INSERT, __METHOD__);
 
         $tablename = $this->backtick($tablename);
 
-        $this->SQL[self::SECTION_INSERT][] = "INSERT INTO {$tablename}";
+        $this->SQL[self::SECTION_INSERT][0] = "INSERT INTO {$tablename}";
 
         foreach($data as $key => $value) {
             $this->set($key, $value);
@@ -95,11 +95,11 @@ class SQuery extends AbstractSQuery
      */
     public function update(string $tablename, array $data = []): self
     {
-        $this->demandForNewQuery(__METHOD__);
+        $this->demandForNewQuery(self::TYPE_UPDATE, __METHOD__);
 
         $tablename = $this->backtick($tablename);
 
-        $this->SQL[self::SECTION_UPDATE][] = "UPDATE {$tablename} SET";
+        $this->SQL[self::SECTION_UPDATE][0] = "UPDATE {$tablename} SET";
 
         foreach($data as $key => $value) {
             $this->set($key, $value);
@@ -118,8 +118,8 @@ class SQuery extends AbstractSQuery
      */
     public function delete(?string $tablename = null): self
     {
-        $this->demandForNewQuery(__METHOD__);
-        $this->SQL[self::SECTION_DELETE][] = "DELETE";
+        $this->demandForNewQuery(self::TYPE_DELETE, __METHOD__);
+        $this->SQL[self::SECTION_DELETE][0] = "DELETE";
         if(!is_null($tablename)) {
             $tablename = $this->backtick($tablename);
             $this->SQL[self::SECTION_FROM][] = "FROM {$tablename}";

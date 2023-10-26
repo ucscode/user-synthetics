@@ -20,7 +20,9 @@ $dependencies = [
         ],
 
         'DOMTable' => [
-            'DOMTable.php'
+            'DOMTableInterface.php',
+            'AbstractDOMTable.php',
+            'DOMTable.php',
         ],
 
         'DataMemo' => [
@@ -39,7 +41,7 @@ $dependencies = [
             'SQueryInterface.php',
             'SQueryTrait.php',
             'AbstractSQuery.php',
-            'SQuery.php'
+            'SQuery.php',
         ],
 
         'X2Client' => [

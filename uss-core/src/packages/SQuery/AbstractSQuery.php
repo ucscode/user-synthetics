@@ -117,11 +117,18 @@ abstract class AbstractSQuery implements SQueryInterface
      *
      * @return void
      */
-    protected function demandForNewQuery(string $method): void
+    protected function demandForNewQuery(string $type, string $method): void
     {
-        $query = $this->getQuery();
-        if(!empty($query)) {
-            throw new \Exception('Current Instance already occupied. You should create a new instance for the ' .  $method . '() method');
+        if(!$this->isType($type)) {
+            $query = $this->getQuery();
+            if(!empty($query)) {
+                throw new \Exception(
+                    sprintf(
+                        'Current Instance already occupied. You should create a new instance for the %s() method',
+                        $method
+                    )
+                );
+            }
         }
     }
 

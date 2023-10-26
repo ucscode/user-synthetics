@@ -2,9 +2,9 @@
 
 class UrlGenerator
 {
-    private string $host;
-    private string $base;
-    private string $path;
+    private string $host; # localhost | domain.com
+    private string $base; 
+    private string $path; 
     private array $query = [];
     private array $parameters = [];
 
@@ -44,9 +44,9 @@ class UrlGenerator
         return $this;
     }
 
-    public function getResult()
+    public function getResult(bool $ignoreHost = false)
     {
-        $result = $this->host;
+        $result = $ignoreHost ? '' : $this->host;
         if(!empty($this->base)) {
             $result .= '/' . $this->base;
         }
