@@ -80,7 +80,7 @@ class UssForm extends UssElement implements UssFormInterface
     public function add(string $name, string $nodeName, array|string|null $context = null, array $config = []): UssElement
     {
         $fieldSet = $this->buildFieldElements($name, $nodeName, $context, $config);
-        $this->appendField($fieldSet);
+        $this->appendFieldToRow($fieldSet);
         return $fieldSet;
     }
 
@@ -279,7 +279,7 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @return UssElement The row to which the field element was appended or null if not appended.
      */
-    public function appendField(UssElement $column, ?int $rowIndex = null): ?UssElement
+    public function appendFieldToRow(UssElement $column, ?int $rowIndex = null): ?UssElement
     {
         if(empty($this->children)) {
             $row = $this->addRow();
@@ -639,7 +639,7 @@ class UssForm extends UssElement implements UssFormInterface
         if($widget->tagName === self::NODE_BUTTON) {
             $fieldSet = $this->buildButtonField($name, $widget, $config);
         } elseif(
-            $widget->hasAttributeValue('type', self::TYPE_HIDDEN) && 
+            $widget->hasAttributeValue('type', self::TYPE_HIDDEN) &&
             $widget->tagName === self::NODE_INPUT
         ) {
             $fieldSet = $this->buildHiddenField($name, $widget, $config);

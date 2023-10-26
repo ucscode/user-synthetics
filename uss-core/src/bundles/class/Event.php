@@ -2,13 +2,11 @@
 
 final class Event
 {
-    use SingletonTrait;
-
     private static $eventList = [];
 
-    public function emit(string $name, array $data = [])
+    public static function emit(string $name, array $data = [])
     {
-        $this->execAll(self::$eventList[$name] ?? [], $data);
+        self::execAll(self::$eventList[$name] ?? [], $data);
     }
 
     public function addListener(string $name, EventInterface|callable $action, float $order = 0): self
@@ -24,7 +22,7 @@ final class Event
         return $this;
     }
 
-    private function execAll(array $list, array $data)
+    private static function execAll(array $list, array $data)
     {
         usort($list, function ($a, $b) {
             return $a['order'] <=> $b['order'];

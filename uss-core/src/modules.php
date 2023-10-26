@@ -13,7 +13,7 @@ new class () {
     {
         $this->iterateModules();
         $this->loadActiveModules();
-        Event::instance()->emit("modules:loaded");
+        Event::emit("modules:loaded");
         $this->render404();
     }
 

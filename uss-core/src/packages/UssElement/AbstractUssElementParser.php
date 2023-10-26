@@ -48,7 +48,7 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
         return $debugInfo;
     }
 
-    public function find(string $selectors)
+    public function find(string $selectors, ?int $index = null)
     {
         $nodelist = [];
 
@@ -90,6 +90,10 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
             }
 
         };
+
+        if(!is_null($index)) {
+            return $nodelist[$index] ?? null;
+        }
 
         return $nodelist;
 

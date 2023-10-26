@@ -76,7 +76,7 @@ class Pairs
      * @param string $action The action to take on delete (CASCADE, RESTRICT, SET NULL). Default is 'CASCADE'.
      * @return bool Returns `true` if the foreign key constraint is added or already exists, `false` otherwise.
      */
-    public function linkParentTable(array $data): bool
+    public function linkToParentTable(array $data): bool
     {
         // Default Options
         $data += [
