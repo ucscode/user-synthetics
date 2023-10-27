@@ -6,13 +6,13 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
 {
     protected readonly string $tagName;
 
-    protected $attributes = [];
-
-    protected ?string $content = null;
-
     protected $parentElement;
 
+    protected $attributes = [];
+
     protected $children = [];
+
+    protected ?string $content = null;
 
     protected bool $void = false;
 

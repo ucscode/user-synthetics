@@ -25,7 +25,7 @@ class UssElement extends AbstractUssElementParser
      *
      * @return bool `true` if the element is void (no closing tag), `false`s otherwise.
      */
-    public function isVoid(bool $void): self
+    public function setVoid(bool $void): self
     {
         $this->void = $void;
         return $this;
@@ -293,6 +293,16 @@ class UssElement extends AbstractUssElementParser
             unset($this->children[$key]);
             $this->children = array_values($this->children);
         };
+    }
+
+    /**
+     * Remove all child elements and context from the element
+     * @return void
+     */
+    public function reset(): void
+    {
+        $this->children = [];
+        $this->content = null;
     }
 
     /**

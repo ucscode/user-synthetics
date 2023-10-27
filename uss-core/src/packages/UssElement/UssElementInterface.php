@@ -4,7 +4,7 @@ namespace Ucscode\UssElement;
 
 interface UssElementInterface
 {
-    public function isVoid(bool $void): self;
+    public function setVoid(bool $void): self;
 
     public function setAttribute(string $attr, ?string $value = null): self;
 
@@ -27,6 +27,8 @@ interface UssElementInterface
     public function hasContent(): bool;
 
     // Child Management
+
+    public function reset(): void;
 
     public function appendChild(UssElement $child): void;
 

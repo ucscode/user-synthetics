@@ -5,64 +5,97 @@ namespace Ucscode\DOMTable;
 use mysqli_result;
 use Ucscode\UssElement\UssElement;
 
-abstract class AbstractDOMTable 
+abstract class AbstractDOMTable
 {
-    protected int $chunks = 10;
-    protected int $page = 1;
+    protected int $totalRows = 0;
+    protected int $totalPages = 0;
+    protected int $rowsPerPage = 10;
+    protected int $currentPage = 1;
+    protected int $availableRowsInPage = 0;
+    protected ?int $prevPage = null;
+    protected ?int $nextPage = null;
     protected array $columns = [];
+    protected bool $displayFooter = false;
     protected array|mysqli_result $data;
-    protected UssElement $emptyContext;
-    protected int $rows;
-    protected int $maxPage;
+
+    protected ?UssElement $table = null;
+    protected ?UssElement $thead = null;
+    protected ?UssElement $tbody = null;
+    protected ?UssElement $tfoot = null;
+    protected ?UssElement $emptinessElement = null;
 
     /**
      * @method getRows
      */
-    public function getRows(): int
+    public function getTotalRows(): int
     {
-        return $this->rows;
+        return $this->totalRows;
     }
 
     /**
      * @method getPages
      */
-    public function getMaxPages(): int
+    public function getTotalPages(): int
     {
-        return $this->maxPage;
+        return $this->totalPages;
+    }
+
+    /**
+     * @method
+     */
+    public function getAvailableRowsInPage(): int
+    {
+        return $this->availableRowsInPage;
+    }
+
+    /**
+     * @method getNextPage
+     */
+    public function getNextPage(): ?int
+    {
+        return $this->nextPage;
+    }
+
+    /**
+     * @method getPrevPage
+     */
+    public function getPrevPage(): ?int
+    {
+        return $this->prevPage;
     }
 
     /**
      * @method setChunks
      */
-    public function setChunks(int $chunks): self
+    public function setRowsPerPage(int $chunks): self
     {
-        $this->chunks = $chunks;
+        $this->rowsPerPage = $chunks;
         return $this;
     }
 
     /**
      * @method getChunks
      */
-    public function getChunks(): int
+    public function getRowsPerPage(): int
     {
-        return $this->chunks;
+        return $this->rowsPerPage;
     }
 
     /**
      * @method setPage
      */
-    public function setPage(int $page): self
+    public function setCurrentPage(int $page): self
     {
-        $this->page = abs($page);
+        $this->currentPage = abs($page);
         return $this;
     }
 
     /**
      * @method getPage
      */
-    public function getPage(): int
+    public function getCurrentPage(): int
     {
-        return $this->page;
+        return $this->currentPage;
     }
 
     /**
@@ -81,7 +114,7 @@ abstract class AbstractDOMTable
         $this->columns = $columns;
         return $this;
     }
-    
+
     /**
      * @method getColumns
      */
@@ -125,7 +158,7 @@ abstract class AbstractDOMTable
     /**
      * @method getData
      */
-    public function getData(): array|mysqli_result 
+    public function getData(): array|mysqli_result
     {
         return $this->data;
     }
@@ -133,17 +166,66 @@ abstract class AbstractDOMTable
     /**
      * @method setEmptyContext
      */
-    public function setEmptyContext(UssElement $context): self
+    public function setEmptinessElement(UssElement $context): self
     {
-        $this->emptyContext = $context;
+        $this->emptinessElement = $context;
         return $this;
     }
 
     /**
      * @method getEmptyContext
      */
-    public function getEmptyContext(): UssElement
+    public function getEmptinessElement(): UssElement
     {
-        return $this->emptyContext;
+        return $this->emptinessElement;
+    }
+
+    /**
+     * @method enableTFoot
+     */
+    public function setDisplayFooter(bool $status): self
+    {
+        $this->displayFooter = $status;
+        return $this;
+    }
+
+    /**
+     * @method getDisplayFooter
+     */
+    public function getDisplayFooter(): bool
+    {
+        return $this->displayFooter;
+    }
+
+    /**
+     * @method getTableElement
+     */
+    public function getTableElement(): ?UssElement
+    {
+        return $this->table;
+    }
+
+    /**
+     * @method getTheadElement
+     */
+    public function getTheadElement(): ?UssElement
+    {
+        return $this->thead;
+    }
+
+    /**
+     * @method getTbodyElement
+     */
+    public function getTbodyElement(): ?UssElement
+    {
+        return $this->tbody;
+    }
+
+    /**
+     * @method getTfootElement
+     */
+    public function getTfootElement(): ?UssElement
+    {
+        return $this->tfoot;
     }
 }

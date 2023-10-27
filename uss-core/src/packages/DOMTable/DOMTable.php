@@ -9,55 +9,41 @@ use Ucscode\UssElement\UssElement;
 class DOMTable extends AbstractDOMTable
 {
     public readonly string $tablename;
-    public readonly UssElement $tableCase;
-    public readonly UssElement $tableWidget;
-    public readonly UssElement $tableContainer;
-    public readonly UssElement $tablePaginator;
-    public readonly UssElement $table;
-    public readonly UssElement $thead;
-    public readonly UssElement $tbody;
-    public readonly UssElement $tfoot;
-    private null|DOMTableInterface $fabricator;
-    protected bool $displayFooter = false;
+    protected ?DOMTableInterface $fabricator;
 
     public function __construct(?string $tablename = null)
     {
-        $this->tablename = empty($tablename) ? ('_' . uniqid()) : $tablename;
-    }
-
-    /**
-     * @method enableTFoot
-     */
-    public function setDisplayFooter(bool $status): self
-    {
-        $this->displayFooter = $status;
-        return $this;
+        if(empty($tablename)) {
+            $tablename = uniqid('_');
+        };
+        $this->tablename = $tablename;
     }
 
     /**
      * @method build
      */
-    public function build(null|DOMTableInterface $fabricator = null): self
+    public function build(?DOMTableInterface $fabricator = null): self
     {
+        $this->developeTableNodes();
         $this->countResource(__METHOD__);
+
         $this->fabricator = $fabricator;
-        $startIndex = ($this->page - 1) * $this->chunks;
+        $startIndex = ($this->currentPage - 1) * $this->rowsPerPage;
 
         if($this->data instanceof mysqli_result) {
             $result = $this->buildFromMysqli($startIndex);
         } else {
             $result = $this->buildFromArray($startIndex);
         };
-        
-        $this->developeTableNodes();
+
+        $this->availableRowsInPage = count($result);
+
         $this->createTHead($this->thead);
         $this->createTBody($result);
 
         if($this->displayFooter) {
             $this->createTHead($this->tfoot);
         }
-
-        $this->restructureTableElements();
 
         return $this;
     }
@@ -67,7 +53,15 @@ class DOMTable extends AbstractDOMTable
      */
     public function getHTML(): string
     {
-        return $this->tableCase->getHTML();
+        if(!$this->table) {
+            throw new Exception(
+                sprintf(
+                    '%s should not be called before build process',
+                    __METHOD__
+                )
+            );
+        }
+        return $this->table->getHTML();
     }
 
     /**
@@ -76,15 +70,26 @@ class DOMTable extends AbstractDOMTable
     protected function countResource(string $method)
     {
         if(!isset($this->data)) {
-            throw new \Exception(
+            throw new Exception(
                 sprintf(
                     '%s: Cannot build table context; No data provided',
                     $method
                 )
             );
         }
-        $this->rows = is_array($this->data) ? count($this->data) : $this->data->num_rows;
-        $this->maxPage = ceil($this->rows / $this->chunks);
+
+        $this->totalRows = is_array($this->data) ? count($this->data) : $this->data->num_rows;
+        $this->totalPages = ceil($this->totalRows / $this->rowsPerPage);
+        $this->nextPage = $this->currentPage + 1;
+        $this->prevPage = $this->currentPage - 1;
+
+        if($this->nextPage > $this->totalPages) {
+            $this->nextPage = null;
+        };
+
+        if($this->prevPage < 1) {
+            $this->prevPage = null;
+        }
     }
 
     /**
@@ -95,7 +100,7 @@ class DOMTable extends AbstractDOMTable
         $result = [];
         $this->data->data_seek($startIndex);
         while($data = $this->data->fetch_assoc()) {
-            if(count($result) === $this->chunks) {
+            if(count($result) === $this->rowsPerPage) {
                 break;
             }
             $result[] = $this->fabricateData($data);
@@ -108,7 +113,7 @@ class DOMTable extends AbstractDOMTable
      */
     protected function buildFromArray(int $startIndex): array
     {
-        $result = array_slice($this->data, $startIndex, $this->chunks);
+        $result = array_slice($this->data, $startIndex, $this->rowsPerPage);
         foreach($result as $key => $data) {
             $result[$key] = $this->fabricateData($data);
         };
@@ -122,6 +127,7 @@ class DOMTable extends AbstractDOMTable
     {
         $extraColunms = array_diff(array_keys($this->columns), array_keys($data));
         if(!empty($extraColunms)) {
+            // update extra columns with null values
             foreach($extraColunms as $key) {
                 $data[$key] = null;
             }
@@ -135,7 +141,7 @@ class DOMTable extends AbstractDOMTable
     /**
      * @method createThead
      */
-    protected function createThead(UssElement $parentElement): void 
+    protected function createThead(UssElement $parentElement): void
     {
         $tr = new UssElement(UssElement::NODE_TR);
         foreach($this->columns as $display) {
@@ -166,31 +172,10 @@ class DOMTable extends AbstractDOMTable
     }
 
     /**
-     * @method restructureTableElements
-     */
-    protected function restructureTableElements(): void
-    {
-        $this->tableCase->appendChild($this->tableWidget);
-        $this->tableContainer->appendChild($this->table);
-        $this->tableCase->appendChild($this->tableContainer);
-        $this->tableCase->appendChild($this->tablePaginator);
-    }
-
-    /**
      * @method createTableNodes
      */
     protected function developeTableNodes(): void
     {
-        $this->tableCase = new UssElement(UssElement::NODE_DIV);
-        $this->tableCase->setAttribute('class', 'table-case');
-        $this->tableCase->setAttribute('id', 'table-' . $this->tablename);
-
-        $this->tableWidget = new UssElement(UssElement::NODE_DIV);
-        $this->tableWidget->setAttribute('class', 'table-widgets');
-
-        $this->tableContainer = new UssElement(UssElement::NODE_DIV);
-        $this->tableContainer->setAttribute('class', 'table-responsive');
-
         $this->table = new UssElement(UssElement::NODE_TABLE);
         $this->table->setAttribute('class', 'table');
 
@@ -198,10 +183,9 @@ class DOMTable extends AbstractDOMTable
         $this->tbody = new UssElement(UssElement::NODE_TBODY);
         $this->tfoot = new UssElement(UssElement::NODE_TFOOT);
 
-        $this->tablePaginator = new UssElement(UssElement::NODE_DIV);
-        $this->tablePaginator->setAttribute('class', 'table-paginator');
-
-        $this->emptyContext = new UssElement(UssElement::NODE_DIV);
-        $this->emptyContext->setContent("No Data Found");
+        if(empty($this->emptinessElement)) {
+            $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
+            $this->emptinessElement->setContent("No Data Found");
+        }
     }
 }
