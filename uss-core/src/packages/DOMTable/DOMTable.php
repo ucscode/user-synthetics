@@ -17,6 +17,7 @@ class DOMTable extends AbstractDOMTable
             $tablename = uniqid('_');
         };
         $this->tablename = $tablename;
+        $this->developeTableNodes();
     }
 
     /**
@@ -24,7 +25,6 @@ class DOMTable extends AbstractDOMTable
      */
     public function build(?DOMTableInterface $fabricator = null): string
     {
-        $this->developeTableNodes();
         $this->countResource(__METHOD__);
 
         $this->fabricator = $fabricator;
