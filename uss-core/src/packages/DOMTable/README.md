@@ -29,20 +29,20 @@ use Ucscode\DOMTable\DOMTable;
 $table = new DOMTable("users");
 
 // Set columns to display on the table
-$table->columns(array(
+$table->setMultipleColumns([
     "id",
     "username",
     "email"
-));
+]);
 
 // Fetch data from MySQL database
 $mysql_result = $db->query("SELECT * FROM users");
 
 // Populate the table with data
-$table->data($mysql_result);
+$table->setData($mysql_result);
 
 // Generate the HTML code for the table
-echo $table->prepare();
+echo $table->build();
 ```
 
 ---
@@ -52,43 +52,41 @@ echo $table->prepare();
 Data may also be populated with array. Consider the example below:
 
 ```php
-$data = array(
-    array(
+$data = [
+    [
         'id' => 1,
         'username' => 'John',
         'email' => 'john@example.com',
-    ),
-    array(
+    ],
+    [
         'id' => 2,
         'username' => 'Jane',
         'email' => 'jane@example.com',
-    ),
+    ],
     // Add more rows as needed
-);
+];
 
-$table->data($data);
+$table->setData($data);
 ```
 
-In this example, the `$dat`a array contains multiple rows of data, where each row is represented as an associative array. Each key in the associative array corresponds to a column name, and the corresponding value represents the data for that column in the row. You can add as many rows as needed to populate the table with your desired data.
+In this example, the `$data` is an array that contains multiple rows of data, where each row is represented as an associative array. Each key in the associative array corresponds to a column name, and the corresponding value represents the data for that column in the row. You can add as many rows as needed to populate the table with your desired data.
 
 ### Modifying column values
 
 You can modify the values of the table columns before they are displayed using the `prepare()` method. The method accepts a callback function as an optional parameter, which allows you to manipulate the data.
 
 ```php
-$table->prepare(function($data) {
-    $data['username'] = 'updated username';
-    $data['email'] = 'changed@email.com';
-    return $data;
+use Ucscode\DOMTable\DOMTableInterface;
+
+$table->build(new class () implements DOMTableInterface 
+{
+    public function forEachItem(array $data): array
+    {
+        $data['username'] = 'updated username';
+        $data['email'] = 'changed@email.com';
+        return $data;
+    }
 });
-```
-
-### Printing or obtaining the table
-
-By default, the `prepare()` method will directly print the HTML table to the browser. However, you can also obtain the generated table as a string by passing `false` as the second parameter.
-
-```php
-$tableHTML = $table->prepare(null, false);
 ```
 
 ## License

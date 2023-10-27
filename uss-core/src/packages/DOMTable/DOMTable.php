@@ -22,7 +22,7 @@ class DOMTable extends AbstractDOMTable
     /**
      * @method build
      */
-    public function build(?DOMTableInterface $fabricator = null): self
+    public function build(?DOMTableInterface $fabricator = null): string
     {
         $this->developeTableNodes();
         $this->countResource(__METHOD__);
@@ -45,22 +45,7 @@ class DOMTable extends AbstractDOMTable
             $this->createTHead($this->tfoot);
         }
 
-        return $this;
-    }
 
-    /**
-     * @method getHTML
-     */
-    public function getHTML(): string
-    {
-        if(!$this->table) {
-            throw new Exception(
-                sprintf(
-                    '%s should not be called before build process',
-                    __METHOD__
-                )
-            );
-        }
         return $this->table->getHTML();
     }
 
