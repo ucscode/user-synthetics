@@ -45,8 +45,9 @@ class DOMTable extends AbstractDOMTable
             $this->createTHead($this->tfoot);
         }
 
+        $this->tableContainer->appendChild($this->table);
 
-        return $this->table->getHTML();
+        return $this->tableContainer->getHTML();
     }
 
     /**
@@ -65,6 +66,7 @@ class DOMTable extends AbstractDOMTable
 
         $this->totalRows = is_array($this->data) ? count($this->data) : $this->data->num_rows;
         $this->totalPages = ceil($this->totalRows / $this->rowsPerPage);
+        
         $this->nextPage = $this->currentPage + 1;
         $this->prevPage = $this->currentPage - 1;
 
@@ -161,6 +163,9 @@ class DOMTable extends AbstractDOMTable
      */
     protected function developeTableNodes(): void
     {
+        $this->tableContainer = new UssElement(UssElement::NODE_DIV);
+        $this->tableContainer->setAttribute('class', 'table-responsive');
+
         $this->table = new UssElement(UssElement::NODE_TABLE);
         $this->table->setAttribute('class', 'table');
 
