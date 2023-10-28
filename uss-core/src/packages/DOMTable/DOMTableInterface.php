@@ -4,5 +4,5 @@ namespace Ucscode\DOMTable;
 
 interface DOMTableInterface
 {
-    public function forEachItem(array $data): array;
+    public function forEachItem(array $item): array;
 }
