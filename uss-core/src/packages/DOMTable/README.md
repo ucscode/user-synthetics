@@ -36,13 +36,16 @@ $table->setMultipleColumns([
 ]);
 
 // Fetch data from MySQL database
-$mysql_result = $db->query("SELECT * FROM users");
+$result = $db->query("SELECT * FROM users");
 
 // Populate the table with data
-$table->setData($mysql_result);
+$table->setData($result);
 
-// Generate the HTML code for the table
-echo $table->build();
+// Generate a UssElement Table Container
+$element = $table->build();
+
+// Print to HTML Page
+echo $element->getHTML();
 ```
 
 ---
@@ -73,20 +76,22 @@ In this example, the `$data` is an array that contains multiple rows of data, wh
 
 ### Modifying column values
 
-You can modify the values of the table columns before they are displayed using the `prepare()` method. The method accepts a callback function as an optional parameter, which allows you to manipulate the data.
+You can modify the values of the each item before they are displayed by passing a `DOMTableInterface` instance to the second argument of the `DOMTable::setData()` method. This will allows you to manipulate the item data before the are rendered.
 
 ```php
 use Ucscode\DOMTable\DOMTableInterface;
 
-$table->build(new class () implements DOMTableInterface 
+$table->setData($result, new class () implements DOMTableInterface 
 {
-    public function forEachItem(array $data): array
+    public function foreachItem(array $item): array
     {
-        $data['username'] = 'updated username';
-        $data['email'] = 'changed@email.com';
-        return $data;
+        $item['username'] = 'updated username';
+        $item['email'] = 'changed@email.com';
+        return $item;
     }
 });
+
+$table->build();
 ```
 
 ## License
