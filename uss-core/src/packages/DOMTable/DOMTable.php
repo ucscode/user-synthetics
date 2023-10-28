@@ -3,6 +3,7 @@
 namespace Ucscode\DOMTable;
 
 use Exception;
+use Generator;
 use mysqli_result;
 use Ucscode\UssElement\UssElement;
 
@@ -21,22 +22,34 @@ class DOMTable extends AbstractDOMTable
     }
 
     /**
+     * @method setData
+     */
+    public function setData(array|mysqli_result $iterable, ?DOMTableInterface $fabricator = null): self
+    {
+        $this->data = $iterable;
+        $this->fabricator = $fabricator;
+        $this->configureProperty();
+        return $this;
+    }
+
+    /**
      * @method build
      */
-    public function build(?DOMTableInterface $fabricator = null): string
+    public function build(): UssElement
     {
-        $this->countResource(__METHOD__);
-
-        $this->fabricator = $fabricator;
         $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
+        $result = [];
 
-        if($this->data instanceof mysqli_result) {
-            $result = $this->buildFromMysqli($startIndex);
-        } else {
-            $result = $this->buildFromArray($startIndex);
-        };
+        foreach($this->getGenerator() as $key => $item) {
+            if(($key < $startIndex) === false) {
+                if(count($result) > $this->itemsPerPage - 1) {
+                    break;
+                }
+                $result[] = $item;
+            }
+        }
 
-        $this->availableRowsInPage = count($result);
+        $this->itemsInCurrentPage = count($result);
 
         $this->createTHead($this->thead);
         $this->createTBody($result);
@@ -47,26 +60,39 @@ class DOMTable extends AbstractDOMTable
 
         $this->tableContainer->appendChild($this->table);
 
-        return $this->tableContainer->getHTML(true);
+        return $this->tableContainer;
     }
 
     /**
+     * @method generator
+     */
+    public function getGenerator(): Generator
+    {
+        if($this->data instanceof mysqli_result) {
+            $this->data->data_seek(0);
+            while($item = $this->data->fetch_assoc()) {
+                $item = $this->fabricateItem($item, $this->fabricator);
+                if($item) {
+                    yield $item;
+                }
+            }
+        } else {
+            foreach($this->data as $key => $item) {
+                $item = $this->fabricateItem($item, $this->fabricator);
+                if($item) {
+                    yield $item;
+                }
+            }
+        };
+    }
+    /**
      * @method countResource
      */
-    protected function countResource(string $method)
+    protected function configureProperty()
     {
-        if(!isset($this->data)) {
-            throw new Exception(
-                sprintf(
-                    '%s: Cannot build table context; No data provided',
-                    $method
-                )
-            );
-        }
+        $this->totalItems = iterator_count($this->getGenerator());
+        $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);
 
-        $this->totalRows = is_array($this->data) ? count($this->data) : $this->data->num_rows;
-        $this->totalPages = ceil($this->totalRows / $this->itemsPerPage);
-        
         $this->nextPage = $this->currentPage + 1;
         $this->prevPage = $this->currentPage - 1;
 
@@ -80,49 +106,21 @@ class DOMTable extends AbstractDOMTable
     }
 
     /**
-     * @method buildMysqliData
+     * @method fabricateItem
      */
-    protected function buildFromMysqli(int $startIndex): array
+    protected function fabricateItem(array $item, ?DOMTableInterface $fabricator): ?array
     {
-        $result = [];
-        $this->data->data_seek($startIndex);
-        while($data = $this->data->fetch_assoc()) {
-            if(count($result) === $this->itemsPerPage) {
-                break;
-            }
-            $result[] = $this->fabricateData($data);
-        };
-        return $result;
-    }
-
-    /**
-     * @method buildArrayData
-     */
-    protected function buildFromArray(int $startIndex): array
-    {
-        $result = array_slice($this->data, $startIndex, $this->itemsPerPage);
-        foreach($result as $key => $data) {
-            $result[$key] = $this->fabricateData($data);
-        };
-        return $result;
-    }
-
-    /**
-     * @method fabricateData
-     */
-    protected function fabricateData(array $data): array
-    {
-        $extraColunms = array_diff(array_keys($this->columns), array_keys($data));
+        $extraColunms = array_diff(array_keys($this->columns), array_keys($item));
         if(!empty($extraColunms)) {
             // update extra columns with null values
             foreach($extraColunms as $key) {
-                $data[$key] = null;
+                $item[$key] = null;
             }
         };
-        if($this->fabricator) {
-            $data = $this->fabricator->forEachItem($data);
+        if($fabricator) {
+            $item = $fabricator->forEachItem($item);
         }
-        return $data;
+        return $item;
     }
 
     /**

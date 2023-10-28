@@ -2,21 +2,23 @@
 
 namespace Ucscode\DOMTable;
 
+use Generator;
+use mysqli;
 use mysqli_result;
 use Ucscode\UssElement\UssElement;
 
 abstract class AbstractDOMTable
 {
-    protected int $totalRows = 0;
+    protected int $totalItems = 0;
     protected int $totalPages = 0;
     protected int $itemsPerPage = 10;
     protected int $currentPage = 1;
-    protected int $availableRowsInPage = 0;
+    protected int $itemsInCurrentPage = 0;
     protected ?int $prevPage = null;
     protected ?int $nextPage = null;
     protected array $columns = [];
     protected bool $displayFooter = false;
-    protected array|mysqli_result $data;
+    protected mysqli_result|array $data;
 
     protected ?UssElement $tableContainer = null;
     protected ?UssElement $table = null;
@@ -28,9 +30,9 @@ abstract class AbstractDOMTable
     /**
      * @method getRows
      */
-    public function getTotalRows(): int
+    public function gettotalItems(): int
     {
-        return $this->totalRows;
+        return $this->totalItems;
     }
 
     /**
@@ -44,9 +46,9 @@ abstract class AbstractDOMTable
     /**
      * @method
      */
-    public function getAvailableRowsInPage(): int
+    public function countItemsInCurrentPage(): int
     {
-        return $this->availableRowsInPage;
+        return $this->itemsInCurrentPage;
     }
 
     /**
@@ -148,18 +150,9 @@ abstract class AbstractDOMTable
     }
 
     /**
-     * @method setData
-     */
-    public function setData(array|mysqli_result $data): self
-    {
-        $this->data = $data;
-        return $this;
-    }
-
-    /**
      * @method getData
      */
-    public function getData(): array|mysqli_result
+    public function getData(): mysqli_result|array
     {
         return $this->data;
     }
