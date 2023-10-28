@@ -47,7 +47,7 @@ class DOMTable extends AbstractDOMTable
 
         $this->tableContainer->appendChild($this->table);
 
-        return $this->tableContainer->getHTML();
+        return $this->tableContainer->getHTML(true);
     }
 
     /**
@@ -133,7 +133,11 @@ class DOMTable extends AbstractDOMTable
         $tr = new UssElement(UssElement::NODE_TR);
         foreach($this->columns as $display) {
             $th = new UssElement(UssElement::NODE_TH);
-            $th->setContent($display);
+            if($display instanceof UssElement) {
+                $th->appendChild($display);
+            } else {
+                $th->setContent($display);
+            }
             $tr->appendChild($th);
         };
         $parentElement->appendChild($tr);
@@ -150,7 +154,11 @@ class DOMTable extends AbstractDOMTable
             foreach(array_keys($this->columns) as $key) {
                 $value = $data[$key];
                 $td = new UssElement(UssElement::NODE_TD);
-                $td->setContent($value);
+                if($value instanceof UssElement) {
+                    $td->appendChild($value);
+                } else {
+                    $td->setContent($value);
+                }
                 $tr->appendChild($td);
             };
             $this->tbody->appendChild($tr);
