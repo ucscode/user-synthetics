@@ -28,7 +28,7 @@ class DOMTable extends AbstractDOMTable
         $this->countResource(__METHOD__);
 
         $this->fabricator = $fabricator;
-        $startIndex = ($this->currentPage - 1) * $this->rowsPerPage;
+        $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
 
         if($this->data instanceof mysqli_result) {
             $result = $this->buildFromMysqli($startIndex);
@@ -65,7 +65,7 @@ class DOMTable extends AbstractDOMTable
         }
 
         $this->totalRows = is_array($this->data) ? count($this->data) : $this->data->num_rows;
-        $this->totalPages = ceil($this->totalRows / $this->rowsPerPage);
+        $this->totalPages = ceil($this->totalRows / $this->itemsPerPage);
         
         $this->nextPage = $this->currentPage + 1;
         $this->prevPage = $this->currentPage - 1;
@@ -87,7 +87,7 @@ class DOMTable extends AbstractDOMTable
         $result = [];
         $this->data->data_seek($startIndex);
         while($data = $this->data->fetch_assoc()) {
-            if(count($result) === $this->rowsPerPage) {
+            if(count($result) === $this->itemsPerPage) {
                 break;
             }
             $result[] = $this->fabricateData($data);
@@ -100,7 +100,7 @@ class DOMTable extends AbstractDOMTable
      */
     protected function buildFromArray(int $startIndex): array
     {
-        $result = array_slice($this->data, $startIndex, $this->rowsPerPage);
+        $result = array_slice($this->data, $startIndex, $this->itemsPerPage);
         foreach($result as $key => $data) {
             $result[$key] = $this->fabricateData($data);
         };
