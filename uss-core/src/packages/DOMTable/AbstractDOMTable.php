@@ -9,7 +9,7 @@ abstract class AbstractDOMTable
 {
     protected int $totalRows = 0;
     protected int $totalPages = 0;
-    protected int $rowsPerPage = 10;
+    protected int $itemsPerPage = 10;
     protected int $currentPage = 1;
     protected int $availableRowsInPage = 0;
     protected ?int $prevPage = null;
@@ -68,18 +68,18 @@ abstract class AbstractDOMTable
     /**
      * @method setChunks
      */
-    public function setRowsPerPage(int $chunks): self
+    public function setItemsPerPage(int $chunks): self
     {
-        $this->rowsPerPage = $chunks;
+        $this->itemsPerPage = $chunks;
         return $this;
     }
 
     /**
      * @method getChunks
      */
-    public function getRowsPerPage(): int
+    public function getItemsPerPage(): int
     {
-        return $this->rowsPerPage;
+        return $this->itemsPerPage;
     }
 
     /**
