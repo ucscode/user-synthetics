@@ -145,10 +145,43 @@ class UssForm extends UssElement implements UssFormInterface
      *
      * @return void
      */
-    public function populate(array $data): void
+    public function populate(array|bool $data): void
     {
-        $result = $this->flattenArray($data);
-        $this->populate = $result;
+        if(is_array($data)) {
+
+            $result = $this->flattenArray($data);
+            $this->populate = $result;
+
+        } elseif($data) {
+
+            foreach($this->populate as $key => $value) {
+
+                if(!is_scalar($value)) {
+                    continue;
+                };
+                
+                $nodes = $this->find("[name='{$key}']");
+
+                if(!empty($nodes)) {
+
+                    $node = $nodes[0];
+
+                    $isWidget = in_array($node->tagName, [
+                        self::NODE_BUTTON,
+                        self::NODE_INPUT,
+                        self::NODE_TEXTAREA,
+                        self::NODE_SELECT
+                    ]);
+
+                    if($isWidget) {
+                        $this->setValue($node, $value, false);
+                    }
+                    
+                };
+
+            };
+
+        }
     }
 
     /**
@@ -342,24 +375,7 @@ class UssForm extends UssElement implements UssFormInterface
      */
     public function getHTML(bool $indent = false): string
     {
-        foreach($this->populate as $key => $value) {
-            if(!is_scalar($value)) {
-                continue;
-            };
-            $nodes = $this->find("[name='{$key}']");
-            if(!empty($nodes)) {
-                $node = $nodes[0];
-                $isWidget = in_array($node->tagName, [
-                    self::NODE_BUTTON,
-                    self::NODE_INPUT,
-                    self::NODE_TEXTAREA,
-                    self::NODE_SELECT
-                ]);
-                if($isWidget) {
-                    $this->setValue($node, $value, false);
-                }
-            };
-        };
+        $this->populate(true);
         return parent::getHTML($indent);
     }
 
