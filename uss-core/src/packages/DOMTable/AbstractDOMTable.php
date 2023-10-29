@@ -20,6 +20,7 @@ abstract class AbstractDOMTable
     protected bool $displayFooter = false;
     protected mysqli_result|array $data;
 
+    protected ?UssElement $tableWrapper = null;
     protected ?UssElement $tableContainer = null;
     protected ?UssElement $table = null;
     protected ?UssElement $thead = null;
@@ -189,6 +190,14 @@ abstract class AbstractDOMTable
     public function getDisplayFooter(): bool
     {
         return $this->displayFooter;
+    }
+
+    /**
+     * @method getTableElement
+     */
+    public function getTableWrapperElement(): ?UssElement
+    {
+        return $this->tableWrapper;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Ucscode\DOMTable;
 
-use Exception;
 use Generator;
 use mysqli_result;
 use Ucscode\UssElement\UssElement;
@@ -57,10 +56,13 @@ class DOMTable extends AbstractDOMTable
         if($this->displayFooter) {
             $this->createTHead($this->tfoot);
         }
-
+        
         $this->tableContainer->appendChild($this->table);
+        $this->tableWrapper->appendChild($this->tableContainer);
 
-        return $this->tableContainer;
+        $this->addEmptinessContext();
+
+        return $this->tableWrapper;
     }
 
     /**
@@ -85,6 +87,7 @@ class DOMTable extends AbstractDOMTable
             }
         };
     }
+    
     /**
      * @method countResource
      */
@@ -169,8 +172,11 @@ class DOMTable extends AbstractDOMTable
      */
     protected function developeTableNodes(): void
     {
+        $this->tableWrapper = new UssElement(UssElement::NODE_DIV);
+        $this->tableWrapper->setAttribute('class', 'table-wrapper');
+
         $this->tableContainer = new UssElement(UssElement::NODE_DIV);
-        $this->tableContainer->setAttribute('class', 'table-responsive');
+        $this->tableContainer->setAttribute('class', 'table-responsive table-container');
 
         $this->table = new UssElement(UssElement::NODE_TABLE);
         $this->table->setAttribute('class', 'table');
@@ -179,9 +185,21 @@ class DOMTable extends AbstractDOMTable
         $this->tbody = new UssElement(UssElement::NODE_TBODY);
         $this->tfoot = new UssElement(UssElement::NODE_TFOOT);
 
-        if(empty($this->emptinessElement)) {
-            $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
-            $this->emptinessElement->setContent("No Data Found");
+        $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
+        $this->emptinessElement->setAttribute('class', 'border p-4 text-center');
+        $this->emptinessElement->setContent("No Data Found");
+    }
+
+    /**
+     * @method addEmptinessContext
+     */
+    public function addEmptinessContext(): void
+    {
+        if(!$this->itemsInCurrentPage) {
+            $emptinessContainer = new UssElement(UssElement::NODE_DIV);
+            $emptinessContainer->setAttribute('class', 'emptiness-container');
+            $emptinessContainer->appendChild($this->emptinessElement);
+            $this->tableWrapper->appendChild($emptinessContainer);
         }
     }
 }
