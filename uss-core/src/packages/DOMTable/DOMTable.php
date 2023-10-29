@@ -10,6 +10,7 @@ class DOMTable extends AbstractDOMTable
 {
     public readonly string $tablename;
     protected ?DOMTableInterface $fabricator;
+    protected array $result;
 
     public function __construct(?string $tablename = null)
     {
@@ -17,7 +18,6 @@ class DOMTable extends AbstractDOMTable
             $tablename = uniqid('_');
         };
         $this->tablename = $tablename;
-        $this->developeTableNodes();
     }
 
     /**
@@ -27,7 +27,6 @@ class DOMTable extends AbstractDOMTable
     {
         $this->data = $iterable;
         $this->fabricator = $fabricator;
-        $this->configureProperty();
         return $this;
     }
 
@@ -36,22 +35,25 @@ class DOMTable extends AbstractDOMTable
      */
     public function build(): UssElement
     {
-        $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
-        $result = [];
+        $this->developeTableNodes();
 
+        $this->result = [];
+        $this->totalItems = 0;
+        $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
+        
         foreach($this->getGenerator() as $key => $item) {
+            $this->totalItems++;
             if(($key < $startIndex) === false) {
-                if(count($result) > $this->itemsPerPage - 1) {
-                    break;
+                if(count($this->result) < $this->itemsPerPage) {
+                    $this->result[] = $item;
                 }
-                $result[] = $item;
             }
         }
 
-        $this->itemsInCurrentPage = count($result);
+        $this->configureProperty();
 
         $this->createTHead($this->thead);
-        $this->createTBody($result);
+        $this->createTBody($this->result);
 
         if($this->displayFooter) {
             $this->createTHead($this->tfoot);
@@ -93,7 +95,7 @@ class DOMTable extends AbstractDOMTable
      */
     protected function configureProperty()
     {
-        $this->totalItems = iterator_count($this->getGenerator());
+        $this->itemsInCurrentPage = count($this->result);
         $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);
 
         $this->nextPage = $this->currentPage + 1;
