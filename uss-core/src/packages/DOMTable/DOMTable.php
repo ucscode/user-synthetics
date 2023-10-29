@@ -187,9 +187,11 @@ class DOMTable extends AbstractDOMTable
         $this->tbody = new UssElement(UssElement::NODE_TBODY);
         $this->tfoot = new UssElement(UssElement::NODE_TFOOT);
 
-        $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
-        $this->emptinessElement->setAttribute('class', 'border p-4 text-center');
-        $this->emptinessElement->setContent("No Item Found");
+        if(empty($this->emptinessElement)) {
+            $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
+            $this->emptinessElement->setAttribute('class', 'border p-4 text-center');
+            $this->emptinessElement->setContent("No Item Found");
+        }
     }
 
     /**

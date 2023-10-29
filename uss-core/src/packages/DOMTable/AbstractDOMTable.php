@@ -161,7 +161,7 @@ abstract class AbstractDOMTable
     /**
      * @method setEmptyContext
      */
-    public function setEmptinessElement(UssElement $context): self
+    public function setEmptinessElement(?UssElement $context): self
     {
         $this->emptinessElement = $context;
         return $this;
