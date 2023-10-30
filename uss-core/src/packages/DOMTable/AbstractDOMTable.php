@@ -2,8 +2,6 @@
 
 namespace Ucscode\DOMTable;
 
-use Generator;
-use mysqli;
 use mysqli_result;
 use Ucscode\UssElement\UssElement;
 
