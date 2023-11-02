@@ -40,7 +40,7 @@ class DOMTable extends AbstractDOMTable
         $this->result = [];
         $this->totalItems = 0;
         $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
-        
+
         foreach($this->getGenerator() as $key => $item) {
             $this->totalItems++;
             if(($key < $startIndex) === false) {
@@ -58,7 +58,7 @@ class DOMTable extends AbstractDOMTable
         if($this->displayFooter) {
             $this->createTHead($this->tfoot);
         }
-        
+
         $this->tableContainer->appendChild($this->table);
         $this->tableWrapper->appendChild($this->tableContainer);
 
@@ -70,7 +70,7 @@ class DOMTable extends AbstractDOMTable
     /**
      * @method generator
      */
-    public function getGenerator(): Generator
+    protected function getGenerator(): Generator
     {
         if($this->data instanceof mysqli_result) {
             $this->data->data_seek(0);
@@ -89,7 +89,7 @@ class DOMTable extends AbstractDOMTable
             }
         };
     }
-    
+
     /**
      * @method countResource
      */
@@ -197,7 +197,7 @@ class DOMTable extends AbstractDOMTable
     /**
      * @method addEmptinessContext
      */
-    public function addEmptinessContext(): void
+    protected function addEmptinessContext(): void
     {
         if(!$this->itemsInCurrentPage) {
             $emptinessContainer = new UssElement(UssElement::NODE_DIV);

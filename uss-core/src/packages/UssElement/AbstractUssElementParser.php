@@ -6,11 +6,11 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
 {
     protected readonly string $tagName;
 
-    protected $parentElement;
+    protected ?UssElementInterface $parentElement = null;
 
-    protected $attributes = [];
+    protected array $attributes = [];
 
-    protected $children = [];
+    protected array $children = [];
 
     protected ?string $content = null;
 
@@ -45,6 +45,7 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
             }
             $debugInfo[$property] = $value;
         }
+        $debugInfo['hasParent'] = !empty($this->parentElement);
         return $debugInfo;
     }
 

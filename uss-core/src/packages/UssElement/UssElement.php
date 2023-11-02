@@ -319,6 +319,14 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
+     * @method getParentElement
+     */
+    public function getParentElement(): ?UssElementInterface
+    {
+        return $this->parentElement;
+    }
+
+    /**
      * Set the parent element of the current element
      *
      * @param UssElement $parent

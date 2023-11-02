@@ -103,7 +103,7 @@ abstract class AbstractDOMTable
     /**
      * @method setColumns
      */
-    public function setMultipleColumns(array $columns): self
+    public function setColumns(array $columns): self
     {
         $keys = [];
         foreach($columns as $key => $value) {
