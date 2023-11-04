@@ -1,6 +1,6 @@
 <?php
 
-use Ucscode\Packages\Pairs;
+use Ucscode\Pairs\Pairs;
 use Ucscode\SQuery\SQuery;
 
 abstract class AbstractUssUtils implements UssInterface
@@ -13,7 +13,7 @@ abstract class AbstractUssUtils implements UssInterface
     /**
      * @method fetchData
      */
-    public function fetchData(string $table, mixed $value, $column = 'id'): ?array
+    public function fetchItem(string $table, mixed $value, $column = 'id'): ?array
     {
         $parameter = is_iterable($value) ? $value : $column;
         $SQL = (new SQuery())->select()

@@ -11,7 +11,7 @@ The `TreeNode` class provides several methods to create and manipulate nodes or 
 Import the `TreeNode` package into your project and instantiate it
 
 ```php
-use Ucscode\Packages\TreeNode;
+use Ucscode\TreeNode\TreeNode;
 
 $treeNode = new TreeNode();
 ```

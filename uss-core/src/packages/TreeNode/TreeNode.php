@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\Packages;
+namespace Ucscode\TreeNode;
 
 class TreeNode
 {

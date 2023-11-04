@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\Packages;
+namespace Ucscode\DataMemo;
 
 /**
  * A Lightweight File-Based Storage Solution for Object Properties
