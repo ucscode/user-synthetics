@@ -147,7 +147,9 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
 
             } else {
 
+                // $html .= $carriage . $indentation . "\t";
                 $html .= $node->getContent();
+                // $html .= $carriage . $indentation;
 
             }
 

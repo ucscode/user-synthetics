@@ -299,7 +299,7 @@ class UssElement extends AbstractUssElementParser
      * Remove all child elements and context from the element
      * @return void
      */
-    public function reset(): void
+    public function freeElement(): void
     {
         $this->children = [];
         $this->content = null;
@@ -324,6 +324,14 @@ class UssElement extends AbstractUssElementParser
     public function getParentElement(): ?UssElementInterface
     {
         return $this->parentElement;
+    }
+
+    /**
+     * @method getParentElement
+     */
+    public function hasParentElement(): bool
+    {
+        return !empty($this->parentElement);
     }
 
     /**

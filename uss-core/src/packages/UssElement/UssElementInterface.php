@@ -28,7 +28,7 @@ interface UssElementInterface
 
     // Child Management
 
-    public function reset(): void;
+    public function freeElement(): void;
 
     public function appendChild(UssElement $child): void;
 
@@ -50,4 +50,10 @@ interface UssElementInterface
 
     public function getHTML(bool $indent = false): string;
 
+    /**
+     * Parent
+     */
+    public function getParentElement(): ?UssElementInterface;
+
+    public function hasParentElement(): bool;
 }

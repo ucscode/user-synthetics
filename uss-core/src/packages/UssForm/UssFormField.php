@@ -3,55 +3,9 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
-use UssFormFieldInterface;
 
-class UssFormField implements UssFormFieldInterface
+class UssFormField extends AbstractUssFormField
 {
-    /**
-     * Containers: No values but has attributes and holds elements 
-     */
-    protected UssElement $rowElement;
-    protected UssElement $containerElement;
-    protected UssElement $widgetContainerElement;
-
-    /**
-     * Elements: Has attributes and contain values
-     */
-    protected UssElement $infoElement;
-    protected UssElement $labelElement;
-    protected UssElement $errorElement;
-    protected UssElement $widgetElement;
-
-    /**
-     * $values: The values for each elements
-     */
-    protected null|string|UssElement $infoValue;
-    protected null|string|UssElement $labelValue;
-    protected null|string|UssElement $errorValue;
-    protected ?string $widgetValue;
-
-    /**
-     * Widget Group: append or prepend gadget (icon, button etc) to widgets
-     */
-    protected null|string|UssElement $widgetAppendant;
-    protected null|string|UssElement $widgetPrependant;
-
-    /**
-     * Other Widget Resource
-     */
-    protected array $widgetOptions = [];
-
-    /**
-     * @method __constuct
-     */
-    public function __construct(
-        public readonly string $fieldName, 
-        public readonly string $nodeName,
-        public readonly ?string $nodeType = null
-    ){
-        $this->generateElements();
-    }
-
     /**
      * For: Row
      */
@@ -60,10 +14,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->rowElement;
     }
 
-    public function setRowAttribute(string $name, string $value): self
+    public function setRowAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->rowElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->rowElement, $name, $value, $append);
     }
 
     public function getRowAttribute(string $name): ?string
@@ -71,10 +24,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->rowElement->getAttribute($name);
     }
 
-    public function removeRowAttribute(string $name): self
+    public function removeRowAttribute(string $name, ?string $detach = null): self
     {
-        $this->rowElement->removeAttribute($name);
-        return $this;
+        return $this->attributeRemover($this->rowElement, $name, $detach);
     }
 
     /**
@@ -85,10 +37,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->containerElement;
     }
 
-    public function setContainerAttribute(string $name, string $value): self
+    public function setContainerAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->containerElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->containerElement, $name, $value, $append);
     }
 
     public function getContainerAttribute(string $name): ?string
@@ -96,9 +47,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->containerElement->getAttribute($name);
     }
 
-    public function removeContainerAttribute(string $name): self
+    public function removeContainerAttribute(string $name, ?string $detach = null): self
     {
-        $this->containerElement->removeAttribute($name);
+        $this->attributeRemover($this->containerElement, $name, $detach);
         return $this;
     }
 
@@ -110,34 +61,33 @@ class UssFormField implements UssFormFieldInterface
         return $this->infoElement;
     }
 
-    public function setInfoAttribute(string $name, string $value): self
+    public function setInfoAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->infoElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->infoElement, $name, $value, $append);
     }
-    
+
     public function getInfoAttribute(string $name): ?string
     {
         return $this->infoElement->getAttribute($name);
     }
 
-    public function removeInfoAttribute(string $name): self
+    public function removeInfoAttribute(string $name, ?string $detach = null): self
     {
-        $this->infoElement->removeAttribute($name);
-        return $this;
+        return $this->attributeRemover($this->infoElement, $name, $detach);
     }
 
-    public function setInfoValue(null|string|UssElement $value): self
+    public function setInfoMessage(null|string|UssElement $value, ?string $icon = null): self
     {
         $this->infoValue = $value;
+        $this->infoIcon = null;
         return $this;
     }
 
-    public function getInfoValue(): null|string|UssElement
+    public function getInfoMessage(): null|string|UssElement
     {
         return $this->infoValue;
     }
-    
+
     /**
      * For: Label
      */
@@ -146,10 +96,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->labelElement;
     }
 
-    public function setLabelAttribute(string $name, string $value): self
+    public function setLabelAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->labelElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->labelElement, $name, $value, $append);
     }
 
     public function getLabelAttribute(string $name): ?string
@@ -157,10 +106,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->labelElement->getAttribute($name);
     }
 
-    public function removeLabelAttribute(string $name): self
+    public function removeLabelAttribute(string $name, ?string $detach = null): self
     {
-        $this->labelElement->removeAttribute($name);
-        return $this;
+        return $this->attributeRemover($this->labelElement, $name, $detach);
     }
 
     public function setLabelValue(null|string|UssElement $value): self
@@ -177,37 +125,47 @@ class UssFormField implements UssFormFieldInterface
     /**
      * For: Error
      */
-    public function getErrorElement(): UssElement
+    public function getValidationElement(): UssElement
     {
-        return $this->errorElement;
+        return $this->validationElement;
     }
 
-    public function setErrorAttribute(string $name, string $value): self
+    public function setValidationAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->errorElement->setAttribute($name, $value);
+        return $this->attributeSetter($this->validationElement, $name, $value, $append);
+    }
+
+    public function getValidationAttribute(string $name): ?string
+    {
+        return $this->validationElement->getAttribute($name);
+    }
+
+    public function removeValidationAttribute(string $name, ?string $detach = null): self
+    {
+        return $this->attributeRemover($this->validationElement, $name, $detach);
+    }
+
+    public function setValidationType(?string $validationType): self
+    {
+        $this->validationType = $validationType;
         return $this;
     }
 
-    public function getErrorAttribute(string $name): ?string
+    public function getValidationType(): ?string
     {
-        return $this->errorElement->getAttribute($name);
+        return $this->validationType;
     }
 
-    public function removeErrorAttribute(string $name): self
+    public function setValidationMessage(?string $value, ?string $icon = null): self
     {
-        $this->errorElement->removeAttribute($name);
+        $this->validationValue = $value;
+        $this->validationIcon = $icon;
         return $this;
     }
 
-    public function setErrorValue(null|string|UssElement $value): self
+    public function getValidationMessage(): ?string
     {
-        $this->errorValue = $value;
-        return $this;
-    }
-
-    public function getErrorValue(): null|string|UssElement
-    {
-        return $this->errorValue;
+        return $this->validationValue;
     }
 
     /**
@@ -218,10 +176,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->widgetContainerElement;
     }
 
-    public function setWidgetContainerAttribute(string $name, string $value): self
+    public function setWidgetContainerAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->widgetContainerElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->widgetContainerElement, $name, $value, $append);
     }
 
     public function getWidgetContainerAttribute(string $name): ?string
@@ -229,9 +186,10 @@ class UssFormField implements UssFormFieldInterface
         return $this->widgetContainerElement->getAttribute($name);
     }
 
-    public function removeWidgetContainerAttribute(string $name): self
+    public function removeWidgetContainerAttribute(string $name, ?string $detach): self
     {
-        $this->widgetContainerElement->removeAttribute($name);
+        $method = !is_null($detach) ? 'removeAttributeValue' : 'removeAttribute';
+        $this->widgetContainerElement->{$method}($name, $detach);
         return $this;
     }
 
@@ -243,10 +201,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->widgetElement;
     }
 
-    public function setWidgetAttribute(string $name, string $value): self
+    public function setWidgetAttribute(string $name, string $value, bool $append = false): self
     {
-        $this->widgetElement->setAttribute($name, $value);
-        return $this;
+        return $this->attributeSetter($this->widgetElement, $name, $value, $append);
     }
 
     public function getWidgetAttribute(string $name): ?string
@@ -254,10 +211,9 @@ class UssFormField implements UssFormFieldInterface
         return $this->widgetElement->getAttribute($name);
     }
 
-    public function removeWidgetAttribute(string $name): self
+    public function removeWidgetAttribute(string $name, ?string $detach = null): self
     {
-        $this->widgetElement->removeAttribute($name);
-        return $this;
+        return $this->attributeRemover($this->widgetElement, $name, $detach);
     }
 
     public function setWidgetValue(?string $value): self
@@ -271,24 +227,24 @@ class UssFormField implements UssFormFieldInterface
         return $this->widgetValue;
     }
 
-    public function setWidgetAppendant(null|string|UssElement $appendant): self
+    public function appendToWidget(null|string|UssElement $appendant): self
     {
-        $this->widgetAppendant = $appendant;
+        $this->widgetAppendant = $this->refactorInputGroupContent($appendant);
         return $this;
     }
 
-    public function getWidgetAppendant(): null|string|UssElement
+    public function getWidgetAppendant(): ?UssElement
     {
         return $this->widgetAppendant;
     }
 
-    public function setWidgetPrependant(null|string|UssElement $prependant): self
+    public function prependToWidget(null|string|UssElement $prependant): self
     {
-        $this->widgetPrependant = $prependant;
+        $this->widgetPrependant = $this->refactorInputGroupContent($prependant);
         return $this;
     }
 
-    public function getWidgetPrependant(): null|string|UssElement
+    public function getWidgetPrependant(): ?UssElement
     {
         return $this->widgetPrependant;
     }
@@ -298,20 +254,32 @@ class UssFormField implements UssFormFieldInterface
      */
     public function setWidgetOptions(array $options): self
     {
-        $this->widgetOptions = $options;
+        $this->widgetOptions['values'] = $options;
+        $this->rebuildWidgetOptionsElements($options);
         return $this;
     }
 
     public function setWidgetOption(string $key, string $displayValue): self
     {
-        $this->widgetOptions[$key] = $displayValue;
+        $optionElement = $this->widgetOptions['elements'][$key] ?? null;
+        if(!$optionElement) {
+            $optionElement = $this->createOptionElement($key, $displayValue);
+            $this->widgetElement->appendChild($optionElement);
+        } else {
+            $optionElement->setContent($displayValue);
+        }
+        $this->widgetOptions['values'][$key] = $displayValue;
+        $this->widgetOptions['elements'][$key] = $optionElement;
         return $this;
     }
 
     public function removeWidgetOption(string $key): self
     {
         if($this->hasWidgetOption($key)) {
-            unset($this->widgetOptions[$key]);
+            $optionElement = $this->getWidgetOptionElement($key);
+            unset($this->widgetOptions['values'][$key]);
+            unset($this->widgetOptions['elements'][$key]);
+            $optionElement->getParentElement()->removeChild($optionElement);
         }
         return $this;
     }
@@ -323,61 +291,146 @@ class UssFormField implements UssFormFieldInterface
 
     public function hasWidgetOption(string $key): bool
     {
-        return array_key_exists($key, $this->widgetOptions);
+        return array_key_exists($key, $this->widgetOptions['values']);
+    }
+    
+    public function getWidgetOptionElement(string $key): ?UssElement
+    {
+        return $this->widgetOptions['elements'][$key] ?? null;
     }
 
     /**
-     * Protected Methods
+     * @method otherWidgetMethods
      */
-    protected function generateElements(): void
+    public function setWidgetChecked(bool $status): self
     {
-        $elements = [
-            'rowElement' => [
-                UssElement::NODE_DIV,
-                'attributes' => [
-                    'class' => 'col-12',
-                    'data-field' => $this->fieldName
-                ],
-            ],
-            'containerElement' => [
-                UssElement::NODE_DIV,
-                'attributes' => [
-                    'class' => 'field-container',
-                ],
-            ],
-            'widgetContainerElement' => [
-                UssElement::NODE_DIV,
-                'attributes' => [
-                    'class' => 'form-single form-checker'
-                ],
-            ],
-            'infoElement' => [
-                UssElement::NODE_DIV,
-                'attributes' => [
-                    'class' => 'form-info'
-                ],
-            ],
-            'labelElement' => [
-                UssElement::NODE_LABEL,
-                'attributes' => [
-                    'class' => 'form-label'
-                ],
-            ],
-            'errorElement' => [
-                UssElement::NODE_DIV,
-                'attributes' => [
-                    'class' => 'form-error'
-                ],
-            ],
-        ];
-
-        foreach($elements as $name => $prop) {
-            $this->{$name} = new UssElement($prop[0]);
-            foreach($prop['attributes'] as $key => $value) {
-                $this->{$name}->setAttribute($key, $value);
+        if($this->isCheckable()) {
+            if($status) {
+                $this->widgetElement->setAttribute('checked', 'checked');
+            } else {
+                $this->widgetElement->removeAttribute('checked');
             }
         }
+        return $this;
+    }
 
-        $this->widgetElement;
+    public function isWidgetChecked(): bool
+    {
+        return $this->isCheckable() && $this->widgetElement->hasAttribute('checked');
+    }
+
+    public function setWidgetDisabled(bool $status): self
+    {
+        if($status) {
+            $this->widgetElement->setAttribute('disabled', 'disabled');
+        } else {
+            $this->widgetElement->removeAttribute('disabled');
+        }
+        return $this;
+    }
+
+    public function isWidgetDisabled(): bool
+    {
+        return $this->widgetElement->hasAttribute('disabled');
+    }
+
+    public function setWidgetReadonly(bool $status): self
+    {
+        if($status) {
+            $this->widgetElement->setAttribute('readonly', 'readonly');
+        } else {
+            $this->widgetElement->removeAttribute('readonly');
+        }
+        return $this;
+    }
+
+    public function isWidgetReadonly(): bool
+    {
+        return $this->widgetElement->hasAttribute('readonly');
+    }
+
+    /**
+     * @method getFieldAsElement
+     */
+    public function getFieldAsElement(): UssElement
+    {
+        $this->rowElement->appendChild($this->containerElement);
+
+        if($this->isCheckable()) {
+            $this->containerElement->appendChild($this->infoElement);
+        } elseif(!$this->isButton()) {
+            $this->containerElement->appendChild($this->labelElement);
+            $this->containerElement->appendChild($this->infoElement);
+        }
+
+        $this->containerElement->appendChild($this->widgetContainerElement);
+        $this->widgetContainerElement->appendChild($this->widgetElement);
+
+        if(!$this->isButton()) {
+
+            if(!$this->isCheckable()) {
+
+                if(!empty($this->widgetAppendant) || !empty($this->widgetPrependant)) {
+
+                    $this->widgetContainerElement->addAttributeValue('class', 'input-group');
+
+                    if($this->widgetPrependant) {
+                        $this->widgetContainerElement->insertBefore(
+                            $this->widgetPrependant,
+                            $this->widgetElement
+                        );
+                    }
+
+                    if($this->widgetAppendant) {
+                        $this->widgetContainerElement->insertAfter(
+                            $this->widgetAppendant,
+                            $this->widgetElement
+                        );
+                    }
+
+                }
+
+            } else {
+                $this->widgetContainerElement->appendChild($this->labelElement);
+            }
+
+            $this->containerElement->appendChild($this->validationElement);
+
+            if($this->validationType) {
+
+                if($this->validationType === self::VALIDATION_SUCCESS) {
+                    $validation = 'text-success';
+                    if(!$this->validationIcon) {
+                        $this->validationIcon = 'bi bi-check-circle';
+                    }
+                } else {
+                    $validation = 'text-danger';
+                    if(!$this->validationIcon) {
+                        $this->validationIcon = 'bi bi-exclamation-circle';
+                    }
+                }
+
+                $this->validationElement->addAttributeValue(
+                    'class',
+                    $validation . ' is-' . $this->validationType
+                );
+
+            }
+
+            $this->insertElementValue('info', $this->infoIcon ?? 'bi bi-info-circle');
+            $this->insertElementValue('label');
+            $this->insertElementValue('validation', $this->validationIcon);
+
+        }
+
+        return $this->rowElement;
+    }
+
+    /**
+     * @method getFieldAsHTML
+     */
+    public function getFieldAsHTML(): string
+    {
+        return $this->getFieldAsElement()->getHTML(true);
     }
 }
