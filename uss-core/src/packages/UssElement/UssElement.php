@@ -12,11 +12,9 @@ namespace Ucscode\UssElement;
  */
 class UssElement extends AbstractUssElementParser
 {
-    public readonly string $tagName;
-
     public function __construct(string $tagName)
     {
-        $this->tagName = strtoupper(trim($tagName));
+        parent::__construct($tagName);
         $this->void = in_array($this->tagName, $this->voidTags);
     }
 
@@ -89,6 +87,20 @@ class UssElement extends AbstractUssElementParser
             return implode(" ", $this->attributes[$attr]);
         };
         return null;
+    }
+
+    /**
+     * Get all element attributes
+     *
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        $attributes = [];
+        foreach($attributes as $key => $value) {
+            $attributes[$key] = implode(" ", $value);
+        }
+        return $attributes;
     }
 
     /**
@@ -171,6 +183,16 @@ class UssElement extends AbstractUssElementParser
     public function getContent(): ?string
     {
         return $this->content;
+    }
+
+    /**
+     * Get the child elements of the current element
+     *
+     * @return array Containing child elements
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
     }
 
     /**

@@ -4,7 +4,8 @@ namespace Ucscode\UssElement;
 
 abstract class AbstractUssElementParser extends AbstractUssElementNodeList implements UssElementInterface
 {
-    protected readonly string $tagName;
+    public readonly string $tagName;
+    public readonly string $nodeName;
 
     protected ?UssElementInterface $parentElement = null;
 
@@ -32,6 +33,12 @@ abstract class AbstractUssElementParser extends AbstractUssElementNodeList imple
         self::NODE_TRACK,
         self::NODE_WBR,
     ];
+
+    public function __construct(string $tagName)
+    {
+        $this->tagName = strtoupper(trim($tagName));
+        $this->nodeName = $this->tagName;
+    }
 
     public function __debugInfo()
     {

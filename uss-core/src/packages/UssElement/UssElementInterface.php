@@ -10,6 +10,8 @@ interface UssElementInterface
 
     public function getAttribute(string $attr): ?string;
 
+    public function getAttributes(): array;
+
     public function hasAttribute(string $attr): bool;
 
     public function removeAttribute(string $attr): self;
@@ -47,6 +49,8 @@ interface UssElementInterface
     public function getChild(int $index): ?UssElement;
 
     public function removeChild(UssElement $child): void;
+
+    public function getChildren(): array;
 
     public function getHTML(bool $indent = false): string;
 

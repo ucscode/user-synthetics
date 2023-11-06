@@ -7,205 +7,408 @@ use Ucscode\UssElement\UssElement;
 class UssFormFieldStack extends AbstractUssFormFieldStack
 {
     /**
-     * @method push
+     * @method addField
      */
-    public function push(UssFormField $field): self
+    public function addField(string $name, UssFormField $field): UssFormFieldStackInterface
     {
-        if(!in_array($field, $this->fieldStack)) {
-            $this->fieldStack[] = $field;
-            $this->stackContainerElement->appendChild($field->getFieldAsElement());
+        $this->fields[$name] = $field;
+        $this->innerContainer['element']->appendChild(
+            $field->getFieldAsElement()
+        );
+        return $this;
+    }
+
+    /**
+     * @method addElement
+     */
+    public function addElement(string $name, UssElement $element): UssFormFieldStackInterface
+    {
+        $this->elements[$name] = $element;
+        $this->innerContainer['element']->appendChild($element);
+        return $this;
+    }
+
+    /**
+     * @method getFields
+     */
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @method getElements
+     */
+    public function getElements(): array
+    {
+        return $this->elements;
+    }
+
+    /**
+     * @method getField
+     */
+    public function getField(string $name): ?UssFormField
+    {
+        return $this->fields[$name] ?? null;
+    }
+
+    /**
+     * @method getElement
+     */
+    public function getElement(string $name): ?UssElement
+    {
+        return $this->elements[$name] ?? null;
+    }
+
+    /**
+     * @method removeField
+     */
+    public function removeField(string $name): UssFormFieldStackInterface
+    {
+        if(array_key_exists($name, $this->fields)) {
+            $field = $this->getField($name);
+            unset($this->fields[$name]);
+            if($field) {
+                $element = $field->getFieldAsElement();
+                if($element->getParentElement() === $this->innerContainer['element']) {
+                    $this->innerContainer['element']->removeChild($element);
+                }
+            }
         }
         return $this;
     }
 
-    public function get(int $index): ?UssFormField
+    /**
+     * @method removeElement
+     */
+    public function removeElement(string $name): UssFormFieldStackInterface
     {
-        return $this->fieldStack[$index] ?? null;
-    }
-
-    public function getAll(): array
-    {
-        return $this->fieldStack;
-    }
-
-    public function pull(int|UssFormField $indexField): ?UssFormField
-    {
-        $formField = null;
-
-        if($indexField instanceof UssFormField) {
-            $key = array_search($indexField, $this->fieldStack, true);
-            if($key !== false) {
-                $formField = $indexField;
-                unset($this->fieldStack[$key]);
+        if(array_key_exists($name, $this->elements)) {
+            $element = $this->getElement($name);
+            unset($this->elements[$name]);
+            if($element && $element->getParentElement() === $this->innerContainer['element']) {
+                $this->innerContainer['element']->removeChild($element);
             }
-        } else {
-            if(array_key_exists($indexField, $this->fieldStack)) {
-                $formField = $this->fieldStack[$indexField];
-                unset($this->fieldStack[$indexField]);
-            }
-        };
-
-        if($formField) {
-            $field = $formField->getFieldAsElement();
-            if($field && $field->hasParentElement()) {
-                $field->getParentElement()->removeChild($field);
-            }
-        };
-
-        $this->fieldStack = array_values($this->fieldStack);
-
-        return $formField;
-    }
-
-    /**
-     * @method setLegend
-     */
-    public function getFieldsetElement(): UssElement
-    {
-        return $this->fieldsetElement;
-    }
-
-    /**
-     * @method setFieldsetAttribute
-     */
-    public function setFieldsetAttribute(string $name, string $value, bool $append = false): self
-    {
-        return $this->attributeSetter($this->fieldsetElement, $name, $value, $append);
-    }
-
-    /**
-     * @method getFieldsetAttribute
-     */
-    public function getFieldsetAttribute(string $name): ?string
-    {
-        return $this->fieldsetElement->getAttribute($name);
-    }
-
-    /**
-     * @method removeFieldsetAttribute
-     */
-    public function removeFieldsetAttribute(string $name, ?string $detach = null): self
-    {
-        return $this->attributeRemover($this->fieldsetElement, $name, $detach);
-    }
-
-    /**
-     * @method getLegendElement
-     */
-    public function getLegendElement(): UssElement
-    {
-        return $this->legendElement;
-    }
-
-    /**
-     * @method setLegendAttribute
-     */
-    public function setLegendAttribute(string $name, string $value, bool $append = false): self
-    {
-        return $this->attributeSetter($this->legendElement, $name, $value, $append);
-    }
-
-    /**
-     * @method getLegendAttribute
-     */
-    public function getLegendAttribute(string $name): ?string
-    {
-        return $this->legendElement->getAttribute($name);
-    }
-
-    /**
-     * @method removeLegendAttribute
-     */
-    public function removeLegendAttribute(string $name, ?string $detach = null): self
-    {
-        return $this->attributeRemover($this->legendElement, $name, $detach);
-    }
-
-    /**
-     * @method removeLegendAttribute
-     */
-    public function setLegendValue(?string $value): self
-    {
-        $this->legendValue = $value;
+        }
         return $this;
     }
 
     /**
-     * @method removeLegendAttribute
+     * @method getOuterContainerElement
      */
-    public function getLegendValue(): ?string
+    public function getOuterContainerElement(): UssElement
     {
-        return $this->legendValue;
+        return $this->outerContainer['element'];
     }
 
     /**
-     * @method getLegendElement
+     * @method setOuterContainerAttribute
      */
-    public function getStackContainerElement(): UssElement
+    public function setOuterContainerAttribute(string $name, string $value, bool $append = false): self
     {
-        return $this->stackContainerElement;
+        return $this->attributeSetter($this->outerContainer['element'], $name, $value, $append);
     }
 
     /**
-     * @method setStackContainerAttribute
+     * @method getOuterContainerAttribute
      */
-    public function setStackContainerAttribute(string $name, string $value, bool $append = false): self
+    public function getOuterContainerAttribute(string $name): ?string
     {
-        return $this->attributeSetter($this->stackContainerElement, $name, $value, $append);
+        return $this->outerContainer['element']->getAttribute($name);
     }
 
     /**
-     * @method getStackContainerAttribute
+     * @method removeOuterContainerAttribute
      */
-    public function getStackContainerAttribute(string $name): ?string
+    public function removeOuterContainerAttribute(string $name, ?string $detach = null): self
     {
-        return $this->stackContainerElement->getAttribute($name);
+        return $this->attributeRemover($this->outerContainer['element'], $name, $detach);
     }
 
     /**
-     * @method removeStackContainerAttribute
+     * @method getTitleElement
      */
-    public function removeStackContainerAttribute(string $name, ?string $detach = null): self
+    public function getTitleElement(): UssElement
     {
-        return $this->attributeRemover($this->stackContainerElement, $name, $detach);
+        return $this->title['element'];
     }
 
     /**
-     * @method disableFieldset
+     * @method setTitleAttribute
      */
-    public function setFieldsetDisabled(bool $status): self
+    public function setTitleAttribute(string $name, string $value, bool $append = false): self
+    {
+        return $this->attributeSetter($this->title['element'], $name, $value, $append);
+    }
+
+    /**
+     * @method getTitleAttribute
+     */
+    public function getTitleAttribute(string $name): ?string
+    {
+        return $this->title['element']->getAttribute($name);
+    }
+
+    /**
+     * @method removeTitleAttribute
+     */
+    public function removeTitleAttribute(string $name, ?string $detach = null): self
+    {
+        return $this->attributeRemover($this->title['element'], $name, $detach);
+    }
+
+    /**
+     * @method setTitleValue
+     */
+    public function setTitleValue(?string $value): self
+    {
+        $this->title['value'] = $value;
+        $this->title['element']->setContent($value);
+        return $this;
+    }
+
+    /**
+     * @method getTitleValue
+     */
+    public function getTitleValue(): ?string
+    {
+        return $this->title['value'];
+    }
+
+    /**
+     * @method hideTitle
+     */
+    public function hideTitle(bool $status): self
+    {
+        $this->title['hidden'] = $status;
+        return $this;
+    }
+
+    /**
+     * @method isTitleHidden
+     */
+    public function isHiddenTitle(): bool
+    {
+        return $this->title['hidden'];
+    }
+
+    /**
+     * @method getSubtitleElement
+     */
+    public function getSubtitleElement(): UssElement
+    {
+        return $this->subtitle['element'];
+    }
+
+    /**
+     * @method setSubtitleAttribute
+     */
+    public function setSubtitleAttribute(string $name, string $value, bool $append = false): self
+    {
+        return $this->attributeSetter($this->subtitle['element'], $name, $value, $append);
+    }
+
+    /**
+     * @method getSubtitleAttribute
+     */
+    public function getSubtitleAttribute(string $name): ?string
+    {
+        return $this->subtitle['element']->getAttribute($name);
+    }
+
+    /**
+     * @method removeSubtitleAttribute
+     */
+    public function removeSubtitleAttribute(string $name, ?string $detach = null): self
+    {
+        return $this->attributeRemover($this->subtitle['element'], $name, $detach);
+    }
+
+    /**
+     * @method setSubtitleValue
+     */
+    public function setSubtitleValue(?string $value): self
+    {
+        $this->subtitle['value'] = $value;
+        $this->subtitle['element']->setContent($value);
+        return $this;
+    }
+
+    /**
+     * @method getTitleValue
+     */
+    public function getSubtitleValue(): ?string
+    {
+        return $this->subtitle['value'];
+    }
+
+    /**
+     * @method hideSubtitle
+     */
+    public function hideSubtitle(bool $status): self
+    {
+        $this->subtitle['hidden'] = $status;
+        return $this;
+    }
+
+    /**
+     * @method isSubtitleHidden
+     */
+    public function isHiddenSubtitle(): bool
+    {
+        return $this->subtitle['hidden'];
+    }
+
+    /**
+     * @method getInstructionElement
+     */
+    public function getInstructionElement(): UssElement
+    {
+        return $this->instruction['element'];
+    }
+
+    /**
+     * @method setInstructionAttribute
+     */
+    public function setInstructionAttribute(string $name, string $value, bool $append = false): self
+    {
+        return $this->attributeSetter($this->instruction['element'], $name, $value, $append);
+    }
+
+    /**
+     * @method getInstructionAttribute
+     */
+    public function getInstructionAttribute(string $name): ?string
+    {
+        return $this->instruction['element']->getAttribute($name);
+    }
+
+    /**
+     * @method removeInstructionAttribute
+     */
+    public function removeInstructionAttribute(string $name, ?string $detach = null): self
+    {
+        return $this->attributeRemover($this->instruction['element'], $name, $detach);
+    }
+
+    /**
+     * @method setInstructionValue
+     */
+    public function setInstructionValue(null|string|UssElement $value): self
+    {
+        $this->instruction['value'] = $value;
+        if($value instanceof UssElement) {
+            $this->instruction['element']->appendChild($value);
+        } else {
+            $this->instruction['element']->setContent($value);
+        }
+        return $this;
+    }
+
+    /**
+     * @method getInstructionValue
+     */
+    public function getInstructionValue(): UssElement|string|null
+    {
+        return $this->instruction['value'];
+    }
+
+    /**
+     * @method hideInstruction
+     */
+    public function hideInstruction(bool $status): self
+    {
+        $this->instruction['hidden'] = $status;
+        return $this;
+    }
+
+    /**
+     * @method isInstructionHidden
+     */
+    public function isHiddenInstruction(): bool
+    {
+        return $this->instruction['hidden'];
+    }
+
+    /**
+     * @method getInnerContainerElement
+     */
+    public function getInnerContainerElement(): UssElement
+    {
+        return $this->innerContainer['element'];
+    }
+
+    /**
+     * @method setInnerContainerAttribute
+     */
+    public function setInnerContainerAttribute(string $name, string $value, bool $append = false): self
+    {
+        return $this->attributeSetter($this->innerContainer['element'], $name, $value, $append);
+    }
+
+    /**
+     * @method getInnerContainerAttribute
+     */
+    public function getInnerContainerAttribute(string $name): ?string
+    {
+        return $this->innerContainer['element']->getAttribute($name);
+    }
+
+    /**
+     * @method removeInnerContainerAttribute
+     */
+    public function removeInnerContainerAttribute(string $name, ?string $detach = null): self
+    {
+        return $this->attributeRemover($this->innerContainer['element'], $name, $detach);
+    }
+
+    /**
+     * @method disableOuterContainer
+     */
+    public function setFieldStackDisabled(bool $status): self
     {
         if($status) {
-            $this->fieldsetElement->setAttribute('disabled', 'disabled');
+            $this->outerContainer['element']->setAttribute('disabled', 'disabled');
         } else {
-            $this->fieldsetElement->removeAttribute('disabled');
+            $this->outerContainer['element']->removeAttribute('disabled');
         }
         return $this;
     }
 
     /**
-     * @method isFieldsetDisabled
+     * @method isFieldStackDisabled
      */
-    public function isFieldsetDisabled(): bool
+    public function isFieldStackDisabled(): bool
     {
-        return $this->fieldsetElement->hasAttribute('disabled');
+        return $this->outerContainer['element']->hasAttribute('disabled');
     }
 
     /**
-     * @method getStackAsElement
+     * @method getFieldStackAsElement
      */
-    public function getStackAsElement(): UssElement
+    public function getFieldStackAsElement(): UssElement
     {
-        $this->fieldsetElement->appendChild($this->legendElement);
-        $this->fieldsetElement->appendChild($this->stackContainerElement);
-        return $this->fieldsetElement;
+        if($this->title['value']) {
+            $this->outerContainer['element']->prependChild($this->title['element']);
+        }
+
+        $this->outerContainer['element']->appendChild($this->innerContainer['element']);
+
+        if($this->instruction['value']) {
+            $this->outerContainer['element']->insertBefore(
+                $this->instruction['element'],
+                $this->innerContainer['element']
+            );
+        }
+
+        return $this->outerContainer['element'];
     }
 
     /**
-     * @method getStackAsHTML
+     * @method getFieldStackAsHTML
      */
-    public function getStackAsHTML(): string
+    public function getFieldStackAsHTML(): string
     {
-        return $this->getStackAsElement()->getHTML(true);
+        return $this->getFieldStackAsElement()->getHTML(true);
     }
 }

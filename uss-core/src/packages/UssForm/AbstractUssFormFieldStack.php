@@ -6,53 +6,113 @@ use Ucscode\UssElement\UssElement;
 
 abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
 {
-    protected UssElement $fieldsetElement;
-    protected UssElement $legendElement;
-    protected UssElement $stackContainerElement;
+    protected array $outerContainer = [
+        'element' => null
+    ];
 
-    protected array $fieldStack = [];
-    protected ?string $legendValue;
+    protected array $title = [
+        'element' => null,
+        'value' => null,
+        'hidden' => false
+    ];
+
+    protected array $subtitle = [
+        'element' => null,
+        'value' => null,
+        'hidden' => false
+    ];
+
+    protected array $instruction = [
+        'element' => null,
+        'value' => null,
+        'hidden' => false
+    ];
+
+    protected array $innerContainer = [
+        'element' => null
+    ];
+
+    protected array $fields = [];
+    protected array $elements = [];
 
     /**
      * @method __construct
      */
     public function __construct(
         public readonly ?string $stackName = null
-    )
-    {
+    ) {
         $this->buildElements();
+    }
+
+    /**
+     * @method setOuterContainerAsDIV
+     */
+    public function setOuterContainerAsDiv(bool $status): self
+    {
+        $element = $this->outerContainer['element'];
+        $node = new UssElement($status ? UssElement::NODE_DIV : UssElement::NODE_FIELDSET);
+        if($element->tagName !== $node->tagName) {
+            foreach($element->getAttributes() as $key => $value) {
+                $node->setAttribute($key, $value);
+            }
+            foreach($element->getChildren() as $child) {
+                $node->appendChild($child);
+            }
+            $this->outerContainer['element'] = $node;
+        }
+        return $this;
+    }
+
+    /**
+     * @method isOuterContainerDIV
+     */
+    public function isOuterContainerDIV(): bool
+    {
+        return $this->outerContainer['element']->nodeName === UssElement::NODE_DIV;
     }
 
     /**
      * @method buildElements
      */
-    public function buildElements(): void
+    protected function buildElements(): void
     {
         $elements = [
-            'fieldsetElement' => [
+            'outerContainer' => [
                 UssElement::NODE_FIELDSET,
                 'attributes' => [
-                    'name' => $this->stackName
+                    'data-name' => $this->stackName
                 ],
             ],
-            'legendElement' => [
+            'title' => [
                 UssElement::NODE_LEGEND,
                 'attributes' => [
 
                 ],
             ],
-            'stackContainerElement' => [
+            'subtitle' => [
+                UssElement::NODE_LEGEND,
+                'attributes' => [
+
+                ],
+            ],
+            'instruction' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'row'
+                    'class' => 'stack-instruction alert alert-info'
+                ]
+            ],
+            'innerContainer' => [
+                UssElement::NODE_DIV,
+                'attributes' => [
+                    'class' => 'row stack-container'
                 ],
             ],
         ];
 
         foreach($elements as $property => $component) {
-            $this->{$property} = new UssElement($component[0]);
+            $this->{$property}['element'] = new UssElement($component[0]);
             foreach($component['attributes'] as $name => $value) {
-                $this->{$property}->setAttribute($name, $value);
+                $this->{$property}['element']->setAttribute($name, $value);
             }
         }
     }
