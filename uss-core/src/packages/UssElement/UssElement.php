@@ -97,7 +97,7 @@ class UssElement extends AbstractUssElementParser
     public function getAttributes(): array
     {
         $attributes = [];
-        foreach($attributes as $key => $value) {
+        foreach($this->attributes as $key => $value) {
             $attributes[$key] = implode(" ", $value);
         }
         return $attributes;
