@@ -2,7 +2,7 @@
 
 namespace Ucscode\UssElement;
 
-abstract class AbstractUssElementParser extends AbstractUssElementNodeList implements UssElementInterface
+abstract class AbstractUssElementParser implements UssElementInterface, UssElementNodeListInterface
 {
     public readonly string $tagName;
     public readonly string $nodeName;

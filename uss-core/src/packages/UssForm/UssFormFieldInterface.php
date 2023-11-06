@@ -46,6 +46,8 @@ interface UssFormFieldInterface
     public function removeInfoAttribute(string $name, ?string $detach): self;
     public function setInfoMessage(null|string|UssElement $value, ?string $icon): self;
     public function getInfoMessage(): null|string|UssElement;
+    public function setInfoHidden(bool $status): self;
+    public function isInfoHidden(): bool;
 
     /**
      * For: Label
@@ -56,6 +58,8 @@ interface UssFormFieldInterface
     public function removeLabelAttribute(string $name, ?string $detach): self;
     public function setLabelValue(null|string|UssElement $value): self;
     public function getLabelValue(): null|string|UssElement;
+    public function setLabelHidden(bool $status): self;
+    public function isLabelHidden(): bool;
 
     /**
      * For: Error
@@ -68,6 +72,8 @@ interface UssFormFieldInterface
     public function getValidationType(): ?string;
     public function setValidationMessage(?string $message, ?string $icon): self;
     public function getValidationMessage(): ?string;
+    public function setValidationHidden(bool $status): self;
+    public function isValidationHidden(): bool;
 
     /**
      * For: WidgetContainer
@@ -104,10 +110,15 @@ interface UssFormFieldInterface
     /**
      * For: Checkable Widget
      */
+    public function isCheckable(): bool;
+    public function isButton(): bool;
     public function setWidgetChecked(bool $status): self;
     public function isWidgetChecked(): bool;
-    public function setWidgetDisabled(bool $status): self;
-    public function isWidgetDisabled(): bool;
-    public function setWidgetReadonly(bool $status): self;
-    public function isWidgetReadonly(): bool;
+    public function isHiddenWidget(): bool;
+    public function setDisabled(bool $status): self;
+    public function isDisabled(): bool;
+    public function setReadonly(bool $status): self;
+    public function isReadonly(): bool;
+    public function setRequired(bool $status): self;
+    public function isRequired(): bool;
 }

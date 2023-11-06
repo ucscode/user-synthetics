@@ -5,31 +5,16 @@ namespace Ucscode\UssForm;
 use Ucscode\UssElement\UssElementInterface;
 use Ucscode\UssElement\UssElement;
 
-interface UssFormInterface extends UssElementInterface
+interface UssFormInterface
 {
-    public function add(
-        string $name,
-        string $fieldType,
-        string|array|null $context,
-        array $config
-    ): UssElement;
+    public function addFieldStack(string $name, ?UssFormFieldStack $fieldStack): self;
+    public function getFieldStack(string $name): ?UssFormFieldStack;
 
-    public function addRow(string $class): UssElement;
+    public function addField(string $name, UssFormField $field, ?string $fieldStackName): self;
+    public function getField(string $name): ?UssFormField;
 
-    public function appendFieldToRow(UssElement $column): ?UssElement;
+    public function addCustomElement(string $name, UssElement $element, ?string $fieldStackName): self;
+    public function getCustomElement(string $name): ?UssElement;
 
-    public function getFieldset(string $name): ?array;
-
-    public function populate(array $data): void;
-
-    public function getValue(UssElement $node): ?string;
-
-    public function setValue(UssElement $node, $value, bool $overwrite): bool;
-
-    public function addDetail(string $key, $value): bool;
-
-    public function getDetail(string $key): mixed;
-
-    public function removeDetail(string $key): void;
-
+    public function populate(array $data): self;
 }

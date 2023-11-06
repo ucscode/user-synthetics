@@ -2,7 +2,6 @@
 
 namespace Ucscode\UssForm;
 
-use ReflectionProperty;
 use Ucscode\UssElement\UssElement;
 
 abstract class AbstractUssFormField implements UssFormFieldInterface
@@ -21,52 +20,57 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     /**
      * Containers: No values but has attributes and holds elements
      */
-    protected UssElement $rowElement;
-    protected UssElement $containerElement;
-    protected UssElement $widgetContainerElement;
+    protected array $row = [
+        'element' => null,
+    ];
 
-    /**
-     * Elements: Has attributes and contain values
-     */
-    protected UssElement $infoElement;
-    protected UssElement $labelElement;
-    protected UssElement $validationElement;
-    protected UssElement $widgetElement;
+    protected array $container = [
+        'element' => null,
+    ];
 
-    /**
-     * $values: The values for each elements
-     */
-    protected null|string|UssElement $labelValue = null;
-    protected null|string|UssElement $infoValue = null;
-    protected ?string $infoIcon = null;
-    protected ?string $validationValue = null;
-    protected ?string $validationType = self::VALIDATION_ERROR;
-    protected ?string $validationIcon = null;
-    protected ?string $widgetValue = null;
+    protected array $widgetContainer = [
+        'element' => null,
+    ];
 
-    /**
-     * Widget Group: append or prepend gadget (icon, button etc) to widgets
-     */
-    protected ?UssElement $widgetAppendant = null;
-    protected ?UssElement $widgetPrependant = null;
+    protected array $info = [
+        'element' => null,
+        'value' => null,
+        'icon' => null,
+        'hidden' => 'false'
+    ];
 
-    /**
-     * Other Widget Resource
-     */
-    protected array $widgetOptions = [
-        'values' => [],
-        'elements' => []
+    protected array $label = [
+        'element' => null,
+        'value' => null,
+        'hidden' => false
+    ];
+
+    protected array $validation = [
+        'element' => null,
+        'value' => null,
+        'icon' => null,
+        'type' => self::VALIDATION_ERROR,
+        'hidden' => false
+    ];
+
+    protected array $widget = [
+        'element' => null,
+        'value' => null,
+        'appendant' => null,
+        'prependant' => null,
+        'options' => [
+            'values' => [],
+            'elements' => [],
+        ]
     ];
 
     /**
      * @method __constuct
      */
     public function __construct(
-        public readonly string $fieldName,
-        public readonly string $nodeName = UssForm::NODE_INPUT,
+        public readonly string $nodeName = UssElement::NODE_INPUT,
         protected ?string $nodeType = UssForm::TYPE_TEXT
     ) {
-        $this->labelValue = $this->labelize($this->fieldName);
         $this->widgetId = $this->generateId();
         $this->generateElements();
     }
@@ -102,20 +106,19 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     protected function generateElements(): void
     {
         $elements = [
-            'rowElement' => [
+            'row' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'col-12',
-                    'data-field' => $this->fieldName
                 ],
             ],
-            'containerElement' => [
+            'container' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'field-container',
                 ],
             ],
-            'widgetContainerElement' => [
+            'widgetContainer' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'widget-container my-1 ' . call_user_func(function () {
@@ -130,20 +133,20 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                     })
                 ],
             ],
-            'infoElement' => [
+            'info' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'form-info small text-secondary'
                 ],
             ],
-            'labelElement' => [
+            'label' => [
                 UssElement::NODE_LABEL,
                 'attributes' => [
                     'class' => $this->isCheckable() ? 'form-check-label' : 'form-label',
                     'for' => $this->widgetId
                 ],
             ],
-            'validationElement' => [
+            'validation' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'form-validity small '
@@ -152,13 +155,19 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         ];
 
         foreach($elements as $name => $prop) {
-            $this->{$name} = new UssElement($prop[0]);
+            $this->{$name}['element'] = new UssElement($prop[0]);
             foreach($prop['attributes'] as $key => $value) {
-                $this->{$name}->setAttribute($key, $value);
+                $this->{$name}['element']->setAttribute($key, $value);
             }
         }
 
         $this->buildWidgetElement();
+
+        if($this->isHiddenWidget()) {
+            $this->setLabelHidden(true);
+            $this->setInfoHidden(true);
+            $this->setValidationHidden(true);
+        }
     }
 
     /**
@@ -176,24 +185,24 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             );
         }
 
-        $this->widgetElement = new UssElement($this->nodeName);
-        $this->widgetElement->setAttribute('name', $this->fieldName);
-        $this->widgetElement->setAttribute('id', $this->widgetId);
+        $this->widget['element'] = new UssElement($this->nodeName);
+        $this->widget['element']->setAttribute('id', $this->widgetId);
+        $this->widget['element']->setAttribute('required', 'required');
 
         switch($this->nodeName) {
 
             case UssElement::NODE_SELECT:
-                $this->widgetElement->setAttribute('class', 'form-select');
+                $this->widget['element']->setAttribute('class', 'form-select');
                 break;
 
             case UssElement::NODE_BUTTON:
-                $this->widgetElement->setAttribute('class', 'btn btn-primary');
-                $this->widgetElement->setAttribute('type', 'button');
-                $this->widgetElement->setContent($this->fieldName);
+                $this->widget['element']->setAttribute('class', 'btn btn-primary');
+                $this->widget['element']->setAttribute('type', 'button');
+                $this->widget['element']->setContent('Submit');
                 break;
 
             case UssElement::NODE_TEXTAREA:
-                $this->widgetElement->setAttribute('class', 'form-control');
+                $this->widget['element']->setAttribute('class', 'form-control');
                 break;
 
             default:
@@ -203,19 +212,16 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                     case UssForm::TYPE_CHECKBOX:
                     case UssForm::TYPE_RADIO:
                     case UssForm::TYPE_SWITCH:
-                        $this->widgetElement->setAttribute('class', 'form-check-input');
+                        $this->widget['element']->setAttribute('class', 'form-check-input');
                         break;
 
                     case UssForm::TYPE_BUTTON:
                     case UssForm::TYPE_SUBMIT:
-                        $this->widgetElement->setAttribute('class', 'btn btn-primary');
-                        if($this->nodeType === UssForm::TYPE_BUTTON) {
-                            $this->widgetElement->setAttribute('value', $this->fieldName);
-                        }
+                        $this->widget['element']->setAttribute('class', 'btn btn-primary');
                         break;
 
                     default:
-                        $this->widgetElement->setAttribute('class', 'form-control');
+                        $this->widget['element']->setAttribute('class', 'form-control');
                 }
 
                 $nodeType = $this->nodeType;
@@ -224,16 +230,16 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                     $nodeType = UssForm::TYPE_CHECKBOX;
                 };
 
-                $this->widgetElement->setAttribute('type', $nodeType);
+                $this->widget['element']->setAttribute('type', $nodeType);
         }
     }
 
     /**
      * @method isCheckable
      */
-    protected function isCheckable(): bool
+    public function isCheckable(): bool
     {
-        return $this->nodeName === UssForm::NODE_INPUT &&
+        return $this->nodeName === UssElement::NODE_INPUT &&
         in_array($this->nodeType, [
             UssForm::TYPE_CHECKBOX,
             UssForm::TYPE_RADIO,
@@ -244,11 +250,11 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     /**
      * @method isButton
      */
-    protected function isButton(): bool
+    public function isButton(): bool
     {
-        if($this->nodeName === UssForm::NODE_BUTTON) {
+        if($this->nodeName === UssElement::NODE_BUTTON) {
             return true;
-        } else if($this->nodeName === UssForm::NODE_INPUT) {
+        } else if($this->nodeName === UssElement::NODE_INPUT) {
             return in_array(
                 $this->nodeType,
                 [
@@ -261,12 +267,22 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     }
 
     /**
+     * @method isHiddenWidget
+     */
+    public function isHiddenWidget(): bool
+    {
+        return 
+            $this->nodeName === UssElement::NODE_INPUT && 
+            $this->nodeType === UssForm::TYPE_HIDDEN;
+    }
+
+    /**
      * @method insertElementValue
      */
     protected function insertElementValue(string $name, ?string $icon = null): void
     {
-        $element = $this->{$name . 'Element'};
-        $value = $this->{$name . 'Value'};
+        $element = $this->{$name}['element'];
+        $value = $this->{$name}['value'];
         $span = new UssElement(UssElement::NODE_SPAN);
 
         if($icon) {
@@ -294,6 +310,28 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                 }
             }
         };
+    }
+
+    /**
+     * @method insertWidgetValue
+     */
+    public function insertWidgetValue(): void
+    {
+        switch($this->widget['element']->nodeName) {
+            case UssElement::NODE_TEXTAREA:
+                $this->widget['element']->setContent($this->widget['value']);
+                break;
+            case UssElement::NODE_SELECT:
+                $key = array_search($this->widget['value'], $this->widget['options']['values']);
+                if($key !== false) {
+                    $optionElement = $this->widget['options']['elements'][$key] ?? null;
+                    if($optionElement) {
+                        $optionElement->setAttribute('selected', 'selected');
+                    }
+                }
+            default:
+                $this->widget['element']->setAttribute('value', $this->widget['value']);
+        }
     }
 
     /**
@@ -328,16 +366,6 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         }
 
         return $element;
-    }
-
-    /**
-     * @method labelize
-     */
-    protected function labelize(string $label): string
-    {
-        $entity = ['[', ']', '_'];
-        $with = ['', '', ' '];
-        return ucfirst(str_replace($entity, $with, $label));
     }
 
     /**
@@ -381,11 +409,11 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
      */
     protected function rebuildWidgetOptionsElements(array $options): void
     {
-        $this->widgetElement->freeElement();
+        $this->widget['element']->freeElement();
         foreach($options as $key => $output) {
             $option = $this->createOptionElement($key, $output);
-            $this->widgetOptions['elements'][$key] = $option;
-            $this->widgetElement->appendChild($option);
+            $this->widget['options']['elements'][$key] = $option;
+            $this->widget['element']->appendChild($option);
         }
     }
 

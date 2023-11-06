@@ -162,9 +162,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function setTitleValue(?string $value): self
     {
-        $this->title['value'] = $value;
-        $this->title['element']->setContent($value);
-        return $this;
+        return $this->valueSetter($this->title, $value);
     }
 
     /**
@@ -229,9 +227,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function setSubtitleValue(?string $value): self
     {
-        $this->subtitle['value'] = $value;
-        $this->subtitle['element']->setContent($value);
-        return $this;
+        return $this->valueSetter($this->subtitle, $value);
     }
 
     /**
@@ -296,13 +292,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function setInstructionValue(null|string|UssElement $value): self
     {
-        $this->instruction['value'] = $value;
-        if($value instanceof UssElement) {
-            $this->instruction['element']->appendChild($value);
-        } else {
-            $this->instruction['element']->setContent($value);
-        }
-        return $this;
+        return $this->valueSetter($this->instruction, $value);
     }
 
     /**
@@ -388,13 +378,20 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function getFieldStackAsElement(): UssElement
     {
-        if($this->title['value']) {
+        if($this->title['value'] && !$this->title['hidden']) {
             $this->outerContainer['element']->prependChild($this->title['element']);
         }
 
         $this->outerContainer['element']->appendChild($this->innerContainer['element']);
 
-        if($this->instruction['value']) {
+        if($this->subtitle['value'] && !$this->subtitle['hidden']) {
+            $this->outerContainer['element']->insertBefore(
+                $this->subtitle['element'],
+                $this->innerContainer['element']
+            );
+        }
+
+        if($this->instruction['value'] && !$this->instruction['hidden']) {
             $this->outerContainer['element']->insertBefore(
                 $this->instruction['element'],
                 $this->innerContainer['element']

@@ -2,7 +2,7 @@
 
 namespace Ucscode\UssElement;
 
-abstract class AbstractUssElementNodeList
+interface UssElementNodeListInterface
 {
     public const NODE_A = 'A';
     public const NODE_ABBR = 'ABBR';
@@ -143,5 +143,4 @@ abstract class AbstractUssElementNodeList
     public const NODE_VIDEO = 'VIDEO';
     public const NODE_WBR = 'WBR';
     public const NODE_XMP = 'XMP';
-
 }

@@ -19,8 +19,6 @@ interface UssFormFieldStackInterface
     public function setOuterContainerAttribute(string $name, string $value, bool $append): self;
     public function getOuterContainerAttribute(string $name): ?string;
     public function removeOuterContainerAttribute(string $name, ?string $detach): self;
-    public function setOuterContainerAsDIV(bool $status): self;
-    public function isOuterContainerDIV(): bool;
 
     public function getTitleElement(): UssElement;
     public function setTitleAttribute(string $name, string $value, bool $append): self;
