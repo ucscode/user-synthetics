@@ -70,7 +70,7 @@ interface UssFormFieldInterface
     public function removeValidationAttribute(string $name, ?string $detach): self;
     public function setValidationType(?string $validationType): self;
     public function getValidationType(): ?string;
-    public function setValidationMessage(?string $message, ?string $icon): self;
+    public function setValidationMessage(?string $message): self;
     public function getValidationMessage(): ?string;
     public function setValidationHidden(bool $status): self;
     public function isValidationHidden(): bool;

@@ -35,7 +35,6 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     protected array $info = [
         'element' => null,
         'value' => null,
-        'icon' => null,
         'hidden' => 'false'
     ];
 
@@ -48,8 +47,8 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     protected array $validation = [
         'element' => null,
         'value' => null,
-        'icon' => null,
         'type' => self::VALIDATION_ERROR,
+        'icon' => null,
         'hidden' => false
     ];
 
@@ -90,7 +89,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                 $value = $property->getValue($this);
                 if($value instanceof UssElement) {
                     $value = 'object(' . $value::class . ')';
-                } elseif( $name === 'widgetOptions' ) {
+                } elseif($name === 'widgetOptions') {
                     $value = $value['values'];
                 }
                 $debugger[$name] = $value;
@@ -149,7 +148,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             'validation' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'form-validity small '
+                    'class' => 'form-validity small d-flex'
                 ],
             ],
         ];
@@ -197,7 +196,8 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
 
             case UssElement::NODE_BUTTON:
                 $this->widget['element']->setAttribute('class', 'btn btn-primary');
-                $this->widget['element']->setAttribute('type', 'button');
+                $nodeType = ($this->nodeType != UssForm::TYPE_SUBMIT) ? UssForm::TYPE_BUTTON : $this->nodeType;
+                $this->widget['element']->setAttribute('type', $nodeType);
                 $this->widget['element']->setContent('Submit');
                 break;
 
@@ -254,7 +254,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     {
         if($this->nodeName === UssElement::NODE_BUTTON) {
             return true;
-        } else if($this->nodeName === UssElement::NODE_INPUT) {
+        } elseif($this->nodeName === UssElement::NODE_INPUT) {
             return in_array(
                 $this->nodeType,
                 [
@@ -271,43 +271,49 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
      */
     public function isHiddenWidget(): bool
     {
-        return 
-            $this->nodeName === UssElement::NODE_INPUT && 
+        return
+            $this->nodeName === UssElement::NODE_INPUT &&
             $this->nodeType === UssForm::TYPE_HIDDEN;
     }
 
     /**
      * @method insertElementValue
      */
-    protected function insertElementValue(string $name, ?string $icon = null): void
+    protected function insertElementValue(UssElement $element, UssElement|string|null $value, ?string $icon = null): void
     {
-        $element = $this->{$name}['element'];
-        $value = $this->{$name}['value'];
-        $span = new UssElement(UssElement::NODE_SPAN);
-
-        if($icon) {
-            $icon = (new UssElement(UssElement::NODE_I))->setAttribute('class', $icon . ' me-1');
-        }
+        $element->freeElement();
 
         if(!is_null($value)) {
+
+            $spanNode = new UssElement(UssElement::NODE_SPAN);
+
+            if($icon) {
+                $iconNode = new UssElement(UssElement::NODE_I);
+                $iconNode->setAttribute('class', $icon . ' me-1');
+            } else {
+                $iconNode = null;
+            }
+
             if($value instanceof UssElement) {
-                if($icon) {
-                    $element->appendChild($icon);
-                    $element->appendChild($span);
-                    $span->appendChild($value);
+
+                if($iconNode) {
+                    $spanNode->appendChild($value);
+                    $element->appendChild($iconNode);
+                    $element->appendChild($spanNode);
                 } else {
                     $element->appendChild($value);
                 }
+
             } else {
-                if($icon) {
-                    $span->setContent($value);
-                    $element->setContent(
-                        ($icon ? $icon->getHTML() : '') .
-                        $span->getHTML()
-                    );
+
+                if($iconNode) {
+                    $spanNode->setContent($value);
+                    $content = ($icon ? $iconNode->getHTML() : '') . $spanNode->getHTML();
+                    $element->setContent($content);
                 } else {
                     $element->setContent($value);
                 }
+
             }
         };
     }
@@ -315,7 +321,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     /**
      * @method insertWidgetValue
      */
-    public function insertWidgetValue(): void
+    protected function insertWidgetValue(): void
     {
         switch($this->widget['element']->nodeName) {
             case UssElement::NODE_TEXTAREA:
@@ -329,6 +335,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                         $optionElement->setAttribute('selected', 'selected');
                     }
                 }
+                // no break
             default:
                 $this->widget['element']->setAttribute('value', $this->widget['value']);
         }
@@ -426,5 +433,37 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         $option->setAttribute('value', $value);
         $option->setContent($output);
         return $option;
+    }
+
+    /**
+     * @method validationHue
+     */
+    protected function validationExec(): void
+    {
+        $validationView = [
+            self::VALIDATION_SUCCESS => [
+                'class' => 'text-success is-valid',
+                'icon' => 'bi bi-check-circle'
+            ],
+            self::VALIDATION_ERROR => [
+                'class' => 'text-danger is-invalid',
+                'icon' => 'bi bi-exclamation-triangle'
+            ]
+        ];
+
+        foreach($validationView as $validationType => $attr) {
+            if($this->validation['type'] === $validationType) {
+                $this->validation['element']->addAttributeValue('class', $attr['class']);
+                $this->validation['icon'] = $attr['icon'];
+            } else {
+                $this->validation['element']->removeAttributeValue('class', $attr['class']);
+            }
+        }
+
+        $this->insertElementValue(
+            $this->validation['element'], 
+            $this->validation['value'], 
+            $this->validation['icon']
+        );
     }
 }

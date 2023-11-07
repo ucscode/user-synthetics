@@ -79,7 +79,7 @@ class UssFormField extends AbstractUssFormField
     public function setInfoMessage(null|string|UssElement $value, ?string $icon = null): self
     {
         $this->info['value'] = $value;
-        $this->info['icon'] = null;
+        $this->insertElementValue($this->info['element'], $value, func_num_args() === 2 ? $icon : 'bi bi-info-circle');
         return $this;
     }
 
@@ -114,6 +114,11 @@ class UssFormField extends AbstractUssFormField
     public function setLabelValue(null|string|UssElement $value): self
     {
         $this->label['value'] = $value;
+        if($value instanceof UssElement) {
+            $this->label['element']->appendChild($value);
+        } else {
+            $this->label['element']->setContent($value);
+        }
         return $this;
     }
 
@@ -148,6 +153,7 @@ class UssFormField extends AbstractUssFormField
     public function setValidationType(?string $validationType): self
     {
         $this->validation['type'] = $validationType;
+        $this->validationExec();
         return $this;
     }
 
@@ -156,10 +162,10 @@ class UssFormField extends AbstractUssFormField
         return $this->validation['type'];
     }
 
-    public function setValidationMessage(?string $value, ?string $icon = null): self
+    public function setValidationMessage(?string $value): self
     {
         $this->validation['value'] = $value;
-        $this->validation['icon'] = $icon;
+        $this->validationExec();
         return $this;
     }
 
@@ -293,7 +299,7 @@ class UssFormField extends AbstractUssFormField
     {
         return array_key_exists($key, $this->widget['options']['values']);
     }
-    
+
     public function getWidgetOptionElement(string $key): ?UssElement
     {
         return $this->widget['options']['elements'][$key] ?? null;
@@ -354,7 +360,7 @@ class UssFormField extends AbstractUssFormField
     {
         return $this->widget['element']->hasAttribute('required');
     }
-    
+
     public function setRequired(bool $status): self
     {
         if($status) {
@@ -460,34 +466,10 @@ class UssFormField extends AbstractUssFormField
                 }
             }
 
-            if($this->validation['type']) {
-
-                if($this->validation['type'] === self::VALIDATION_SUCCESS) {
-                    $validation = 'text-success';
-                    if(!$this->validation['icon']) {
-                        $this->validation['icon'] = 'bi bi-check-circle';
-                    }
-                } else {
-                    $validation = 'text-danger';
-                    if(!$this->validation['icon']) {
-                        $this->validation['icon'] = 'bi bi-exclamation-circle';
-                    }
-                }
-
-                $this->validation['element']->addAttributeValue(
-                    'class',
-                    $validation . ' is-' . $this->validation['type']
-                );
-
-            }
-
             if(!$this->validation['hidden']) {
                 $this->container['element']->appendChild($this->validation['element']);
             }
-            
-            $this->insertElementValue('info', $this->info['icon'] ?? 'bi bi-info-circle');
-            $this->insertElementValue('label');
-            $this->insertElementValue('validation', $this->validation['icon']);
+
             $this->insertWidgetValue();
         }
 

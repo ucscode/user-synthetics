@@ -45,17 +45,21 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     /**
      * @method addField
      */
-    public function addField(string $name, UssFormField $field, ?string $fieldStackName = null): UssFormInterface
+    public function addField(string $name, UssFormField $field, array $options = []): UssFormInterface
     {
-        $fieldStack = $this->getActiveFieldStack($fieldStackName);
+        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null);
+
         if(is_null($field->getLabelValue())) {
             $field->setLabelValue($this->labelize($name));
         };
-        if(is_null($field->getWidgetAttribute('name'))) {
+
+        if(($options['mapped'] ?? null) !== false) {
             $field->setWidgetAttribute('name', $name);
         }
+
         $fieldStack->addField($name, $field);
         $this->fields[$name] = $field;
+
         return $this;
     }
 
@@ -70,9 +74,9 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     /**
      * @method addCustomElement
      */
-    public function addCustomElement(string $name, UssElement $element, ?string $fieldStackName = null): UssFormInterface
+    public function addCustomElement(string $name, UssElement $element, array $options = []): UssFormInterface
     {
-        $fieldStack = $this->getActiveFieldStack($fieldStackName);
+        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null);
         $fieldStack->addElement($name, $element);
         $this->elements[$name] = $element;
         return $this;
@@ -89,10 +93,19 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     /**
      * @method addFieldStack
      */
-    public function addFieldStack(string $name, ?UssFormFieldStack $fieldStack = null): UssFormInterface
+    public function addFieldStack(?string $name = null, ?UssFormFieldStack $fieldStack = null): UssFormInterface
     {
+        if(is_null($name)) {
+            $name = uniqid('_');
+        }
+
+        if(is_null($fieldStack)) {
+            $fieldStack = new UssFormFieldStack($name);
+        }
+
         $this->fieldStacks[$name] = $fieldStack;
         $this->appendChild($fieldStack->getFieldStackAsElement());
+
         return $this;
     }
 
@@ -120,7 +133,7 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     {
         if($this->flatArray) {
             foreach($this->flatArray as $name => $value) {
-                $field = call_user_func(function() use($name, $value): ?UssFormField {
+                $field = call_user_func(function () use ($name, $value): ?UssFormField {
                     $fields = [];
                     foreach($this->fields as $field) {
                         if($field->getWidgetAttribute('name') === $name) {
@@ -184,7 +197,7 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
         };
         return $fieldStack;
     }
-    
+
     /**
      * Recursively flattens a multi-dimensional array and constructs keys in the specified format.
      *
