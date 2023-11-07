@@ -461,8 +461,8 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         }
 
         $this->insertElementValue(
-            $this->validation['element'], 
-            $this->validation['value'], 
+            $this->validation['element'],
+            $this->validation['value'],
             $this->validation['icon']
         );
     }

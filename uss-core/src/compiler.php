@@ -1,7 +1,6 @@
 <?php
 
-$autoloader = call_user_func(function () 
-{
+$autoloader = call_user_func(function () {
     $iterator = function (string $dir) {
         return new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
@@ -13,8 +12,7 @@ $autoloader = call_user_func(function ()
     return [$iterator('bundles')];
 });
 
-spl_autoload_register(function ($className) use ($autoloader) 
-{
+spl_autoload_register(function ($className) use ($autoloader) {
     $split = explode('\\', $className);
 
     if(count($split) > 1 && $split[0] === 'Ucscode') {
@@ -23,7 +21,7 @@ spl_autoload_register(function ($className) use ($autoloader)
             return require $filepath;
         }
     };
-    
+
     foreach($autoloader as $iterator) {
         foreach($iterator as $fileinfo) {
             if(strtoupper($fileinfo->getExtension()) === 'PHP') {
@@ -36,4 +34,3 @@ spl_autoload_register(function ($className) use ($autoloader)
         }
     }
 });
-

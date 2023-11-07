@@ -132,8 +132,7 @@ $table->setData($Array);
 $table->setRowsPerPage(3);
 $table->setCurrentPage($_GET['page'] ?: 1); // The current page
 
-$result = $table->build(new class () implements DOMTableInterface 
-{
+$result = $table->build(new class () implements DOMTableInterface {
     protected string $checkbox = "<input type='checkbox' name='username' value='%s'>";
 
     public function forEachItem(array $data): array

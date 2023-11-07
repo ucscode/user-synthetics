@@ -8,7 +8,7 @@ interface UssFormFieldInterface
 {
     public const VALIDATION_ERROR = 'invalid';
     public const VALIDATION_SUCCESS = 'valid';
-    
+
     public function getFieldAsHTML(): string;
     public function getFieldAsElement(): UssElement;
 

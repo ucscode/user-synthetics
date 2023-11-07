@@ -14,9 +14,9 @@ class BlockManager
 
     /**
      * Insert content into a block without editing the twig template directory
-     * 
+     *
      * Example: appendTo('body', 'custom-name', 'value')
-     * 
+     *
      * Example2: appendTo('body', [
      *  'custom-name' => 'value'
      * ])
@@ -32,9 +32,9 @@ class BlockManager
 
     /**
      * Remove content from a block
-     * 
+     *
      * Example: removeFrom('body', 'custom-name')
-     * 
+     *
      * Example2: removeFrom('body', [
      *  'custom-name'
      * ])
@@ -51,7 +51,7 @@ class BlockManager
 
     /**
      * Clear all appended content of a block
-     * 
+     *
      * Example: clear('body');
      */
     public function clear(string $blockName): void
@@ -63,7 +63,7 @@ class BlockManager
 
     /**
      * Get all content appended to a block
-     * 
+     *
      * Example: getBlocks('body')
      */
     public function getBlocks(?string $name = null): ?array

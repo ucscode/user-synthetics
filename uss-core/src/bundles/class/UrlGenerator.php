@@ -3,8 +3,8 @@
 class UrlGenerator
 {
     private string $host; # localhost | domain.com
-    private string $base; 
-    private string $path; 
+    private string $base;
+    private string $path;
     private array $query = [];
     private array $parameters = [];
 
@@ -13,7 +13,7 @@ class UrlGenerator
         $uss = Uss::instance();
         $this->base = $uss->filterContext($base);
         $this->host = $uss->abspathToUrl(ROOT_DIR);
-        $this->polyfill($path);        
+        $this->polyfill($path);
         foreach($query as $key => $value) {
             $this->setQuery($key, $value);
         }
