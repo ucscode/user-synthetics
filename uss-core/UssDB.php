@@ -14,8 +14,8 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
-    define('DB_PASSWORD', '');
-    define('DB_NAME', DB_PREFIX . 'test');
+    define('DB_PASSWORD', '12345678');
+    define('DB_NAME', 'www_uss');
 
 } else {
 
@@ -24,6 +24,6 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
     define('DB_HOST', 'localhost');
     define('DB_USER', '');
     define('DB_PASSWORD', '');
-    define('DB_NAME', DB_PREFIX . '');
+    define('DB_NAME', '');
 
 };

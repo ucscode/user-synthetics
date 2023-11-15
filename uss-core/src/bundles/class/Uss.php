@@ -29,7 +29,7 @@ final class Uss extends AbstractUss
             $twig->addExtension(new \Twig\Extension\DebugExtension());
         };
 
-        $twig->addGlobal($this->namespace, new UssTwigGlobalExtension($this->namespace));
+        $twig->addGlobal($this->namespace, new UssTwigGlobalExtension($this));
 
         foreach($this->twigExtensions as $extension) {
             if(is_string($extension)) {

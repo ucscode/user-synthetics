@@ -7,16 +7,13 @@
 final class UssTwigGlobalExtension
 {
     public string $jsElement;
-
     public array $globals;
 
-    public function __construct(
-        private string $namespace
-    ) {
-        $uss = Uss::instance();
-        $uss->addJsProperty('platform', UssImmutable::PROJECT_NAME);
-        $uss->addJsProperty('url', $uss->abspathToUrl(ROOT_DIR));
-        $jsonElement = json_encode($uss->getJsProperty());
+    public function __construct(private Uss $uss)
+    {
+        $this->uss->addJsProperty('platform', UssImmutable::PROJECT_NAME);
+        $this->uss->addJsProperty('url', $this->uss->abspathToUrl(ROOT_DIR));
+        $jsonElement = json_encode($this->uss->getJsProperty());
         $this->jsElement = base64_encode($jsonElement);
         $this->globals = Uss::$globals;
     }

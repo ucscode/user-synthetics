@@ -365,7 +365,7 @@ abstract class AbstractUssUtils implements UssInterface
             try {
 
                 // Initialize Mysqli
-                $this->mysqli = @new \mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+                $this->mysqli = @new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
                 if($this->mysqli->connect_errno) {
                     throw new \Exception($this->mysqli->connect_error);
