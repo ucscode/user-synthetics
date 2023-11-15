@@ -76,7 +76,7 @@ class Pairs
      * @param string $action The action to take on delete (CASCADE, RESTRICT, SET NULL). Default is 'CASCADE'.
      * @return bool Returns `true` if the foreign key constraint is added or already exists, `false` otherwise.
      */
-    public function linkToParentTable(array $data): bool
+    public function linkToParentTable(array $data): ?bool
     {
         // Default Options
         $data += [
@@ -90,27 +90,32 @@ class Pairs
             throw new \Exception(__METHOD__ . '(): Array parameter expects an index "parentTable"');
         };
 
-        $SQL = "
-			IF NOT EXISTS (
-				SELECT NULL 
-				FROM information_schema.TABLE_CONSTRAINTS
-				WHERE
-					CONSTRAINT_SCHEMA = DATABASE() AND
-					CONSTRAINT_NAME   = '{$data['constraint']}' AND
-					CONSTRAINT_TYPE   = 'FOREIGN KEY' AND
-					TABLE_NAME = '{$this->tablename}'
-			)
-			THEN
-				ALTER TABLE `{$this->tablename}`
-				MODIFY `_ref` {$data['type']},
-				ADD CONSTRAINT `{$data['constraint']}`
-				FOREIGN KEY (`_ref`)
-				REFERENCES `{$data['parentTable']}`(`{$data['primaryKey']}`)
-				ON DELETE {$data['action']};
-			END IF
-		";
+        // Check if the constraint exists
+        $SQL = "SELECT NULL 
+        FROM information_schema.TABLE_CONSTRAINTS 
+        WHERE 
+            CONSTRAINT_SCHEMA = DATABASE() 
+            AND CONSTRAINT_NAME = '{$data['constraint']}' 
+            AND CONSTRAINT_TYPE = 'FOREIGN KEY' 
+            AND TABLE_NAME = '{$this->tablename}'";
 
-        return $this->mysqli->query($SQL);
+        $result = $this->mysqli->query($SQL);
+
+        // If the constraint doesn't exist, add it
+
+        if ($result->num_rows == 0) {
+
+            $SQL = "ALTER TABLE `{$this->tablename}`
+            MODIFY `_ref` {$data['type']},
+            ADD CONSTRAINT `{$data['constraint']}`
+            FOREIGN KEY (`_ref`)
+            REFERENCES `{$data['parentTable']}`(`{$data['primaryKey']}`)
+            ON DELETE {$data['action']};";
+
+            return $this->mysqli->query($SQL);
+        }
+
+        return null;
     }
 
     /**
