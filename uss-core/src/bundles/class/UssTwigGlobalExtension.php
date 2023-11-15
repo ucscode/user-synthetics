@@ -23,7 +23,7 @@ final class UssTwigGlobalExtension
      */
     public function abspathToUrl(string $path, bool $base = false): string
     {
-        return Uss::instance()->abspathToUrl($path, $base);
+        return $this->uss->abspathToUrl($path, $base);
     }
 
     /**
@@ -31,7 +31,7 @@ final class UssTwigGlobalExtension
      */
     public function keygen(int $length = 10, bool $use_spec_chars = false): string
     {
-        return Uss::instance()->keygen($length, $use_spec_chars);
+        return $this->uss->keygen($length, $use_spec_chars);
     }
 
     /**
@@ -39,7 +39,7 @@ final class UssTwigGlobalExtension
      */
     public function relativeTime($time, bool $full = false): string
     {
-        return Uss::instance()->relativeTime($time, $full);
+        return $this->uss->relativeTime($time, $full);
     }
 
     /**
@@ -67,7 +67,7 @@ final class UssTwigGlobalExtension
     # Get an option
     public function getOption(string $name): mixed
     {
-        return Uss::instance()->options->get($name);
+        return $this->uss->options->get($name);
     }
 
 }
