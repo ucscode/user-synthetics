@@ -342,7 +342,7 @@ class Pairs
 				`_ref` INT,
 				`_key` VARCHAR(255) NOT NULL,
 				`_value` TEXT,
-				`epoch` BIGINT NOT NULL DEFAULT UNIX_TIMESTAMP()
+				`epoch` BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP())
 			);
 		";
 
