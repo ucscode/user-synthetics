@@ -39,7 +39,8 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
      * @method __construct
      */
     public function __construct(
-        public readonly ?string $stackName = null
+        public readonly ?string $stackName = null,
+        public readonly bool $isFieldset = true
     ) {
         $this->buildElements();
     }
@@ -78,34 +79,34 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
     {
         $elements = [
             'outerContainer' => [
-                UssElement::NODE_FIELDSET,
+                $this->isFieldset ? UssElement::NODE_FIELDSET : UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'fs-outer-container',
-                    'data-fs' => $this->stackName
+                    'class' => 'fieldstack-outer-container',
+                    'data-fieldstack' => $this->stackName
                 ],
             ],
             'title' => [
                 UssElement::NODE_LEGEND,
                 'attributes' => [
-                    'class' => 'fs-title'
+                    'class' => 'fieldstack-title'
                 ],
             ],
             'subtitle' => [
                 UssElement::NODE_P,
                 'attributes' => [
-                    'class' => 'fs-subtitle small'
+                    'class' => 'fieldstack-subtitle small'
                 ],
             ],
             'instruction' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'fs-instruction alert alert-info'
+                    'class' => 'fieldstack-instruction alert alert-info'
                 ]
             ],
             'innerContainer' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'row fs-inner-container'
+                    'class' => 'row fieldstack-inner-container'
                 ],
             ],
         ];

@@ -335,7 +335,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                         $optionElement->setAttribute('selected', 'selected');
                     }
                 }
-                // no break
+                break;
             default:
                 $this->widget['element']->setAttribute('value', $this->widget['value']);
         }
@@ -388,7 +388,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     /**
      * @method attributeSetter
      */
-    protected function attributeSetter(UssElement $element, string $name, string $value, bool $append): self
+    protected function attributeSetter(UssElement $element, string $name, ?string $value, bool $append): self
     {
         if($append) {
             $element->addAttributeValue($name, $value);

@@ -145,7 +145,7 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
                         } else {
                             $index = $indent + 1;
                         }
-                        $html .= $this->buildNode($child, $index) . $carriage;
+                        $html .= $child->buildNode($child, $index) . $carriage;
                     }
 
                     $html .= $indentation;

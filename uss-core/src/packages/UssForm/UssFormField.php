@@ -14,7 +14,7 @@ class UssFormField extends AbstractUssFormField
         return $this->row['element'];
     }
 
-    public function setRowAttribute(string $name, string $value, bool $append = false): self
+    public function setRowAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->row['element'], $name, $value, $append);
     }
@@ -37,7 +37,7 @@ class UssFormField extends AbstractUssFormField
         return $this->container['element'];
     }
 
-    public function setContainerAttribute(string $name, string $value, bool $append = false): self
+    public function setContainerAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->container['element'], $name, $value, $append);
     }
@@ -61,7 +61,7 @@ class UssFormField extends AbstractUssFormField
         return $this->info['element'];
     }
 
-    public function setInfoAttribute(string $name, string $value, bool $append = false): self
+    public function setInfoAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->info['element'], $name, $value, $append);
     }
@@ -96,7 +96,7 @@ class UssFormField extends AbstractUssFormField
         return $this->label['element'];
     }
 
-    public function setLabelAttribute(string $name, string $value, bool $append = false): self
+    public function setLabelAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->label['element'], $name, $value, $append);
     }
@@ -135,7 +135,7 @@ class UssFormField extends AbstractUssFormField
         return $this->validation['element'];
     }
 
-    public function setValidationAttribute(string $name, string $value, bool $append = false): self
+    public function setValidationAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->validation['element'], $name, $value, $append);
     }
@@ -182,7 +182,7 @@ class UssFormField extends AbstractUssFormField
         return $this->widgetContainer['element'];
     }
 
-    public function setWidgetContainerAttribute(string $name, string $value, bool $append = false): self
+    public function setWidgetContainerAttribute(string $name, ?string $value, bool $append = false): self
     {
         return $this->attributeSetter($this->widgetContainer['element'], $name, $value, $append);
     }
@@ -207,8 +207,18 @@ class UssFormField extends AbstractUssFormField
         return $this->widget['element'];
     }
 
-    public function setWidgetAttribute(string $name, string $value, bool $append = false): self
+    public function setWidgetAttribute(string $name, ?string $value, bool $append = false): self
     {
+        if(strtolower(trim($name)) === 'value') {
+            switch($this->widget['element']->nodeName) {
+                case UssElement::NODE_INPUT:
+                case UssElement::NODE_BUTTON:
+                    if($append) {
+                        $value = $this->widget['value'] . ' ' . $value;
+                    }
+                    return $this->setWidgetValue($value);
+            };
+        }
         return $this->attributeSetter($this->widget['element'], $name, $value, $append);
     }
 
@@ -224,7 +234,8 @@ class UssFormField extends AbstractUssFormField
 
     public function setWidgetValue(?string $value): self
     {
-        $this->widget['value'] = $value;
+        $this->widget['value'] = $value ?? '';
+        $this->insertWidgetValue();
         return $this;
     }
 
@@ -469,8 +480,6 @@ class UssFormField extends AbstractUssFormField
             if(!$this->validation['hidden']) {
                 $this->container['element']->appendChild($this->validation['element']);
             }
-
-            $this->insertWidgetValue();
         }
 
         return $this->row['element'];

@@ -192,16 +192,16 @@ abstract class AbstractUssUtils implements UssInterface
         $columns = [];
 
         $SQL = (new SQuery())
-            ->select('column_name')
-            ->from('information_schema.columns')
-            ->where('table_schema', DB_NAME)
-            ->and('table_name', $tableName);
+            ->select('COLUMN_NAME')
+            ->from('information_schema.COLUMNS')
+            ->where('TABLE_SCHEMA', DB_NAME)
+            ->and('TABLE_NAME', $tableName);
 
         $result = Uss::instance()->mysqli->query($SQL);
 
         if($result->num_rows) {
             while($column = $result->fetch_assoc()) {
-                $value = $column['column_name'];
+                $value = $column['column_name'] ?? $column['COLUMN_NAME'];
                 $columns[$value] = $value;
             }
         };

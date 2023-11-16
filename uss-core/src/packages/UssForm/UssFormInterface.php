@@ -7,7 +7,7 @@ use Ucscode\UssElement\UssElement;
 
 interface UssFormInterface
 {
-    public function addFieldStack(?string $name, ?UssFormFieldStack $fieldStack): self;
+    public function addFieldStack(?string $name, ?UssFormFieldStack $fieldStack): UssFormFieldStack;
     public function getFieldStack(string $name): ?UssFormFieldStack;
 
     public function addField(string $name, UssFormField $field, array $options): self;

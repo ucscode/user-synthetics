@@ -93,7 +93,7 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     /**
      * @method addFieldStack
      */
-    public function addFieldStack(?string $name = null, ?UssFormFieldStack $fieldStack = null): UssFormInterface
+    public function addFieldStack(?string $name = null, ?UssFormFieldStack $fieldStack = null): UssFormFieldStack
     {
         if(is_null($name)) {
             $name = uniqid('_');
@@ -106,7 +106,7 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
         $this->fieldStacks[$name] = $fieldStack;
         $this->appendChild($fieldStack->getFieldStackAsElement());
 
-        return $this;
+        return $fieldStack;
     }
 
     /**
