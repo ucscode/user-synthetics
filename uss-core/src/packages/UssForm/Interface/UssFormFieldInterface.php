@@ -16,4 +16,8 @@ interface UssFormFieldInterface extends ContainerInterface, InfoInterface, Label
 {
     public function getFieldAsHTML(): string;
     public function getFieldAsElement(): UssElement;
+    public function addLineBreak(): self;
+    public function removeLineBreak(): self;
+    public function hasLineBreak(): bool;
+    public function getLineBreak(): ?UssElement;
 }

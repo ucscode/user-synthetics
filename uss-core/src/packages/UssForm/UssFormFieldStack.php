@@ -16,6 +16,11 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
         $this->innerContainer['element']->appendChild(
             $field->getFieldAsElement()
         );
+        if($field->hasLineBreak()) {
+            $this->innerContainer['element']->appendChild(
+                $field->getLineBreak()
+            );
+        };
         return $this;
     }
 
