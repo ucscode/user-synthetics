@@ -4,7 +4,7 @@ namespace Ucscode\UssForm\Trait\Field;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\UssForm;
-use Ucscode\UssForm\UssFormField;
+use Ucscode\UssForm\UssFormFieldSecondary;
 
 trait FieldWidgetTrait
 {
@@ -17,7 +17,7 @@ trait FieldWidgetTrait
             'values' => [],
             'elements' => [],
         ],
-        'alt' => []
+        'secondary' => []
     ];
 
     public function getWidgetElement(): UssElement
@@ -173,60 +173,54 @@ trait FieldWidgetTrait
     /**
      * @method createAlt
      */
-    public function createAlt(string $name, string $type = UssForm::TYPE_HIDDEN): UssElement
+    public function createSecondaryField(string $name, string $type = UssForm::TYPE_HIDDEN): UssFormFieldSecondary
     {
-        $altTypes = [
-            UssForm::TYPE_HIDDEN,
-            UssForm::TYPE_CHECKBOX,
-            UssForm::TYPE_RADIO,
-            UssForm::TYPE_SWITCH
-        ];
+        $secondaryField = new UssFormFieldSecondary($type);
 
-        if(!in_array($type, $altTypes)) {
-            $type = UssForm::TYPE_HIDDEN;
-        }
-
-        $field = new UssFormField(UssForm::NODE_INPUT, $type);
-        $altElement = $field->getWidgetContainerElement();
-
-        if(!empty($this->widget['alt'])) {
-            $prev = end($this->widget['alt']);
+        if(!empty($this->widget['secondary'])) {
+            $prev = end($this->widget['secondary']);
         } else {
             $prev = $this->widgetContainer['element'];
         }
 
-        $this->widget['alt'][$name] = $altElement;
-        $this->container['element']->insertAfter($altElement, $prev);
-        return $altElement;
+        $this->widget['secondary'][$name] = $secondaryField;
+
+        $this->container['element']->insertAfter(
+            $secondaryField->getWidgetContainerElement(), 
+            $prev
+        );
+
+        return $secondaryField;
     }
 
     /**
      * @method getAlt
      */
-    public function getAlt(string $name): ?UssElement
+    public function getSecondaryField(string $name): ?UssFormFieldSecondary
     {
-        return $this->widget['alt'][$name] ?? null;
+        return $this->widget['secondary'][$name] ?? null;
     }
 
     /**
      * @method removeAlt
      */
-    public function removeAlt(string $name): ?UssElement
+    public function removeSecondaryField(string $name): ?UssFormFieldSecondary
     {
-        $altElement = $this->getAlt($name);
-        if($altElement) {
-            $altElement
+        $secondaryField = $this->getSecondaryField($name);
+        if($secondaryField) {
+            $secondaryFieldElement = $secondaryField->getFieldAsElement();
+            $secondaryFieldElement
                 ->getParentElement()
-                ->removeChild($altElement);
-            unset($this->widget['alt'][$name]);
+                ->removeChild($secondaryFieldElement);
+            unset($this->widget['secondary'][$name]);
         };
-        return $altElement;
+        return $secondaryField;
     }
 
     /**
      * @method getAlts
      */
-    public function getAlts(): array
+    public function getSecondaryFields(): array
     {
         return $this->widget['alt'];
     }

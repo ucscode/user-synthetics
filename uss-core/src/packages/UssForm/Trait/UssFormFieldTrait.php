@@ -15,9 +15,22 @@ trait UssFormFieldTrait
         UssElement::NODE_BUTTON
     ];
 
-    protected function generateElements(): void
+    public readonly string $widgetId;
+    private static int $count = 0;
+
+    /**
+     * @method generateId
+     */
+    public function generateId(): string
     {
-        $elements = [
+        self::$count++;
+        $id = $this->prefix . '-' . $this->nodeName . '-' . self::$count;
+        return strtolower($id);
+    }
+
+    protected function getElementStructure(): array
+    {
+        return [
             'row' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
@@ -33,16 +46,7 @@ trait UssFormFieldTrait
             'widgetContainer' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'widget-container ' . call_user_func(function () {
-                        $class = '';
-                        if($this->isCheckable()) {
-                            $class = 'form-check ';
-                            if($this->nodeType === UssForm::TYPE_SWITCH) {
-                                $class .= 'form-switch';
-                            }
-                        }
-                        return $class;
-                    })
+                    'class' => $this->widgetContainerClass()
                 ],
             ],
             'info' => [
@@ -65,8 +69,13 @@ trait UssFormFieldTrait
                 ],
             ],
         ];
+    }
 
-        foreach($elements as $name => $prop) {
+    protected function generateElements(): void
+    {
+        $this->widgetId = $this->generateId();
+
+        foreach($this->getElementStructure() as $name => $prop) {
             $this->{$name}['element'] = new UssElement($prop[0]);
             foreach($prop['attributes'] as $key => $value) {
                 $this->{$name}['element']->setAttribute($key, $value);
@@ -74,7 +83,6 @@ trait UssFormFieldTrait
         }
 
         $this->buildWidgetElement();
-        $this->buildFieldStructure();
     }
 
     /**
@@ -359,5 +367,20 @@ trait UssFormFieldTrait
                 ->removeAttributeValue('class', 'input-single', true);
             $func();
         }
+    }
+
+    /**
+     * @method 
+     */
+    protected function widgetContainerClass(): string
+    {
+        $class = 'widget-container ';
+        if($this->isCheckable()) {
+            $class .= 'form-check ';
+            if($this->nodeType === UssForm::TYPE_SWITCH) {
+                $class .= 'form-switch';
+            }
+        }
+        return $class;
     }
 }

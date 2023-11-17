@@ -27,9 +27,6 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     use FieldValidationTrait;
     use UssFormFieldTrait;
 
-    public readonly string $widgetId;
-    private static int $count = 0;
-
     /**
      * @method __constuct
      */
@@ -37,18 +34,8 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         public readonly string $nodeName = UssElement::NODE_INPUT,
         protected ?string $nodeType = UssForm::TYPE_TEXT
     ) {
-        $this->widgetId = $this->generateId();
         $this->generateElements();
-    }
-
-    /**
-     * @method generateId
-     */
-    public function generateId(): string
-    {
-        self::$count++;
-        $id = strtolower('uff-' . $this->nodeName . '-0' . self::$count);
-        return $id;
+        $this->buildFieldStructure();
     }
 
     /**

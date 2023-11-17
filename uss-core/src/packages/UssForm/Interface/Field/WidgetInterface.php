@@ -3,6 +3,7 @@
 namespace Ucscode\UssForm\Interface\Field;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\UssFormFieldSecondary;
 
 interface WidgetInterface
 {
@@ -31,8 +32,8 @@ interface WidgetInterface
     public function setRequired(bool $status): self;
     public function isRequired(): bool;
 
-    public function createAlt(string $name, string $type): UssElement;
-    public function getAlt(string $name): ?UssElement;
-    public function removeAlt(string $name): ?UssElement;
-    public function getAlts(): array;
+    public function createSecondaryField(string $name, string $type): UssFormFieldSecondary;
+    public function getSecondaryField(string $name): ?UssFormFieldSecondary;
+    public function removeSecondaryField(string $name): ?UssFormFieldSecondary;
+    public function getSecondaryFields(): array;
 }
