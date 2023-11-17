@@ -3,6 +3,7 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Abstraction\AbstractUssFormField;
 
 class UssFormField extends AbstractUssFormField
 {
@@ -79,7 +80,11 @@ class UssFormField extends AbstractUssFormField
     public function setInfoMessage(null|string|UssElement $value, ?string $icon = null): self
     {
         $this->info['value'] = $value;
-        $this->insertElementValue($this->info['element'], $value, func_num_args() === 2 ? $icon : 'bi bi-info-circle');
+        $this->insertElementValue(
+            $this->info['element'],
+            $value,
+            func_num_args() === 2 ? $icon : 'bi bi-info-circle'
+        );
         return $this;
     }
 
@@ -247,6 +252,12 @@ class UssFormField extends AbstractUssFormField
     public function appendToWidget(null|string|UssElement $appendant): self
     {
         $this->widget['appendant'] = $this->refactorInputGroupContent($appendant);
+        $this->extendWidgetAside(function () {
+            $this->widgetContainer['element']->insertAfter(
+                $this->widget['appendant'],
+                $this->widget['element']
+            );
+        });
         return $this;
     }
 
@@ -258,6 +269,14 @@ class UssFormField extends AbstractUssFormField
     public function prependToWidget(null|string|UssElement $prependant): self
     {
         $this->widget['prependant'] = $this->refactorInputGroupContent($prependant);
+        $this->extendWidgetAside(function () {
+            if($this->widget['prependant']) {
+                $this->widgetContainer['element']->insertBefore(
+                    $this->widget['prependant'],
+                    $this->widget['element']
+                );
+            }
+        });
         return $this;
     }
 
@@ -382,12 +401,24 @@ class UssFormField extends AbstractUssFormField
         return $this;
     }
 
-    public function setInfoHidden(bool $status): UssFormFieldInterface
+    public function setInfoHidden(bool $status): self
     {
         if($this->isHiddenWidget()) {
             $status = true;
         };
         $this->info['hidden'] = $status;
+
+        if(!$this->info['hidden']) {
+            $this->container['element']->insertBefore(
+                $this->info['element'],
+                $this->widgetContainer['element']
+            );
+        } else {
+            $this->info['element']
+                ->getParentElement()
+                ->removeChild($this->info['element']);
+        }
+
         return $this;
     }
 
@@ -396,12 +427,28 @@ class UssFormField extends AbstractUssFormField
         return $this->info['hidden'];
     }
 
-    public function setLabelHidden(bool $status): UssFormFieldInterface
+    public function setLabelHidden(bool $status): self
     {
         if($this->isHiddenWidget()) {
             $status = true;
         };
         $this->label['hidden'] = $status;
+
+        if(!$this->label['hidden'] && !$this->isButton()) {
+            if(!$this->isCheckable()) {
+                $this->container['element']->prependChild($this->label['element']);
+            } else {
+                $this->widgetContainer['element']->insertAfter(
+                    $this->label['element'],
+                    $this->widget['element']
+                );
+            }
+        } else {
+            $this->label['element']
+                ->getParentElement()
+                ->removeChild($this->label['element']);
+        }
+
         return $this;
     }
 
@@ -410,12 +457,22 @@ class UssFormField extends AbstractUssFormField
         return $this->label['hidden'];
     }
 
-    public function setValidationHidden(bool $status): UssFormFieldInterface
+    public function setValidationHidden(bool $status): self
     {
         if($this->isHiddenWidget()) {
             $status = true;
         };
         $this->validation['hidden'] = $status;
+        if(!$this->validation['hidden'] && !$this->isButton()) {
+            $this->container['element']->insertAfter(
+                $this->validation['element'],
+                $this->widgetContainer['element']
+            );
+        } else {
+            $this->validation['element']
+                ->getParentElement()
+                ->removeChild($this->validation['element']);
+        }
         return $this;
     }
 
@@ -429,59 +486,6 @@ class UssFormField extends AbstractUssFormField
      */
     public function getFieldAsElement(): UssElement
     {
-        $this->row['element']->appendChild($this->container['element']);
-
-        if($this->isCheckable()) {
-            if(!$this->info['hidden']) {
-                $this->container['element']->appendChild($this->info['element']);
-            }
-        } elseif(!$this->isButton()) {
-            if(!$this->label['hidden']) {
-                $this->container['element']->appendChild($this->label['element']);
-            }
-            if(!$this->info['hidden']) {
-                $this->container['element']->appendChild($this->info['element']);
-            }
-        }
-
-        $this->container['element']->appendChild($this->widgetContainer['element']);
-        $this->widgetContainer['element']->appendChild($this->widget['element']);
-
-        if(!$this->isButton()) {
-
-            if(!$this->isCheckable()) {
-
-                if(!empty($this->widget['appendant']) || !empty($this->widget['prependant'])) {
-
-                    $this->widgetContainer['element']->addAttributeValue('class', 'input-group');
-
-                    if($this->widget['prependant']) {
-                        $this->widgetContainer['element']->insertBefore(
-                            $this->widget['prependant'],
-                            $this->widget['element']
-                        );
-                    }
-
-                    if($this->widget['appendant']) {
-                        $this->widgetContainer['element']->insertAfter(
-                            $this->widget['appendant'],
-                            $this->widget['element']
-                        );
-                    }
-
-                }
-
-            } else {
-                if(!$this->label['hidden']) {
-                    $this->widgetContainer['element']->appendChild($this->label['element']);
-                }
-            }
-
-            if(!$this->validation['hidden']) {
-                $this->container['element']->appendChild($this->validation['element']);
-            }
-        }
-
         return $this->row['element'];
     }
 
@@ -491,5 +495,66 @@ class UssFormField extends AbstractUssFormField
     public function getFieldAsHTML(): string
     {
         return $this->getFieldAsElement()->getHTML(true);
+    }
+
+    /**
+     * @method createAlt
+     */
+    public function createAlt(string $name, string $type = UssForm::TYPE_HIDDEN): UssElement
+    {
+        $altTypes = [
+            UssForm::TYPE_HIDDEN,
+            UssForm::TYPE_CHECKBOX,
+            UssForm::TYPE_RADIO,
+            UssForm::TYPE_SWITCH
+        ];
+
+        if(!in_array($type, $altTypes)) {
+            $type = UssForm::TYPE_HIDDEN;
+        }
+
+        $field = new self(UssForm::NODE_INPUT, $type);
+        $altElement = $field->getWidgetContainerElement();
+
+        if(!empty($this->widget['alt'])) {
+            $prev = end($this->widget['alt']);
+        } else {
+            $prev = $this->widgetContainer['element'];
+        }
+
+        $this->widget['alt'][$name] = $altElement;
+        $this->container['element']->insertAfter($altElement, $prev);
+        return $altElement;
+    }
+
+    /**
+     * @method getAlt
+     */
+    public function getAlt(string $name): ?UssElement
+    {
+        return $this->widget['alt'][$name] ?? null;
+    }
+
+    /**
+     * @method removeAlt
+     */
+    public function removeAlt(string $name): ?UssElement
+    {
+        $altElement = $this->getAlt($name);
+        if($altElement) {
+            $altElement
+                ->getParentElement()
+                ->removeChild($altElement);
+            unset($this->widget['alt'][$name]);
+        };
+        return $altElement;
+    }
+
+    /**
+     * @method getAlts
+     */
+    public function getAlts(): array
+    {
+        return $this->widget['alt'];
     }
 }

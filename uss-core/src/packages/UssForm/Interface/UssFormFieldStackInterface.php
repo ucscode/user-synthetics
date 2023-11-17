@@ -1,8 +1,9 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Interface;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\UssFormField;
 
 interface UssFormFieldStackInterface
 {

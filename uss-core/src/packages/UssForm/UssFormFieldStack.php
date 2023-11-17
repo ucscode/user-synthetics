@@ -3,13 +3,14 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Abstraction\AbstractUssFormFieldStack;
 
 class UssFormFieldStack extends AbstractUssFormFieldStack
 {
     /**
      * @method addField
      */
-    public function addField(string $name, UssFormField $field): UssFormFieldStackInterface
+    public function addField(string $name, UssFormField $field): self
     {
         $this->fields[$name] = $field;
         $this->innerContainer['element']->appendChild(
@@ -21,7 +22,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
     /**
      * @method addElement
      */
-    public function addElement(string $name, UssElement $element): UssFormFieldStackInterface
+    public function addElement(string $name, UssElement $element): self
     {
         $this->elements[$name] = $element;
         $this->innerContainer['element']->appendChild($element);
@@ -63,7 +64,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
     /**
      * @method removeField
      */
-    public function removeField(string $name): UssFormFieldStackInterface
+    public function removeField(string $name): self
     {
         if(array_key_exists($name, $this->fields)) {
             $field = $this->getField($name);
@@ -81,7 +82,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
     /**
      * @method removeElement
      */
-    public function removeElement(string $name): UssFormFieldStackInterface
+    public function removeElement(string $name): self
     {
         if(array_key_exists($name, $this->elements)) {
             $element = $this->getElement($name);

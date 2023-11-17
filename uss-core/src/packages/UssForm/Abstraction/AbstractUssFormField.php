@@ -1,8 +1,10 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Abstraction;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Interface\UssFormFieldInterface;
+use Ucscode\UssForm\UssForm;
 
 abstract class AbstractUssFormField implements UssFormFieldInterface
 {
@@ -35,7 +37,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     protected array $info = [
         'element' => null,
         'value' => null,
-        'hidden' => 'false'
+        'hidden' => false
     ];
 
     protected array $label = [
@@ -60,7 +62,8 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         'options' => [
             'values' => [],
             'elements' => [],
-        ]
+        ],
+        'alt' => []
     ];
 
     /**
@@ -108,7 +111,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             'row' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'col-12',
+                    'class' => 'col-12 mt-1 mb-2',
                 ],
             ],
             'container' => [
@@ -120,7 +123,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             'widgetContainer' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'widget-container my-1 ' . call_user_func(function () {
+                    'class' => 'widget-container ' . call_user_func(function () {
                         $class = '';
                         if($this->isCheckable()) {
                             $class = 'form-check ';
@@ -135,7 +138,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             'info' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'form-info small text-secondary'
+                    'class' => 'form-info small text-secondary d-flex align-items-baseline'
                 ],
             ],
             'label' => [
@@ -148,7 +151,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             'validation' => [
                 UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'form-validity small d-flex'
+                    'class' => 'form-validity small d-flex align-items-baseline'
                 ],
             ],
         ];
@@ -161,6 +164,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
         }
 
         $this->buildWidgetElement();
+        $this->buildFieldStructure();
 
         if($this->isHiddenWidget()) {
             $this->setLabelHidden(true);
@@ -231,6 +235,30 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                 };
 
                 $this->widget['element']->setAttribute('type', $nodeType);
+        }
+    }
+
+    protected function buildFieldStructure(): void
+    {
+        $this->row['element']->appendChild($this->container['element']);
+
+        /**
+         * - Buttons cannot have label element
+         * - Checkables can only have labels after the widget element
+         */
+        if(!$this->isButton() && !$this->isCheckable()) {
+            $this->container['element']->appendChild($this->label['element']);
+        }
+
+        $this->container['element']->appendChild($this->info['element']);
+        $this->container['element']->appendChild($this->widgetContainer['element']);
+        $this->widgetContainer['element']->appendChild($this->widget['element']);
+
+        if(!$this->isButton()) {
+            if($this->isCheckable()) {
+                $this->widgetContainer['element']->appendChild($this->label['element']);
+            }
+            $this->container['element']->appendChild($this->validation['element']);
         }
     }
 
@@ -315,6 +343,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
                 }
 
             }
+
         };
     }
 
@@ -465,5 +494,18 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
             $this->validation['value'],
             $this->validation['icon']
         );
+    }
+
+    /**
+     * @method extendWidgetAside
+     */
+    protected function extendWidgetAside(callable $func): void
+    {
+        if(!$this->isCheckable() && !$this->isButton()) {
+            $this->widgetContainer['element']
+                ->addAttributeValue('class', 'input-group', true)
+                ->removeAttributeValue('class', 'input-single', true);
+            $func();
+        }
     }
 }

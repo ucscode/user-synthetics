@@ -1,8 +1,9 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Abstraction;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Interface\UssFormFieldStackInterface;
 
 abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
 {

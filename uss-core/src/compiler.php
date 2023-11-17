@@ -13,10 +13,13 @@ $autoloader = call_user_func(function () {
 });
 
 spl_autoload_register(function ($className) use ($autoloader) {
-    $split = explode('\\', $className);
+    $package = explode('\\', $className);
 
-    if(count($split) > 1 && $split[0] === 'Ucscode') {
-        $filepath = UssImmutable::SRC_DIR . "/packages/{$split[1]}/{$split[2]}.php";
+    if(count($package) > 1 && $package[0] === 'Ucscode') {
+        $filepath = UssImmutable::SRC_DIR . "/packages/";
+        array_shift($package);
+        $file = implode("/", $package) . ".php";
+        $filepath .= $file;
         if(is_file($filepath)) {
             return require $filepath;
         }
