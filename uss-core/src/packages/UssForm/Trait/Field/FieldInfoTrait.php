@@ -50,7 +50,7 @@ trait FieldInfoTrait
 
     public function setInfoHidden(bool $status): self
     {
-        if($this->isHiddenWidget()) {
+        if($this->isWidgetHidden()) {
             $status = true;
         };
         $this->info['hidden'] = $status;

@@ -215,6 +215,48 @@ trait FieldWidgetTrait
     }
 
     /**
+     * @method isHiddenWidget
+     */
+    public function isWidgetHidden(): bool
+    {
+        return
+            $this->nodeName === UssElement::NODE_INPUT &&
+            $this->nodeType === UssForm::TYPE_HIDDEN;
+    }
+
+    /**
+     * @method isCheckable
+     */
+    public function isCheckable(): bool
+    {
+        return $this->nodeName === UssElement::NODE_INPUT &&
+        in_array($this->nodeType, [
+            UssForm::TYPE_CHECKBOX,
+            UssForm::TYPE_RADIO,
+            UssForm::TYPE_SWITCH
+        ]);
+    }
+
+    /**
+     * @method isButton
+     */
+    public function isButton(): bool
+    {
+        if($this->nodeName === UssElement::NODE_BUTTON) {
+            return true;
+        } elseif($this->nodeName === UssElement::NODE_INPUT) {
+            return in_array(
+                $this->nodeType,
+                [
+                    UssForm::TYPE_SUBMIT,
+                    UssForm::TYPE_BUTTON
+                ]
+            );
+        }
+        return false;
+    }
+
+    /**
      * @method createAlt
      */
     public function createAlt(string $name, string $type = UssForm::TYPE_HIDDEN): UssElement

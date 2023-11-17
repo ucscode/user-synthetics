@@ -28,7 +28,7 @@ interface WidgetInterface
     public function isButton(): bool;
     public function setWidgetChecked(bool $status): self;
     public function isWidgetChecked(): bool;
-    public function isHiddenWidget(): bool;
+    public function isWidgetHidden(): bool;
     public function setDisabled(bool $status): self;
     public function isDisabled(): bool;
     public function setReadonly(bool $status): self;

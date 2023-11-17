@@ -61,7 +61,7 @@ trait FieldValidationTrait
 
     public function setValidationHidden(bool $status): self
     {
-        if($this->isHiddenWidget()) {
+        if($this->isWidgetHidden()) {
             $status = true;
         };
         $this->validation['hidden'] = $status;

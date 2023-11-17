@@ -50,7 +50,7 @@ trait FieldLabelTrait
 
     public function setLabelHidden(bool $status): self
     {
-        if($this->isHiddenWidget()) {
+        if($this->isWidgetHidden()) {
             $status = true;
         };
         $this->label['hidden'] = $status;
