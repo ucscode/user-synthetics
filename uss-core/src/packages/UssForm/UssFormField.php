@@ -7,7 +7,7 @@ use Ucscode\UssForm\Abstraction\AbstractUssFormField;
 
 class UssFormField extends AbstractUssFormField
 {
-    protected string $prefix = 'uff';
+    protected string $prefix = 'primary-field';
     
     /**
      * @method getFieldAsElement

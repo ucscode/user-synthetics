@@ -23,7 +23,7 @@ class UssFormFieldSecondary
     ];
 
     public readonly string $nodeName;
-    protected string $prefix = 'uffs';
+    protected string $prefix = 'secondary-field';
 
     public function __construct(protected string $nodeType)
     {
