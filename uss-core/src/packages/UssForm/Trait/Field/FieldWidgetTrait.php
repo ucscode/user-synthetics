@@ -176,9 +176,14 @@ trait FieldWidgetTrait
     public function createSecondaryField(string $name, string $type = UssForm::TYPE_HIDDEN): UssFormFieldSecondary
     {
         $secondaryField = new UssFormFieldSecondary($type);
+        
+        if($this->widget['element']->hasAttribute('name')) {
+            $secondaryField->setWidgetAttribute('name', $this->widget['element']->getAttribute('name'));
+        }
 
         if(!empty($this->widget['secondary'])) {
-            $prev = end($this->widget['secondary']);
+            $lastSecondaryField = end($this->widget['secondary']);
+            $prev = $lastSecondaryField->getFieldAsElement();
         } else {
             $prev = $this->widgetContainer['element'];
         }

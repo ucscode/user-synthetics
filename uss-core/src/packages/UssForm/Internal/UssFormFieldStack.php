@@ -92,7 +92,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
                 if($element->getParentElement() === $this->innerContainer['element']) {
                     $this->innerContainer['element']->removeChild($element);
                     if($lineBreak) {
-                        $this->innerContainer['element']->removeChild($lineBreak);
+                        $lineBreak->getParentElement()->removeChild($lineBreak);
                     }
                 }
             }

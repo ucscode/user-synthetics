@@ -146,7 +146,7 @@ class UssForm extends AbstractUssForm
      */
     public function addCustomElement(string $name, UssElement $element, array $options = []): UssFormInterface
     {
-        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null);
+        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null, $name);
         $fieldStack->addElement($name, $element);
         $this->elements[$name] = $element;
         return $this;
