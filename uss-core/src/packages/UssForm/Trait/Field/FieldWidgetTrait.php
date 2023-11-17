@@ -62,7 +62,7 @@ trait FieldWidgetTrait
         return $this->widget['value'];
     }
 
-    public function appendToWidget(null|string|UssElement $appendant): self
+    public function setWidgetSuffix(null|string|UssElement $appendant): self
     {
         $this->widget['appendant'] = $this->refactorInputGroupContent($appendant);
         $this->extendWidgetAside(function () {
@@ -74,12 +74,24 @@ trait FieldWidgetTrait
         return $this;
     }
 
-    public function getWidgetAppendant(): ?UssElement
+    public function getWidgetSuffix(): ?UssElement
     {
         return $this->widget['appendant'];
     }
 
-    public function prependToWidget(null|string|UssElement $prependant): self
+    public function removeWidgetSuffix(): self
+    {
+        if($this->widget['appendant']) {
+            $this->widget['appendant']
+                ->getParentElement()
+                ->removeChild($this->widget['appendant']);
+
+            $this->widget['appendant'] = null;
+        }
+        return $this;
+    }
+
+    public function setWidgetPrefix(null|string|UssElement $prependant): self
     {
         $this->widget['prependant'] = $this->refactorInputGroupContent($prependant);
         $this->extendWidgetAside(function () {
@@ -93,9 +105,21 @@ trait FieldWidgetTrait
         return $this;
     }
 
-    public function getWidgetPrependant(): ?UssElement
+    public function getWidgetPrefix(): ?UssElement
     {
         return $this->widget['prependant'];
+    }
+
+    public function removeWidgetPrefix(): self
+    {
+        if($this->widget['prependant']) {
+            $this->widget['prependant']
+                ->getParentElement()
+                ->removeChild($this->widget['prependant']);
+
+            $this->widget['prependant'] = null;
+        }
+        return $this;
     }
 
     /**
