@@ -5,66 +5,34 @@ namespace Ucscode\UssForm\Abstraction;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Interface\UssFormFieldInterface;
 use Ucscode\UssForm\UssForm;
+use Ucscode\UssForm\Trait\Field\FieldContainerTrait;
+use Ucscode\UssForm\Trait\Field\FieldInfoTrait;
+use Ucscode\UssForm\Trait\Field\FieldLabelTrait;
+use Ucscode\UssForm\Trait\Field\FieldRowTrait;
+use Ucscode\UssForm\Trait\Field\FieldValidationTrait;
+use Ucscode\UssForm\Trait\Field\FieldWidgetContainerTrait;
+use Ucscode\UssForm\Trait\Field\FieldWidgetTrait;
 
 abstract class AbstractUssFormField implements UssFormFieldInterface
 {
-    private static int $count = 0;
+    use FieldRowTrait;
+    use FieldContainerTrait;
+    use FieldInfoTrait;
+    use FieldLabelTrait;
+    use FieldWidgetContainerTrait;
+    use FieldWidgetTrait;
+    use FieldValidationTrait;
 
-    public readonly string $widgetId;
-
-    protected array $validNodeNames = [
+    protected const PRIMARY_NODES = [
         UssElement::NODE_INPUT,
         UssElement::NODE_SELECT,
         UssElement::NODE_TEXTAREA,
         UssElement::NODE_BUTTON
     ];
 
-    /**
-     * Containers: No values but has attributes and holds elements
-     */
-    protected array $row = [
-        'element' => null,
-    ];
+    public readonly string $widgetId;
 
-    protected array $container = [
-        'element' => null,
-    ];
-
-    protected array $widgetContainer = [
-        'element' => null,
-    ];
-
-    protected array $info = [
-        'element' => null,
-        'value' => null,
-        'hidden' => false
-    ];
-
-    protected array $label = [
-        'element' => null,
-        'value' => null,
-        'hidden' => false
-    ];
-
-    protected array $validation = [
-        'element' => null,
-        'value' => null,
-        'type' => self::VALIDATION_ERROR,
-        'icon' => null,
-        'hidden' => false
-    ];
-
-    protected array $widget = [
-        'element' => null,
-        'value' => null,
-        'appendant' => null,
-        'prependant' => null,
-        'options' => [
-            'values' => [],
-            'elements' => [],
-        ],
-        'alt' => []
-    ];
+    private static int $count = 0;
 
     /**
      * @method __constuct
@@ -83,7 +51,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     public function __debugInfo()
     {
         $debugger = [];
-        $skip = ['validNodeNames'];
+        $skip = [];
 
         foreach((new \ReflectionClass($this))->getProperties() as $property) {
             $property->setAccessible(true);
@@ -178,12 +146,12 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
      */
     protected function buildWidgetElement(): void
     {
-        if(!in_array($this->nodeName, $this->validNodeNames)) {
+        if(!in_array($this->nodeName, self::PRIMARY_NODES)) {
             throw new \Exception(
                 sprintf(
                     "Invalid nodename %s in __construct() argument #2; valid nodenames are %s",
                     $this->nodeName,
-                    implode(", ", $this->validNodeNames)
+                    implode(", ", self::PRIMARY_NODES)
                 )
             );
         }
