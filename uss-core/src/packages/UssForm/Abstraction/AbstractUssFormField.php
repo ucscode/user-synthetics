@@ -11,6 +11,7 @@ use Ucscode\UssForm\Trait\Field\FieldLabelTrait;
 use Ucscode\UssForm\Trait\Field\FieldRowTrait;
 use Ucscode\UssForm\Trait\Field\FieldValidationTrait;
 use Ucscode\UssForm\Trait\Field\FieldWidgetContainerTrait;
+use Ucscode\UssForm\Trait\Field\FieldWidgetMinorTrait;
 use Ucscode\UssForm\Trait\Field\FieldWidgetTrait;
 use Ucscode\UssForm\Trait\UssFormFieldTrait;
 
@@ -22,6 +23,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
     use FieldLabelTrait;
     use FieldWidgetContainerTrait;
     use FieldWidgetTrait;
+    use FieldWidgetMinorTrait;
     use FieldValidationTrait;
     use UssFormFieldTrait;
 

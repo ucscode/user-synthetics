@@ -4,6 +4,7 @@ namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssElement\UssElementNodeListInterface;
+use Ucscode\UssForm\Interface\UssFormInterface;
 
 class UssForm extends UssElement implements UssFormInterface, UssElementNodeListInterface
 {

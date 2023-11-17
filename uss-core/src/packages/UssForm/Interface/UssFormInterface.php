@@ -1,9 +1,10 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Interface;
 
-use Ucscode\UssElement\UssElementInterface;
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\UssFormFieldStack;
+use Ucscode\UssForm\UssFormField;
 
 interface UssFormInterface
 {
