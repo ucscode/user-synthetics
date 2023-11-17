@@ -4,7 +4,7 @@ namespace Ucscode\UssForm\Trait\Field;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\UssForm;
-use Ucscode\UssForm\UssFormFieldSecondary;
+use Ucscode\UssForm\Internal\UssFormFieldSecondary;
 
 trait FieldWidgetTrait
 {

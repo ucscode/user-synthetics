@@ -1,12 +1,13 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Internal;
 
 use Ucscode\UssForm\Trait\Field\FieldWidgetContainerTrait;
 use Ucscode\UssForm\Trait\Field\FieldWidgetTrait;
 use Ucscode\UssForm\Trait\UssFormFieldTrait;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Trait\Field\FieldLabelTrait;
+use Ucscode\UssForm\UssForm;
 
 class UssFormFieldSecondary
 {

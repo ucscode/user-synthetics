@@ -3,73 +3,142 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssElement\UssElementNodeListInterface;
 use Ucscode\UssForm\Interface\UssFormInterface;
+use Ucscode\UssForm\Abstraction\AbstractUssForm;
+use Ucscode\UssForm\Internal\UssFormFieldStack;
 
-class UssForm extends UssElement implements UssFormInterface, UssElementNodeListInterface
+class UssForm extends AbstractUssForm 
 {
-    public const TYPE_TEXT = 'text';
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_DATE = 'date';
-    public const TYPE_TIME = 'time';
-    public const TYPE_EMAIL = 'email';
-    public const TYPE_PASSWORD = 'password';
-    public const TYPE_CHECKBOX = 'checkbox';
-    public const TYPE_RADIO = 'radio';
-    public const TYPE_SWITCH = 'switch';
-    public const TYPE_FILE = 'file';
-    public const TYPE_COLOR = 'color';
-    public const TYPE_RANGE = 'range';
-    public const TYPE_SEARCH = 'search';
-    public const TYPE_URL = 'url';
-    public const TYPE_TEL = 'tel';
-    public const TYPE_HIDDEN = 'hidden';
-    public const TYPE_SUBMIT = 'submit';
-    public const TYPE_BUTTON = 'button';
-    public const TYPE_RESET = 'reset';
-    public const TYPE_DATETIME_LOCAL = 'datetime-local';
-
-    protected array $fieldStacks = [];
-    protected array $fields = [];
-    protected array $elements = [];
-    protected ?array $flatArray = null;
-
     /**
-     * @method __construct
+     * The fieldstack becomes the current active stack to hold the next field
+     * 
+     * @param string $name (optional): The name of the fieldstack; Auto-generated if not given
+     * 
+     * @return UssFormFieldStack: The system generated fieldstack instance
      */
-    public function __construct(string $name, ?string $action = null, string $method = 'GET', ?string $enctype = null)
+    public function addFieldStack(?string $name = null, bool $isDiv = false): UssFormFieldStack
     {
-        parent::__construct(UssElement::NODE_FORM);
-        $this->setDefaultAttributes($name, $action, $method, $enctype);
+        $name = $name ?? 'stack' . (++self::$stackIndex);
+        $fieldStack = $this->getFieldStack($name);
+        if(!$fieldStack){
+            $fieldStack = new UssFormFieldStack($name, $isDiv, $this);
+            $this->fieldStacks[$name] = $fieldStack;
+            $this->stackContainer->appendChild($fieldStack->getFieldStackAsElement());
+        }
+        return $fieldStack;
     }
 
     /**
-     * @method addField
+     * Get a fieldstack by name
+     * 
+     * @return ?UssFormFieldStack: The fieldstack instance or null of not found
      */
-    public function addField(string $name, UssFormField $field, array $options = []): UssFormInterface
+    public function getFieldStack(string $name): ?UssFormFieldStack
     {
-        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null);
+        return $this->fieldStacks[$name] ?? null;
+    }
 
-        if(is_null($field->getLabelValue())) {
-            $field->setLabelValue($this->labelize($name));
-        };
-
-        if(($options['mapped'] ?? null) !== false) {
-            $field->setWidgetAttribute('name', $name);
+    /**
+     * Get a fieldstack by fieldname
+     */
+     public function getFieldStackByField(string $name): ?UssFormFieldStack
+    {
+        foreach($this->fieldStacks as $fieldStack) {
+            if($fieldStack->getField($name)) {
+                return $fieldStack;
+            }
         }
+        return null;
+    }
 
-        $fieldStack->addField($name, $field);
-        $this->fields[$name] = $field;
-
+    /**
+     * Remove a fieldstack form the form 
+     * 
+     * @param string $name: The name of the field stack to remove
+     * 
+     * @return self: The UssForm instances
+     */
+    public function removeFieldStack(string $name): self
+    {
+        $fieldStack = $this->getFieldStack($name);
+        if($fieldStack) {
+            unset($this->fieldStacks[$name]);
+            $element = $fieldStack->getFieldStackAsElement();
+            $parent = $element->getParentElement();
+            if($parent) {
+                $parent->removeChild($element);
+            }
+        }
         return $this;
     }
 
     /**
-     * @method getField
+     * Get all available fieldstacks
+     * 
+     * @return array: A list of fieldstacks
+     */
+    public function getFieldStacks(): array
+    {
+        return $this->fieldStacks;
+    }
+
+    /**
+     * Add a field to the most active fieldstack in the form instance
+     * 
+     * @param string $name: The name of the field
+     * @param UssFormField $field: The instance of the field
+     * @param array $options: Options for additional configuration of the field
+     * 
+     * @return self: The UssForm instance
+     */
+    public function addField(string $name, UssFormField $field, array $options = []): self
+    {
+        $fieldStack = $this->getActiveFieldStack($options['fieldStack'] ?? null, $name);
+        $this->alterField($name, $field, $options);
+        $fieldStack->addField($name, $field);
+        return $this;
+    }
+
+    /**
+     * Find a field from all available fieldstack
+     * 
+     * @param string $name: The name of the field to get
+     * 
+     * @return ?UssFormField: The field instance or null
      */
     public function getField(string $name): ?UssFormField
     {
-        return $this->fields[$name] ?? null;
+        $field = null;
+        foreach($this->fieldStacks as $fieldStack) {
+            if($field = $fieldStack->getField($name)) {
+                break;
+            }
+        };
+        return $field;
+    }
+
+    /**
+     * Remove a field from a stack if found
+     */
+    public function removeField(string $name): self
+    {
+        foreach($this->fieldStacks as $fieldStack) {
+            $fieldStack->removeField($name);
+        }
+        return $this;
+    }
+
+    /**
+     * @method getFields
+     */
+    public function getFields(): array
+    {
+        $availableFields = [];
+        foreach($this->fieldStacks as $fieldStack) {
+            $fields = $fieldStack->getFields();
+            $availableFields = array_merge($availableFields, $fields);
+        }
+        return $availableFields;
     }
 
     /**
@@ -92,30 +161,11 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
     }
 
     /**
-     * @method addFieldStack
+     * @method removeCustomElement
      */
-    public function addFieldStack(?string $name = null, ?UssFormFieldStack $fieldStack = null): UssFormFieldStack
+    public function removeCustomElement(string $name): self
     {
-        if(is_null($name)) {
-            $name = uniqid('_');
-        }
-
-        if(is_null($fieldStack)) {
-            $fieldStack = new UssFormFieldStack($name);
-        }
-
-        $this->fieldStacks[$name] = $fieldStack;
-        $this->appendChild($fieldStack->getFieldStackAsElement());
-
-        return $fieldStack;
-    }
-
-    /**
-     * @method getFieldStack
-     */
-    public function getFieldStack(string $name): ?UssFormFieldStack
-    {
-        return $this->fieldStacks[$name] ?? null;
+        return $this;
     }
 
     /**
@@ -136,7 +186,7 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
             foreach($this->flatArray as $name => $value) {
                 $field = call_user_func(function () use ($name, $value): ?UssFormField {
                     $fields = [];
-                    foreach($this->fields as $field) {
+                    foreach($this->getFields() as $field) {
                         if($field->getWidgetAttribute('name') === $name) {
                             $fields[] = $field;
                         }
@@ -165,72 +215,5 @@ class UssForm extends UssElement implements UssFormInterface, UssElementNodeList
         }
 
         return parent::buildNode($node, $indent);
-    }
-
-    /**
-     * @method setDefaultAttributes
-     */
-    protected function setDefaultAttributes(string $name, ?string $action, string $method, ?string $enctype): void
-    {
-        $this->setAttribute('name', $name);
-        $this->setAttribute('action', $action);
-        $this->setAttribute('method', strtoupper($method));
-        if(!is_null($enctype)) {
-            $this->setAttribute('enctype', $enctype);
-        };
-        $this->setAttribute('id', "ussf-" . $name);
-    }
-
-    /**
-     * @method getAssignedFieldStack
-     */
-    protected function getActiveFieldStack(?string $fieldStackName): UssFormFieldStack
-    {
-        $fieldStack = $this->getFieldStack($fieldStackName ?? '');
-        if(!$fieldStack) {
-            if(empty($this->fieldStacks)) {
-                $fieldStackName = 'default';
-                $fieldStack = new UssFormFieldStack($fieldStackName);
-                $this->addFieldStack($fieldStackName, $fieldStack);
-            } else {
-                $fieldStack = end($this->fieldStacks);
-            }
-        };
-        return $fieldStack;
-    }
-
-    /**
-     * Recursively flattens a multi-dimensional array and constructs keys in the specified format.
-     *
-     * @param array  $array   The multi-dimensional array to flatten.
-     * @param string $prefix  (Optional) The prefix to prepend to keys.
-     * @return array The flattened array with keys in the specified format.
-     */
-    private function flattenArray($value, ?string $key = null)
-    {
-        $result = [];
-        if (!is_array($value)) {
-            $result[$key] = $value;
-        } else {
-            foreach ($value as $innerKey => $innerValue) {
-                if (func_num_args() > 1) {
-                    $newKey = $key . "[$innerKey]";
-                } else {
-                    $newKey = $innerKey;
-                }
-                $result = array_merge($result, $this->flattenArray($innerValue, $newKey));
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * @method labelize
-     */
-    protected function labelize(string $label): string
-    {
-        $entity = ['[', ']', '_'];
-        $with = ['', '', ' '];
-        return ucfirst(str_replace($entity, $with, $label));
     }
 }

@@ -4,6 +4,7 @@ namespace Ucscode\UssForm\Abstraction;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Interface\UssFormFieldStackInterface;
+use Ucscode\UssForm\UssForm;
 
 abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
 {
@@ -41,7 +42,8 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
      */
     public function __construct(
         public readonly ?string $stackName = null,
-        public readonly bool $isFieldset = true
+        public readonly bool $isFieldset = true,
+        public readonly UssForm $relatedForm
     ) {
         $this->buildElements();
     }
@@ -82,7 +84,7 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
             'outerContainer' => [
                 $this->isFieldset ? UssElement::NODE_FIELDSET : UssElement::NODE_DIV,
                 'attributes' => [
-                    'class' => 'fieldstack-outer-container',
+                    'class' => 'fieldstack-outer-container col-12',
                     'data-fieldstack' => $this->stackName
                 ],
             ],

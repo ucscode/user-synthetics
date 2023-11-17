@@ -1,9 +1,10 @@
 <?php
 
-namespace Ucscode\UssForm;
+namespace Ucscode\UssForm\Internal;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Abstraction\AbstractUssFormFieldStack;
+use Ucscode\UssForm\UssFormField;
 
 class UssFormFieldStack extends AbstractUssFormFieldStack
 {
@@ -12,15 +13,26 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function addField(string $name, UssFormField $field): self
     {
-        $this->fields[$name] = $field;
-        $this->innerContainer['element']->appendChild(
-            $field->getFieldAsElement()
-        );
-        if($field->hasLineBreak()) {
+        $previousField = $this->getField($name);
+        if(!$previousField) {
             $this->innerContainer['element']->appendChild(
-                $field->getLineBreak()
+                $field->getFieldAsElement()
+            );
+        } else {
+            if($previousField !== $field) {
+                $this->innerContainer['element']->replaceChild(
+                    $field->getFieldAsElement(),
+                    $previousField->getFieldAsElement()
+                );
+            }
+        }
+        if($field->hasLineBreak()) {
+            $this->innerContainer['element']->insertAfter(
+                $field->getLineBreak(),
+                $field->getFieldAsElement()
             );
         };
+        $this->fields[$name] = $field;
         return $this;
     }
 
@@ -76,8 +88,12 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
             unset($this->fields[$name]);
             if($field) {
                 $element = $field->getFieldAsElement();
+                $lineBreak = $field->getLineBreak();
                 if($element->getParentElement() === $this->innerContainer['element']) {
                     $this->innerContainer['element']->removeChild($element);
+                    if($lineBreak) {
+                        $this->innerContainer['element']->removeChild($lineBreak);
+                    }
                 }
             }
         }

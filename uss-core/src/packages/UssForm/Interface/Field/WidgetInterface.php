@@ -3,7 +3,7 @@
 namespace Ucscode\UssForm\Interface\Field;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\UssFormFieldSecondary;
+use Ucscode\UssForm\Internal\UssFormFieldSecondary;
 
 interface WidgetInterface
 {
