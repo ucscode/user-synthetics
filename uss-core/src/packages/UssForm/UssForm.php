@@ -16,12 +16,12 @@ class UssForm extends AbstractUssForm
      * 
      * @return UssFormFieldStack: The system generated fieldstack instance
      */
-    public function addFieldStack(?string $name = null, bool $isDiv = false): UssFormFieldStack
+    public function addFieldStack(?string $name = null, bool $useFieldset = true): UssFormFieldStack
     {
         $name = $name ?? 'stack' . (++self::$stackIndex);
         $fieldStack = $this->getFieldStack($name);
         if(!$fieldStack){
-            $fieldStack = new UssFormFieldStack($name, $isDiv, $this);
+            $fieldStack = new UssFormFieldStack($name, $useFieldset, $this);
             $this->fieldStacks[$name] = $fieldStack;
             $this->stackContainer->appendChild($fieldStack->getFieldStackAsElement());
         }

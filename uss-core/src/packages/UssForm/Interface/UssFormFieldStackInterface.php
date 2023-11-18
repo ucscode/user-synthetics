@@ -8,12 +8,13 @@ use Ucscode\UssForm\UssFormField;
 interface UssFormFieldStackInterface
 {
     public function addField(string $name, UssFormField $field): self;
-    public function addElement(string $name, UssElement $element): self;
     public function getField(string $name): ?UssFormField;
-    public function getElement(string $name): ?UssElement;
     public function removeField(string $name): self;
-    public function removeElement(string $name): self;
     public function getFields(): array;
+
+    public function addElement(string $name, UssElement $element): self;
+    public function getElement(string $name): ?UssElement;
+    public function removeElement(string $name): self;
     public function getElements(): array;
 
     public function getOuterContainerElement(): UssElement;
@@ -28,7 +29,7 @@ interface UssFormFieldStackInterface
     public function setTitleValue(?string $value): self;
     public function getTitleValue(): ?string;
     public function hideTitle(bool $status): self;
-    public function isHiddenTitle(): bool;
+    public function isTitleHidden(): bool;
 
     public function getSubtitleElement(): UssElement;
     public function setSubtitleAttribute(string $name, string $value, bool $append): self;
@@ -37,7 +38,7 @@ interface UssFormFieldStackInterface
     public function setSubtitleValue(?string $value): self;
     public function getSubtitleValue(): ?string;
     public function hideSubtitle(bool $status): self;
-    public function isHiddenSubtitle(): bool;
+    public function isSubtitleHidden(): bool;
 
     public function getInstructionElement(): UssElement;
     public function setInstructionAttribute(string $name, string $value, bool $append): self;
@@ -46,7 +47,7 @@ interface UssFormFieldStackInterface
     public function setInstructionValue(string|null|UssElement $value): self;
     public function getInstructionValue(): UssElement|string|null;
     public function hideInstruction(bool $status): self;
-    public function isHiddenInstruction(): bool;
+    public function isInstructionHidden(): bool;
 
     public function getInnerContainerElement(): UssElement;
     public function setInnerContainerAttribute(string $name, string $value, bool $append): self;

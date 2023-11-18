@@ -29,7 +29,7 @@ interface UssFormInterface
     public const TYPE_RESET = 'reset';
     public const TYPE_DATETIME_LOCAL = 'datetime-local';
 
-    public function addFieldStack(?string $name, bool $isDiv): UssFormFieldStack;
+    public function addFieldStack(?string $name, bool $useFieldset): UssFormFieldStack;
     public function getFieldStack(string $name): ?UssFormFieldStack;
     public function removeFieldStack(string $name): self;
     public function getFieldStacks(): array;

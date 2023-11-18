@@ -51,7 +51,7 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
         if(!$fieldStack) {
             if(empty($this->fieldStacks)) {
                 $fieldStackName = 'default';
-                $fieldStack = $this->addFieldStack($fieldStackName, false);
+                $fieldStack = $this->addFieldStack($fieldStackName, true);
             } else {
                 $fieldStack = end($this->fieldStacks);
             }

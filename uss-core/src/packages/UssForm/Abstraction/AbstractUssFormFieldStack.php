@@ -3,8 +3,8 @@
 namespace Ucscode\UssForm\Abstraction;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Interface\UssFormFieldStackInterface;
 use Ucscode\UssForm\UssForm;
+use Ucscode\UssForm\Interface\UssFormFieldStackInterface;
 
 abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
 {
@@ -34,46 +34,16 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
         'element' => null
     ];
 
-    protected array $fields = [];
-    protected array $elements = [];
-
     /**
      * @method __construct
      */
     public function __construct(
-        public readonly ?string $stackName = null,
+        public readonly ?string $name = null,
         public readonly bool $isFieldset = true,
         public readonly UssForm $relatedForm
     ) {
         $this->buildElements();
     }
-
-    // /**
-    //  * @method setOuterContainerAsDIV
-    //  */
-    // public function setOuterContainerAsDiv(bool $status): self
-    // {
-    //     $element = $this->outerContainer['element'];
-    //     $node = new UssElement($status ? UssElement::NODE_DIV : UssElement::NODE_FIELDSET);
-    //     if($element->tagName !== $node->tagName) {
-    //         foreach($element->getAttributes() as $key => $value) {
-    //             $node->setAttribute($key, $value);
-    //         }
-    //         foreach($element->getChildren() as $child) {
-    //             $node->appendChild($child);
-    //         }
-    //         $this->outerContainer['element'] = $node;
-    //     }
-    //     return $this;
-    // }
-
-    // /**
-    //  * @method isOuterContainerDIV
-    //  */
-    // public function isOuterContainerDIV(): bool
-    // {
-    //     return $this->outerContainer['element']->nodeName === UssElement::NODE_DIV;
-    // }
 
     /**
      * @method buildElements
@@ -85,11 +55,11 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
                 $this->isFieldset ? UssElement::NODE_FIELDSET : UssElement::NODE_DIV,
                 'attributes' => [
                     'class' => 'fieldstack-outer-container col-12',
-                    'data-fieldstack' => $this->stackName
+                    'data-fieldstack' => $this->name
                 ],
             ],
             'title' => [
-                UssElement::NODE_LEGEND,
+                $this->isFieldset ? UssElement::NODE_LEGEND : UssElement::NODE_H2,
                 'attributes' => [
                     'class' => 'fieldstack-title'
                 ],
@@ -120,6 +90,16 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
                 $this->{$property}['element']->setAttribute($name, $value);
             }
         }
+
+        $this->structureElement();
+    }
+
+    protected function structureElement(): void
+    {
+        $this->outerContainer['element']->prependChild($this->title['element']);
+        $this->outerContainer['element']->appendChild($this->subtitle['element']);
+        $this->outerContainer['element']->insertBefore($this->instruction['element']);
+        $this->outerContainer['element']->appendChild($this->innerContainer['element']);
     }
 
     /**
@@ -160,5 +140,16 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
             $entity['element']->setContent($value);
         }
         return $this;
+    }
+
+    /**
+     * @method hideElement
+     */
+    protected function hideElement(UssElement $element): void
+    {
+        $parentElement = $element->getParentElement();
+        if($parentElement) {
+            $parentElement->removeChild($element);
+        }
     }
 }
