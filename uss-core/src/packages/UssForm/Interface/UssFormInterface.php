@@ -33,14 +33,16 @@ interface UssFormInterface
     public function getFieldStack(string $name): ?UssFormFieldStack;
     public function removeFieldStack(string $name): self;
     public function getFieldStacks(): array;
+    
     public function getFieldStackByField(string $name): ?UssFormFieldStack;
+    public function getFieldStackByElement(string $name): ?UssFormFieldStack;
 
     public function addField(string $name, UssFormField $field, array $options): self;
     public function getField(string $name): ?UssFormField;
     public function removeField(string $name): self;
     public function getFields(): array;
 
-    public function addCustomElement(string $name, UssElement $element, array $options): self;
+    public function addCustomElement(string $name, UssElement $element): self;
     public function getCustomElement(string $name): ?UssElement;
     public function removeCustomElement(string $name): self;
 

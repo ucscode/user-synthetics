@@ -98,7 +98,7 @@ abstract class AbstractUssFormFieldStack implements UssFormFieldStackInterface
     {
         $this->outerContainer['element']->prependChild($this->title['element']);
         $this->outerContainer['element']->appendChild($this->subtitle['element']);
-        $this->outerContainer['element']->insertBefore($this->instruction['element']);
+        $this->outerContainer['element']->appendChild($this->instruction['element']);
         $this->outerContainer['element']->appendChild($this->innerContainer['element']);
     }
 

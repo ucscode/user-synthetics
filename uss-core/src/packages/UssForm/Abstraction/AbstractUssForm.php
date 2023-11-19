@@ -12,7 +12,6 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
 {
     public readonly UssElement $stackContainer;
     protected array $fieldStacks = [];
-    protected array $elements = [];
     protected ?array $flatArray = null;
     protected static $stackIndex = 0;
 
@@ -45,17 +44,27 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
     /**
      * @method getAssignedFieldStack
      */
-    protected function getActiveFieldStack(?string $fieldStackName, string $name): UssFormFieldStack
+    protected function getActiveFieldStack(?string $fieldStackName, string $name, bool $byElement = false): UssFormFieldStack
     {
-        $fieldStack = $this->getFieldStackByField($name) ?? $this->getFieldStack($fieldStackName ?? '');
+        // If user specified a fieldstack name
+        if(!empty($fieldStackName)) {
+            $fieldStack = $this->getFieldStack($fieldStackName);
+        } else {
+            $fieldStack = !$byElement ? $this->getFieldStackByField($name) : $this->getFieldstackByElement($name);
+        }
+
         if(!$fieldStack) {
+            // if fieldstack container is totally empty
             if(empty($this->fieldStacks)) {
+                // create a new fieldstack named "default"
                 $fieldStackName = 'default';
                 $fieldStack = $this->addFieldStack($fieldStackName, true);
             } else {
+                // get the last appended fieldstack
                 $fieldStack = end($this->fieldStacks);
             }
         };
+
         return $fieldStack;
     }
 
@@ -103,5 +112,20 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
         if(($options['mapped'] ?? null) !== false) {
             $field->setWidgetAttribute('name', $name);
         }
+    }
+
+    /**
+     * @method iterateFieldstack
+     */
+    protected function iterateFieldstack(\closure $closure): mixed
+    {
+        $result = null;
+        foreach($this->fieldStacks as $fieldStack) {
+            $result = $closure($fieldStack);
+            if(!empty($result)) {
+                break;
+            }
+        }
+        return $result;;
     }
 }
