@@ -2,5 +2,5 @@
 
 interface EventInterface
 {
-    public function eventAction(array $data): void;
+    public function eventAction(array|object $data): void;
 }

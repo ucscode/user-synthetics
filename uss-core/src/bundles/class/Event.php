@@ -22,7 +22,7 @@ final class Event
         return $this;
     }
 
-    private static function execAll(array $list, array $data)
+    private static function execAll(array $list, array|object $data)
     {
         usort($list, function ($a, $b) {
             return $a['order'] <=> $b['order'];

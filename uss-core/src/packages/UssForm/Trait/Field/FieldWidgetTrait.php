@@ -227,6 +227,6 @@ trait FieldWidgetTrait
      */
     public function getSecondaryFields(): array
     {
-        return $this->widget['alt'];
+        return $this->widget['secondary'];
     }
 }
