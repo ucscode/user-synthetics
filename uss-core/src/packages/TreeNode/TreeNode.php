@@ -5,11 +5,6 @@ namespace Ucscode\TreeNode;
 class TreeNode
 {
     /**
-     * Holds incrementing record of node ID
-     */
-    private static int $lastId = 0;
-
-    /**
      * The ID assigned to the current node
      */
     protected int $nodeId;
@@ -18,11 +13,6 @@ class TreeNode
      * The name of the TreeNode object
      */
     protected string $name;
-
-    /**
-     * The parent of the TreeNode object
-     */
-    private ?TreeNode $parentNode = null;
 
     /**
      * The depth or level of the TreeNode object
@@ -40,6 +30,16 @@ class TreeNode
      * An array containing multiple TreeNode objects representing the TreeNode children
      */
     protected array $children = [];
+
+    /**
+     * The parent of the TreeNode object
+     */
+    private ?TreeNode $parentNode = null;
+    
+    /**
+     * Holds incrementing record of node ID
+     */
+    private static int $lastId = 0;
 
     /**
      * TreeNode Constructor
@@ -185,11 +185,11 @@ class TreeNode
      * @throws \Exception Throws an exception indicating that properties should not be set directly.
      * @ignore
      */
-    public function __set($key, $value)
-    {
-        $_class = __CLASS__;
-        throw new \Exception("{$_class}: Not allowed to set `\${$key}` property directly; Use `set_attr()` method instead");
-    }
+    // public function __set($key, $value)
+    // {
+    //     $_class = __CLASS__;
+    //     throw new \Exception("{$_class}: Not allowed to set `\${$key}` property directly; Use `set_attr()` method instead");
+    // }
 
 
     /**
