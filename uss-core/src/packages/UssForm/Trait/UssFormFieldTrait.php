@@ -76,6 +76,7 @@ trait UssFormFieldTrait
         $this->widgetId = $this->generateId();
 
         foreach($this->getElementStructure() as $name => $prop) {
+            # $this->{name} === $this->label | $this->widget | ...
             $this->{$name}['element'] = new UssElement($prop[0]);
             foreach($prop['attributes'] as $key => $value) {
                 $this->{$name}['element']->setAttribute($key, $value);

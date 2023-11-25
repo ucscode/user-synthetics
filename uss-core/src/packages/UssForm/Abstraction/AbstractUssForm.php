@@ -99,7 +99,7 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
     protected function labelize(string $label): string
     {
         $entity = ['[', ']', '_'];
-        $with = ['', '', ' '];
+        $with = [' ', '', ' '];
         return ucfirst(str_replace($entity, $with, $label));
     }
 

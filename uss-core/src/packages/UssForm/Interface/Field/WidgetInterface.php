@@ -9,7 +9,7 @@ interface WidgetInterface
 {
     public function getWidgetElement(): UssElement;
 
-    public function setWidgetAttribute(string $name, ?string $value, bool $append): self;
+    public function setWidgetAttribute(string $name, ?string $value, bool $append = false): self;
     public function getWidgetAttribute(string $name): ?string;
     public function removeWidgetAttribute(string $name, ?string $detach): self;
 
