@@ -46,13 +46,7 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
      */
     public function getFieldStackAsElement(): UssElement
     {
-        $optional = ['title', 'subtitle', 'instruction'];
-        foreach($optional as $prop) {
-            $property = $this->{$prop};
-            if(is_null($property['value'])) {
-                $this->hideElement($property['element']);
-            }
-        }
+        $this->refactorFieldstackElement();
         return $this->outerContainer['element'];
     }
 
@@ -62,5 +56,19 @@ class UssFormFieldStack extends AbstractUssFormFieldStack
     public function getFieldStackAsHTML(): string
     {
         return $this->getFieldStackAsElement()->getHTML(true);
+    }
+
+    /**
+     * @method refactorFieldstackElements
+     */
+    protected function refactorFieldstackElement(): void
+    {
+        $optional = ['title', 'subtitle', 'instruction'];
+        foreach($optional as $prop) {
+            $property = $this->{$prop};
+            if(is_null($property['value'])) {
+                $this->hideElement($property['element']);
+            }
+        }
     }
 }

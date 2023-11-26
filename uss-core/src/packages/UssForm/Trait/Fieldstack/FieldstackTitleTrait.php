@@ -43,7 +43,9 @@ trait FieldstackTitleTrait
      */
     public function setTitleValue(?string $value): self
     {
-        return $this->valueSetter($this->title, $value);
+        $this->valueSetter($this->title, $value);
+        $this->refactorTitle();
+        return $this;
     }
 
     /**
@@ -60,11 +62,7 @@ trait FieldstackTitleTrait
     public function hideTitle(bool $status): self
     {
         $this->title['hidden'] = $status;
-        if($this->title['hidden']) {
-            $this->hideElement($this->title['element']);
-        } else {
-            $this->outerContainer['element']->prependChild($this->title['element']);
-        }
+        $this->refactorTitle();
         return $this;
     }
 
@@ -74,5 +72,15 @@ trait FieldstackTitleTrait
     public function isTitleHidden(): bool
     {
         return $this->title['hidden'];
+    }
+
+    /**
+     * @method refactorTitle
+     */
+    private function refactorTitle(): void
+    {
+        $this->isTitleHidden() ? 
+            $this->hideElement($this->title['element']) : 
+            $this->outerContainer['element']->prependChild($this->title['element']);
     }
 }

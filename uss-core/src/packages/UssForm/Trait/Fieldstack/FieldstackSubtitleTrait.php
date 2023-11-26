@@ -43,7 +43,9 @@ trait FieldstackSubtitleTrait
      */
     public function setSubtitleValue(?string $value): self
     {
-        return $this->valueSetter($this->subtitle, $value);
+        $this->valueSetter($this->subtitle, $value);
+        $this->refactorSubtitle();
+        return $this;
     }
 
     /**
@@ -60,7 +62,24 @@ trait FieldstackSubtitleTrait
     public function hideSubtitle(bool $status): self
     {
         $this->subtitle['hidden'] = $status;
-        if($this->subtitle['hidden']) {
+        $this->refactorSubtitle();
+        return $this;
+    }
+
+    /**
+     * @method isSubtitleHidden
+     */
+    public function isSubtitleHidden(): bool
+    {
+        return $this->subtitle['hidden'];
+    }
+
+    /**
+     * @method refactorSubtitle
+     */
+    private function refactorSubtitle(): void
+    {
+        if($this->isSubtitleHidden()) {
             $this->hideElement($this->subtitle['element']);
         } else {
             // subtitle has to be between title and instruction; above inner-container
@@ -81,14 +100,5 @@ trait FieldstackSubtitleTrait
                 );
             }
         }
-        return $this;
-    }
-
-    /**
-     * @method isSubtitleHidden
-     */
-    public function isSubtitleHidden(): bool
-    {
-        return $this->subtitle['hidden'];
     }
 }

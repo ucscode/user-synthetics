@@ -31,7 +31,7 @@ abstract class AbstractUssFormField implements UssFormFieldInterface
      * @method __constuct
      */
     public function __construct(
-        public readonly string $nodeName = UssElement::NODE_INPUT,
+        public readonly string $nodeName = UssForm::NODE_INPUT,
         protected ?string $nodeType = UssForm::TYPE_TEXT
     ) {
         $this->generateElements();

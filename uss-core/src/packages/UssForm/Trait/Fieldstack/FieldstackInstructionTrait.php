@@ -43,7 +43,9 @@ trait FieldstackInstructionTrait
      */
     public function setInstructionValue(null|string|UssElement $value): self
     {
-        return $this->valueSetter($this->instruction, $value);
+        $this->valueSetter($this->instruction, $value);
+        $this->refactorInstruction();
+        return $this;
     }
 
     /**
@@ -60,14 +62,7 @@ trait FieldstackInstructionTrait
     public function hideInstruction(bool $status): self
     {
         $this->instruction['hidden'] = $status;
-        if($this->instruction['hidden']) {
-            $this->hideElement($this->instruction['element']);
-        } else {
-            $this->outerContainer->insertBefore(
-                $this->instruction['element'],
-                $this->innerContainer['element']
-            );
-        }
+        $this->refactorInstruction();
         return $this;
     }
 
@@ -80,5 +75,20 @@ trait FieldstackInstructionTrait
 
         }
         return $this->instruction['hidden'];
+    }
+
+    /**
+     * @method refactorInstruction
+     */
+    private function refactorInstruction(): void
+    {
+        if($this->isInstructionHidden()) {
+            $this->hideElement($this->instruction['element']);
+        } else {
+            $this->outerContainer['element']->insertBefore(
+                $this->instruction['element'],
+                $this->innerContainer['element']
+            );
+        }
     }
 }
