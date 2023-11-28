@@ -189,6 +189,26 @@ class UssForm extends AbstractUssForm
     }
 
     /**
+     * @method openTag
+     */
+    public function open(): string
+    {
+        $form = new UssElement(UssElement::NODE_FORM);
+        foreach($this->getAttributes() as $key => $value) {
+            $form->setAttribute($key, $value);
+        }
+        return preg_replace("/<\/form>$/", '', $form->getHTML());
+    }
+
+    /**
+     * @method closeTag
+     */
+    public function close(): string
+    {
+        return '</form>';
+    }
+
+    /**
      * @method buildNodes
      */
     protected function buildNode(UssElement $node, ?int $indent)

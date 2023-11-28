@@ -32,6 +32,7 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
      */
     protected function setDefaultAttributes(string $name, ?string $action, string $method, ?string $enctype): void
     {
+        $name = preg_replace('/[^\w\d.]/', '-', $name);
         $this->setAttribute('name', $name);
         $this->setAttribute('action', $action);
         $this->setAttribute('method', strtoupper($method));
@@ -111,6 +112,11 @@ abstract class AbstractUssForm extends UssElement implements UssFormInterface, U
         $field->setLabelValue($field->getLabelValue() ?? $this->labelize($name));
         if(($options['mapped'] ?? null) !== false) {
             $field->setWidgetAttribute('name', $name);
+            foreach($field->getSecondaryFields() as $secondaryField) {
+                if(is_null($secondaryField->getWidgetAttribute("name"))) {
+                    $secondaryField->setWidgetAttribute("name", $name);
+                };
+            }
         }
     }
 
