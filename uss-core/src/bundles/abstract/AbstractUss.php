@@ -1,76 +1,29 @@
 <?php
 
+use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-use Twig\Extension\ExtensionInterface;
+use Twig\Extension\DebugExtension;
 
 abstract class AbstractUss extends AbstractUssUtils
 {
-    protected readonly ?FilesystemLoader $twigLoader;
+    public readonly FilesystemLoader $filesystemLoader;
+    public readonly Environment $twigEnvironment;
     protected array $consoleJS = [];
-    protected array $twigExtensions = [];
 
     protected function __construct()
     {
-        $this->twigLoader = new FilesystemLoader();
-        $this->twigLoader->addPath(UssImmutable::VIEW_DIR, $this->namespace);
-        $this->twigLoader->addPath(UssImmutable::VIEW_DIR, '__main__');
-        $this->loadTwigAssets();
-        $this->loadUssDatabase();
-        $this->loadUssSession();
-        $this->loadUssVariables();
+        $this->filesystemLoader = new FilesystemLoader([UssImmutable::VIEW_DIR]);
+        $this->filesystemLoader->addPath(UssImmutable::VIEW_DIR, self::NAMESPACE);
+        
+        $this->twigEnvironment = new Environment($this->filesystemLoader, [
+            'debug' => UssImmutable::DEBUG
+        ]);
+
+        $this->twigEnvironment->addExtension(new DebugExtension());
+        $this->twigEnvironment->addGlobal(self::NAMESPACE, new UssTwigExtension($this));
+
+        $this->twigComponentLoader();
     }
-
-    /**
-    * Add a Twig filesystem path with a specified namespace.
-    *
-    * @param string $directory The directory path to add.
-    * @param string $namespace The namespace for the Twig filesystem path.
-    * @throws \Exception If the namespace contains invalid characters, is already in use, or matches the current namespace.
-    */
-    public function addTwigFilesystem(string $directory, string $namespace): void
-    {
-        $namespace = $this->validateNamespace($namespace);
-
-        if (in_array($namespace, $this->twigLoader->getNamespaces())) {
-            throw new \Exception(
-                sprintf('%s: `%s` namespace already exists.', __METHOD__, $namespace)
-            );
-        }
-
-        $this->twigLoader->addPath($directory, $namespace);
-    }
-
-
-    /**
-    * Adds a Twig extension to the environment.
-    *
-    * @param string $fullyQualifiedClassName The fully qualified class name of the Twig extension.
-    * @throws \Exception If the provided class does not implement Twig\Extension\ExtensionInterface.
-    */
-    public function addTwigExtension(string|ExtensionInterface $extension): void
-    {
-        if(is_string($extension)) {
-            $interfaceName = ExtensionInterface::class;
-            $key = $extension;
-            if (!in_array($interfaceName, class_implements($extension))) {
-                throw new \Exception(
-                    sprintf(
-                        'The class "%s" provided to %s() must implement "%s".',
-                        $extension,
-                        __METHOD__,
-                        $interfaceName
-                    )
-                );
-            };
-        } else {
-            $key = $extension::class;
-        }
-
-        if(!array_key_exists($key, $this->twigExtensions)) {
-            $this->twigExtensions[] = $extension;
-        };
-    }
-
 
     /**
      * Pass a variable from PHP to JavaScript.
@@ -153,5 +106,4 @@ abstract class AbstractUss extends AbstractUssUtils
             }
         ));
     }
-
 }

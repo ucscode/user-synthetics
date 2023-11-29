@@ -2,12 +2,14 @@
 
 interface UssInterface
 {
+    public const NAMESPACE = 'Uss';
+
     public const SANITIZE_ENTITIES = 1;
     public const SANITIZE_SQL = 2;
     public const SANITIZE_SCRIPT_TAGS = 4;
 
-    public function addTwigFilesystem(string $directory, string $namespace): void;
-    public function addTwigExtension(string $fullyQualifiedClassName): void;
+    //public function addTwigFilesystem(string $directory, string $namespace): void;
+    // public function addTwigExtension(string $fullyQualifiedClassName): void;
     public function addJsProperty(string $key, mixed $value): void;
     public function getJsProperty(?string $key = null): mixed;
     public function removeJsProperty(string $key): mixed;

@@ -2,10 +2,10 @@
 
 use Ucscode\Pairs\Pairs;
 use Ucscode\SQuery\SQuery;
+use Ucscode\UssElement\UssElement;
 
 abstract class AbstractUssUtils implements UssInterface
 {
-    protected string $namespace = 'Uss';
     public static array $globals = [];
     public readonly ?Pairs $options;
     public readonly ?\mysqli $mysqli;
@@ -216,7 +216,7 @@ abstract class AbstractUssUtils implements UssInterface
      * @param callable|null $mapper Optional. A callback function to apply to each row before adding it to the result. The callback should accept a value and a key as its arguments.
      * @return array The resulting associative array.
      */
-    public function mysqli_result_to_array(\mysqli_result $result, ?callable $mapper = null): array
+    public function mysqliResultToArray(\mysqli_result $result, ?callable $mapper = null): array
     {
         $data = [];
         while($row = $result->fetch_assoc()) {
@@ -275,37 +275,14 @@ abstract class AbstractUssUtils implements UssInterface
     }
 
     /**
-    * @method refactorNamespace
-    */
-    protected function refactorNamespace(string $templatePath): string
+     * @method twigComponentLoader
+     */
+    protected function twigComponentLoader(): void
     {
-        if(substr($templatePath, 0, 1) === '@') {
-            $split = explode("/", $templatePath);
-            $split[0][1] = strtoupper($split[0][1]);
-            $templatePath = implode("/", $split);
-        };
-        return $templatePath;
-    }
-
-    /**
-    * Validate the provided Twig namespace.
-    *
-    * @param string $namespace The Twig namespace to validate.
-    * @throws \Exception If the namespace contains invalid characters or matches the current namespace.
-    */
-    protected function validateNamespace(string $namespace): string
-    {
-        if (!preg_match("/^\w+$/i", $namespace)) {
-            throw new \Exception(
-                sprintf('%s: Twig namespace may only contain letters, numbers, and underscores.', __METHOD__)
-            );
-        } elseif (strtolower($namespace) === strtolower($this->namespace)) {
-            throw new \Exception(
-                sprintf('%s: Use of `%s` as a namespace is not allowed.', __METHOD__, $namespace)
-            );
-        };
-
-        return ucfirst($namespace);
+        $this->loadTwigAssets();
+        $this->loadUssDatabase();
+        $this->loadUssSession();
+        $this->loadUssVariables();
     }
 
     /**
@@ -339,20 +316,24 @@ abstract class AbstractUssUtils implements UssInterface
 
         foreach($vendors as $block => $contents) {
 
-            $contents = array_map(function ($value) {
+            $contents = array_map(function ($key, $value) {
 
                 $type = explode(".", $value);
                 $value = $this->abspathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
 
                 if(strtolower(end($type)) === 'css') {
-                    $element = "<link rel='stylesheet' href='" . $value . "'>";
+                    $element = (new UssElement(UssElement::NODE_LINK))
+                        ->setAttribute('rel', 'stylesheet')
+                        ->setAttribute('href', $value);
                 } else {
-                    $element = "<script type='text/javascript' src='" . $value . "'></script>";
+                    $element = (new UssElement(UssElement::NODE_SCRIPT))
+                        ->setAttribute('type', 'text/javascript')
+                        ->setAttribute('src', $value);
                 };
 
-                return $element;
+                return $element->getHTML();
 
-            }, $contents);
+            }, array_keys($contents), $contents);
 
             $blockManager->appendTo($block, $contents);
 

@@ -13,46 +13,24 @@ final class Uss extends AbstractUss
      * Render A Twig Template
      *
      * @param string $templateFile: Reference to the twig template.
-     * @param array $variables: A list of variables that will be passed to the template
+     * @param array $variables:     A list of variables that will be passed to the template
      *
      * @return void
      */
     public function render(string $templateFile, array $variables = [], $return = false): ?string
     {
-        $templateFile = $this->refactorNamespace($templateFile);
-
-        $twig = new \Twig\Environment($this->twigLoader, [
-            'debug' => UssImmutable::DEBUG
-        ]);
-
-        if(UssImmutable::DEBUG) {
-            $twig->addExtension(new \Twig\Extension\DebugExtension());
-        };
-
-        $twig->addGlobal($this->namespace, new UssTwigGlobalExtension($this));
-
-        foreach($this->twigExtensions as $extension) {
-            if(is_string($extension)) {
-                $extension = new $extension();
-            }
-            $twig->addExtension($extension);
-        }
-
-        $result = $twig->render($templateFile, $variables);
-
-        if(!$return) {
+        $result = $this->twigEnvironment->render($templateFile, $variables);
+        return $return ? $result : call_user_func(function() use($result) {
             print($result);
             die();
-        }
-
-        return $result;
+        });
     }
 
     /**
      * Retrieve URL request path segments.
      *
-     * @param int|null $index Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
-     * @return array|string|null The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
+     * @param int|null $index       Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
+     * @return array|string|null    The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
      */
     public function splitUri(?int $index = null): array|string|null
     {
@@ -81,7 +59,7 @@ final class Uss extends AbstractUss
 
         $nonce = hash_hmac($algorithm, $dataToHash, $secretKey);
 
-        if ($receivedNonce === null) {
+        if($receivedNonce === null) {
             return $nonce . ':' . $salt;
         } else {
             $token = explode(':', $receivedNonce);
@@ -93,7 +71,6 @@ final class Uss extends AbstractUss
                 return false;
             }
         }
-
     }
 
 };
