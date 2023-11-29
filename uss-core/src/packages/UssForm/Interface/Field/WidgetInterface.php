@@ -32,6 +32,8 @@ interface WidgetInterface
     public function setRequired(bool $status): self;
     public function isRequired(): bool;
 
+    public function inverse(bool $inverse): self;
+
     public function createSecondaryField(string $name, string $type): UssFormFieldSecondary;
     public function getSecondaryField(string $name): ?UssFormFieldSecondary;
     public function removeSecondaryField(string $name): ?UssFormFieldSecondary;

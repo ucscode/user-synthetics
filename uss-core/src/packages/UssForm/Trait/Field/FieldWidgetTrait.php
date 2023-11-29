@@ -17,7 +17,8 @@ trait FieldWidgetTrait
             'values' => [],
             'elements' => [],
         ],
-        'secondary' => []
+        'secondary' => [],
+        'inverse' => false,
     ];
 
     public function getWidgetElement(): UssElement
@@ -170,6 +171,12 @@ trait FieldWidgetTrait
         return false;
     }
 
+    public function inverse(bool $inverse): self
+    {
+        $this->widget['inverse'] = $inverse;
+        return $this;
+    }
+
     /**
      * @method createAlt
      */
@@ -182,17 +189,19 @@ trait FieldWidgetTrait
         }
 
         if(!empty($this->widget['secondary'])) {
-            $lastSecondaryField = end($this->widget['secondary']);
-            $prev = $lastSecondaryField->getFieldAsElement();
+            $lastSecondaryField = !$this->widget['inverse'] ? end($this->widget['secondary']) : reset($this->widget['secondary']);
+            $siblingElement = $lastSecondaryField->getFieldAsElement();
         } else {
-            $prev = $this->widgetContainer['element'];
+            $siblingElement = $this->widgetContainer['element'];
         }
 
         $this->widget['secondary'][$name] = $secondaryField;
 
-        $this->container['element']->insertAfter(
+        $method = $this->widget['inverse'] ? "insertBefore" : "insertAfter";
+        
+        $this->container['element']->{$method}(
             $secondaryField->getWidgetContainerElement(), 
-            $prev
+            $siblingElement
         );
 
         return $secondaryField;
