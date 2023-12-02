@@ -14,10 +14,9 @@ class DOMTable extends AbstractDOMTable
 
     public function __construct(?string $tablename = null)
     {
-        if(empty($tablename)) {
-            $tablename = uniqid('_');
-        };
+        $tablename = $tablename ?: uniqid('_');
         $this->tablename = $tablename;
+        $this->developeTableNodes();
     }
 
     /**
@@ -35,8 +34,8 @@ class DOMTable extends AbstractDOMTable
      */
     public function build(): UssElement
     {
-        $this->developeTableNodes();
-
+        $this->clearNodes();
+        
         $this->result = [];
         $this->totalItems = 0;
         $startIndex = ($this->currentPage - 1) * $this->itemsPerPage;
@@ -191,6 +190,25 @@ class DOMTable extends AbstractDOMTable
             $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
             $this->emptinessElement->setAttribute('class', 'border p-4 text-center');
             $this->emptinessElement->setContent("No Item Found");
+        }
+    }
+
+    /**
+     * @method clearNodes
+     */
+    protected function clearNodes(): void
+    {
+        $nodelist = [
+            'tableWrapper',
+            'tableContainer',
+            'table',
+            'thead',
+            'tbody',
+            'tfoot'
+        ];
+
+        foreach($nodelist as $node) {
+            $this->{$node}->freeElement();
         }
     }
 
