@@ -12,17 +12,17 @@
             <meta charset="utf-8">
             <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
             <meta name='description' content='{{ page_description|default('') }}'>
-        {% endblock head_metas %}
+        {% endblock %}
 
         {% block head_css %}
-            {{ Uss.renderBlocks('head_css', 2)|raw }} 
-        {% endblock head_css %}
+            {{ Uss.renderBlocks('head_css', 1)|raw }} 
+        {% endblock %}
 
         {% block head_js %}
-            {{ Uss.renderBlocks('head_js', 2)|raw }}
-        {% endblock head_js %}
+            {{ Uss.renderBlocks('head_js', 1)|raw }}
+        {% endblock %}
 
-    {% endblock head %}
+    {% endblock %}
 
 </head>
 <body>
@@ -31,11 +31,11 @@
         
         {{ Uss.renderBlocks('body_intro', 1)|raw }}
 
-        {% block body_main %}{% endblock body_main %}
+        {% block body_main %}{% endblock %}
 
         {% block body_js %}
-            {{ Uss.renderBlocks('body_js', 2)|raw }}
-        {% endblock body_js %}
+            {{ Uss.renderBlocks('body_js', 1)|raw }}
+        {% endblock %}
 
         {{ Uss.renderBlocks('body_outro', 1)|raw }}
 
