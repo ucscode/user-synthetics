@@ -2,11 +2,43 @@
 
 defined('ROOT_DIR') || die('@CORE:MODULE');
 
+/**
+ * Module Loader
+ *
+ * This file defines an anonymous class responsible for loading modules in the project.
+ * The class dynamically loads and initializes modules based on the project's requirements.
+ *
+ * @package Ucscode\Uss
+ */
 new class () {
+    /**
+     * The name of the configuration file required for each modules
+     * @var string
+     */
     private string $jsonFile = 'config.json';
+
+    /**
+     * The base file required for each modules
+     * @var string
+     */
     private string $baseFile = 'index.php';
+
+    /**
+     * The list of active available modules in the project
+     * @var array
+     */
     private array $modules = [];
+
+    /**
+     * Modules awaiting the loading of a dependency module.
+     * @var array
+     */
     private array $pending = [];
+
+    /**
+     * Loaded modules to avoid unconditional reloading.
+     * @var array
+     */
     private array $loaded = [];
 
     public function __construct()
@@ -17,6 +49,11 @@ new class () {
         $this->render404();
     }
 
+    /**
+     * Module Directory Iterator
+     *
+     * This iterates the modules directory and discover all modules that has configuration file
+     */
     private function iterateModules(): void
     {
         $iterator = new \FileSystemIterator(UssImmutable::MOD_DIR);
@@ -31,6 +68,12 @@ new class () {
         }
     }
 
+    /**
+     * Process Modules Configuration File
+     *
+     * This inspects the modules configuration file and add the modules into the
+     * available module list if not error is encountered
+     */
     private function processJSON(string $configFile, \SplFileInfo $system): void
     {
         $config = json_decode(file_get_contents($configFile), true);
@@ -67,6 +110,11 @@ new class () {
         }
     }
 
+    /**
+     * Load Active Modules
+     *
+     * This iterates throught all active modules and load them individually
+     */
     private function loadActiveModules(): void
     {
         foreach($this->modules as $path => $config) {
@@ -74,6 +122,12 @@ new class () {
         }
     }
 
+    /**
+     * Check for dependencies
+     *
+     * This checks if the module is dependent on another modules before loading.
+     * If the modules has dependency, it loads all dependencies first before loading the module
+     */
     private function handleConfig(string $path, array $config): void
     {
         if(!is_array($config['dependencies'] ?? null)) {
@@ -89,6 +143,12 @@ new class () {
         $this->loadOnce($path);
     }
 
+    /**
+     * Dependency Loader
+     *
+     * This method is the logic behind dependency loading.
+     * It checks if a module is loaded or is pending to avoid loading dependencies multiple times
+     */
     private function loadDependencies(string $path, array $dependencies): void
     {
         if(!$this->isLoaded($path) && !$this->isPending($path)) {
@@ -111,6 +171,11 @@ new class () {
         }
     }
 
+    /**
+     * Load Module Once
+     *
+     * This checks if a module has already been loaded and ignores further loading of the module
+     */
     private function loadOnce(string $path): void
     {
         if(!$this->isLoaded($path)) {
@@ -119,6 +184,12 @@ new class () {
         };
     }
 
+    /**
+     * Find a module
+     *
+     * Each module must have a unique name.
+     * This method finds the module and returns the module's path and configuration information
+     */
     private function findModule(string $name): ?array
     {
         foreach($this->modules as $path => $config) {
@@ -132,21 +203,32 @@ new class () {
         return null;
     }
 
+    /**
+     * This checks if a modules is already loaded
+     */
     private function isLoaded(string $path): bool
     {
         return in_array($path, $this->loaded);
     }
 
+    /**
+     * This checks if a modules is in pending state
+     */
     private function isPending(string $path): bool
     {
         return in_array($path, $this->pending);
     }
 
+    /**
+     * Render 404 Error Pages
+     *
+     * When there is no router to handle a route or display anything on the screen
+     * This method will automatically render a 404 error page
+     */
     private function render404(): void
     {
         $matchingRoutes = Route::getInventories(true);
         $isGetRequest = $_SERVER['REQUEST_METHOD'] === 'GET';
-
         if(empty($matchingRoutes) && $isGetRequest) {
             Uss::instance()->render('@Uss/error.html.twig');
         }

@@ -1,15 +1,34 @@
 <?php
+/**
+ * database.php - Database Configuration
+ *
+ * This file defines constants related to database configuration, including whether the
+ * database is enabled, the table prefix, and connection details based on the server
+ * environment (local or remote development).
+ *
+ * @package Ucscode\Uss
+ */
 
-define('DB_ENABLED', true); // false to disabled
+/**
+ * Flag indicating whether the database is enabled or disabled.
+ *
+ * @var bool
+ */
+define('DB_ENABLED', true);
 
-// Database Table Prefix
-
+/**
+ * Prefix for database tables.
+ *
+ * @var string
+ */
 define('DB_PREFIX', 'uss_');
 
-if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
+// Check server environment for database connection details
+
+if (in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 
     /**
-     * For Local Development Only
+     * Database connection details for local development.
      */
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
@@ -19,11 +38,11 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 } else {
 
     /**
-     * For Remote Development Only
+     * Database connection details for remote development.
      */
     define('DB_HOST', 'localhost');
     define('DB_USER', '');
     define('DB_PASSWORD', '');
     define('DB_NAME', '');
 
-};
+}

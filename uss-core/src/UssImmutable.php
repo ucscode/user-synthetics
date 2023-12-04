@@ -20,9 +20,9 @@ final class UssImmutable
     public const AUTHOR_EMAIL = 'uche23mail@gmail.com';
     public const AUTHOR_WEBSITE = 'https://ucscode.me';
     public const MIN_PHP_VERSION = '8.1';
+    public const VENDOR_DIR = ROOT_DIR . '/vendor';
     public const CORE_DIR = ROOT_DIR . "/uss-core";
     public const MOD_DIR = ROOT_DIR . '/uss-modules';
-    public const VENDOR_DIR = ROOT_DIR . '/vendor';
     public const ASSETS_DIR = self::CORE_DIR . '/assets';
     public const VIEW_DIR = self::CORE_DIR . '/view';
     public const SRC_DIR = self::CORE_DIR . "/src";
