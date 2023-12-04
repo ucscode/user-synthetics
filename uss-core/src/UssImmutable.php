@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * Class UssImmutable
+ *
+ * This class represents an immutable object, meaning that its state cannot be modified
+ * after an instance is created. The use of the `final` keyword ensures that this class
+ * cannot be extended or subclassed.
+ *
+ * @package Ucscode\Uss
+ */
 final class UssImmutable
 {
     public const DEBUG = true;

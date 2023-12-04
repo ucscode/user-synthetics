@@ -112,7 +112,7 @@ $data = array( /* some form data */ );
 
 // Trigger events
 
-(new Event())->emit('user.registered', $data);
+Event::emit('user.registered', $data);
 ```
 
 In the example above, we've set an order of `-10` for second `user.registration` Event. <br>
