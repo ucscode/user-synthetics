@@ -1,25 +1,11 @@
-## The structure of user synthetics has been updated. This notice will be removed once the documentation has been updated
-
-<div align="center">
-	<img src="uss-core/assets/images/origin.png" alt="User Synthetics Logo" width="140">
+<div style="text-align: center">
+	<img src="uss-core/assets/images/origin.png" alt="User Synthetics Logo" width="90">
 	<h1>User Synthetics</h1>
 	<p>Modular PHP Framework for Customizable and Extensible Web Applications</p>
-	<a href="https://uss.ucscode.me/docs"><strong>Explore the User Synthetics docs »</strong></a>
+	<a href="docs/"><strong>Explore the User Synthetics docs »</strong></a>
 	<br>
 	<br>
 </div>
-
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Demo](#demo)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Documentation](#documentation)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
 
 ## Introduction
 
@@ -27,21 +13,11 @@ User Synthetics is a powerful and versatile PHP framework designed to simplify t
 
 The framework provides a solid foundation, incorporating essential third-party libraries like Bootstrap, Toastr.js, and Bootbox, to empower developers with a comprehensive set of tools for building modern and interactive web applications.
 
-## Demo
+## Screenshot
 
-Check out the video showcase of User Synthetics in action:
+This is a screenshot of [Uss Dashboard Module](https://github.com/ucscode/uss-dashboard)
 
-[![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)](https://uss.ucscode.me/videos)
-
-Click the image above or <a href='https://uss.ucscode.me/videos' target='_blank'>**click here**</a> to watch the video.
-
----
-
-A live demo of User Synthetics has been prepared for you to explore and experience its capabilities. The demo showcases various features and modules of the framework, giving you a glimpse of its flexibility and functionality.
-
-**[Access the User Synthetics Live Demo](https://uss.ucscode.me/demo)**
-
-> Please note that the demo is for exploration purposes only, and any changes or data entered in the demo environment will not be saved.
+![User Synthetics Video Showcase](https://i.ibb.co/9wyFmLT/1677511496611.png)
 
 ## Features
 
@@ -62,11 +38,11 @@ Follow these steps to get started with User Synthetics:
 1. Clone the repository: `git clone https://github.com/ucscode/user-synthetics.git`.
 2. Set up your web server to serve the cloned directory as the document root.
 3. Customize the framework and modules to suit your project's requirements.
-4. Refer to the [User Synthetics documentation](https://uss.ucscode.me/docs) for detailed usage instructions and guides.
+4. Refer to the [User Synthetics documentation](docs/) for detailed usage instructions and guides.
 
 ## Documentation
 
-Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](https://uss.ucscode.me/docs) to explore the resources.
+Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](docs/) to explore the resources.
 
 ## Contributing
 
@@ -79,27 +55,6 @@ If you have ideas for new features, bug fixes, or improvements, you can submit a
 ## License
 
 User Synthetics is released under the GNU General Public License (GPL) version 3 or later. For more information about, please refer to the [LICENSE](https://www.gnu.org/licenses/gpl-3.0.html) file.
-
-## Events Naming Convention
-
-While this is not a formal recommendation, it can be useful for defining or identifying event names used in user synthetics. 
-
-Consider the following code snippet in PHP:
-
-```php
-Events::instance()->addListener('uss:pages/users@nav.dropdown', ...);
-```
-
-The event name `uss:pages/users@nav.dropdown` can be broken down as follows:
-
-- `uss:` - Represents the identity or source of the event.
-- `pages/users` - Refers to the event name or a possible point of execution.
-- `@nav` - Indicates an element, in this case `<nav>`, where the event can be found or referenced.
-- `.dropdown` 
-  - It might signify an action related to the event. Other example can be `.click`, `.submit`, etc.
-  - It might also be used to indicate the position of an element associated with the event, such as `.top`, `.left`, `.right`, or `.bottom`.
-
-These breakdowns can help provide a clearer understanding of the event name and its components within user synthetics.
 
 ## Acknowledgements
 
