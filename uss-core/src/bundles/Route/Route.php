@@ -65,7 +65,7 @@ class Route
         $requestMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
 
         if(!is_array($methods)) {
-            $methods = [$this->methods];
+            $methods = [$methods];
         };
 
         $this->methods = $methods;
