@@ -54,6 +54,10 @@ interface UssElementInterface
 
     public function getHTML(bool $indent = false): string;
 
+    public function open(): string;
+    
+    public function close(): string;
+
     /**
      * Parent
      */

@@ -47,6 +47,4 @@ interface UssFormInterface
     public function removeCustomElement(string $name): self;
 
     public function populate(array $data): self;
-    public function open(): string;
-    public function close(): string;
 }

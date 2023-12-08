@@ -357,6 +357,26 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
+     * @method openTag
+     */
+    public function open(): string
+    {
+        $form = new UssElement($this->nodeName);
+        foreach($this->getAttributes() as $key => $value) {
+            $form->setAttribute($key, $value);
+        }
+        return preg_replace("/<\/" . strtolower($this->nodeName) . ">$/", '', $form->getHTML());
+    }
+
+    /**
+     * @method closeTag
+     */
+    public function close(): string
+    {
+        return '</' . strtolower($this->nodeName) . '>';
+    }
+
+    /**
      * Set the parent element of the current element
      *
      * @param UssElement $parent

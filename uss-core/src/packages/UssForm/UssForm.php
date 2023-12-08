@@ -7,20 +7,20 @@ use Ucscode\UssForm\Interface\UssFormInterface;
 use Ucscode\UssForm\Abstraction\AbstractUssForm;
 use Ucscode\UssForm\Internal\UssFormFieldStack;
 
-class UssForm extends AbstractUssForm 
+class UssForm extends AbstractUssForm
 {
     /**
      * The fieldStack becomes the current active stack to hold the next field
-     * 
+     *
      * @param string $name (optional): The name of the fieldStack; Auto-generated if not given
-     * 
+     *
      * @return UssFormFieldStack: The system generated fieldStack instance
      */
     public function addFieldStack(?string $name = null, bool $useFieldset = true): UssFormFieldStack
     {
         $name = $name ?? 'stack' . (++self::$stackIndex);
         $fieldStack = $this->getFieldStack($name);
-        if(!$fieldStack){
+        if(!$fieldStack) {
             $fieldStack = new UssFormFieldStack($name, $useFieldset, $this);
             $this->fieldStacks[$name] = $fieldStack;
             $this->stackContainer->appendChild($fieldStack->getFieldStackAsElement());
@@ -30,7 +30,7 @@ class UssForm extends AbstractUssForm
 
     /**
      * Get a fieldStack by name
-     * 
+     *
      * @return ?UssFormFieldStack: The fieldStack instance or null of not found
      */
     public function getFieldStack(string $name): ?UssFormFieldStack
@@ -41,9 +41,9 @@ class UssForm extends AbstractUssForm
     /**
      * Get a fieldStack by fieldname
      */
-     public function getFieldStackByField(string $name): ?UssFormFieldStack
+    public function getFieldStackByField(string $name): ?UssFormFieldStack
     {
-        return $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        return $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             if($fieldStack->getField($name)) {
                 return $fieldStack;
             }
@@ -53,9 +53,9 @@ class UssForm extends AbstractUssForm
     /**
      * Get a fieldStack by element name
      */
-     public function getFieldStackByElement(string $name): ?UssFormFieldStack
+    public function getFieldStackByElement(string $name): ?UssFormFieldStack
     {
-        return $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        return $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             if($fieldStack->getElement($name)) {
                 return $fieldStack;
             }
@@ -63,10 +63,10 @@ class UssForm extends AbstractUssForm
     }
 
     /**
-     * Remove a fieldStack form the form 
-     * 
+     * Remove a fieldStack form the form
+     *
      * @param string $name: The name of the field stack to remove
-     * 
+     *
      * @return self: The UssForm instances
      */
     public function removeFieldStack(string $name): self
@@ -85,7 +85,7 @@ class UssForm extends AbstractUssForm
 
     /**
      * Get all available fieldStacks
-     * 
+     *
      * @return array: A list of fieldStacks
      */
     public function getFieldStacks(): array
@@ -95,11 +95,11 @@ class UssForm extends AbstractUssForm
 
     /**
      * Add a field to the most active fieldStack in the form instance
-     * 
+     *
      * @param string $name: The name of the field
      * @param UssFormField $field: The instance of the field
      * @param array $options: Options for additional configuration of the field
-     * 
+     *
      * @return self: The UssForm instance
      */
     public function addField(string $name, UssFormField $field, array $options = []): self
@@ -112,14 +112,14 @@ class UssForm extends AbstractUssForm
 
     /**
      * Find a field from all available fieldStack
-     * 
+     *
      * @param string $name: The name of the field to get
-     * 
+     *
      * @return ?UssFormField: The field instance or null
      */
     public function getField(string $name): ?UssFormField
     {
-        return $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        return $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             return $fieldStack->getField($name);
         });
     }
@@ -129,7 +129,7 @@ class UssForm extends AbstractUssForm
      */
     public function removeField(string $name): self
     {
-        $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             $fieldStack->removeField($name);
         });
         return $this;
@@ -163,7 +163,7 @@ class UssForm extends AbstractUssForm
      */
     public function getCustomElement(string $name): ?UssElement
     {
-        return $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        return $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             return $fieldStack->getElement($name);
         });
     }
@@ -173,7 +173,7 @@ class UssForm extends AbstractUssForm
      */
     public function removeCustomElement(string $name): self
     {
-        $this->iterateFieldstack(function(UssFormFieldStack $fieldStack) use ($name) {
+        $this->iterateFieldstack(function (UssFormFieldStack $fieldStack) use ($name) {
             $fieldStack->removeElement($name);
         });
         return $this;
@@ -186,26 +186,6 @@ class UssForm extends AbstractUssForm
     {
         $this->flatArray = $this->flattenArray($data);
         return $this;
-    }
-
-    /**
-     * @method openTag
-     */
-    public function open(): string
-    {
-        $form = new UssElement(UssElement::NODE_FORM);
-        foreach($this->getAttributes() as $key => $value) {
-            $form->setAttribute($key, $value);
-        }
-        return preg_replace("/<\/form>$/", '', $form->getHTML());
-    }
-
-    /**
-     * @method closeTag
-     */
-    public function close(): string
-    {
-        return '</form>';
     }
 
     /**
