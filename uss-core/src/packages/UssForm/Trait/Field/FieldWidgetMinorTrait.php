@@ -103,7 +103,7 @@ trait FieldWidgetMinorTrait
 
     public function getWidgetOptions(): array
     {
-        return $this->widget['options'];
+        return $this->widget['options']['values'];
     }
 
     public function hasWidgetOption(string $key): bool

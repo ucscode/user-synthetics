@@ -194,7 +194,9 @@ class UssForm extends AbstractUssForm
     protected function buildNode(UssElement $node, ?int $indent)
     {
         if($this->flatArray) {
+
             foreach($this->flatArray as $name => $value) {
+
                 $field = call_user_func(function () use ($name, $value): ?UssFormField {
                     $fields = [];
                     foreach($this->getFields() as $field) {
@@ -215,14 +217,20 @@ class UssForm extends AbstractUssForm
                     }
                     return null;
                 });
+
                 if($field) {
                     if($field->isCheckable()) {
                         $field->setWidgetChecked($field->getWidgetValue() == $value);
                     } else {
+                        if($name === 'status') {
+                            var_dump($field->getWidgetOptions());
+                        }
                         $field->setWidgetValue($value);
                     }
                 }
+
             }
+
         }
 
         return parent::buildNode($node, $indent);

@@ -228,8 +228,9 @@ trait UssFormFieldTrait
                 $this->widget['element']->setContent($this->widget['value']);
                 break;
             case UssElement::NODE_SELECT:
-                $key = array_search($this->widget['value'], $this->widget['options']['values']);
-                if($key !== false) {
+                $key = $this->widget['value'];
+                $exists = array_key_exists($key, $this->getWidgetOptions());
+                if($exists) {
                     $optionElement = $this->widget['options']['elements'][$key] ?? null;
                     if($optionElement) {
                         $optionElement->setAttribute('selected', 'selected');
@@ -371,7 +372,7 @@ trait UssFormFieldTrait
     }
 
     /**
-     * @method 
+     * @method
      */
     protected function widgetContainerClass(): string
     {

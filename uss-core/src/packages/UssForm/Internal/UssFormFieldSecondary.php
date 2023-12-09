@@ -2,18 +2,22 @@
 
 namespace Ucscode\UssForm\Internal;
 
+use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\UssForm;
+use Ucscode\UssForm\Interface\UssFormFieldSecondaryInterface;
+use Ucscode\UssForm\Trait\UssFormFieldTrait;
 use Ucscode\UssForm\Trait\Field\FieldWidgetContainerTrait;
 use Ucscode\UssForm\Trait\Field\FieldWidgetTrait;
-use Ucscode\UssForm\Trait\UssFormFieldTrait;
-use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Trait\Field\FieldLabelTrait;
-use Ucscode\UssForm\UssForm;
 
-class UssFormFieldSecondary
+class UssFormFieldSecondary implements UssFormFieldSecondaryInterface
 {
+    /** Field Traits that implements the method of UssFormFieldSecondaryInterface */
     use FieldWidgetContainerTrait;
     use FieldWidgetTrait;
     use FieldLabelTrait;
+
+    /** UssFormField Method */
     use UssFormFieldTrait;
 
     protected const SECONDARY_TYPES = [
@@ -65,7 +69,7 @@ class UssFormFieldSecondary
         ];
     }
 
-    
+
 
     protected function buildFieldStructure(): void
     {

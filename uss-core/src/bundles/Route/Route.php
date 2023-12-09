@@ -16,7 +16,7 @@ class Route
     public function __construct(
         string $route,
         RouteInterface $controller,
-        array|string $methods = 'GET'
+        array|string $methods = ['GET', 'POST']
     ) {
         $this->route = $route;
         $this->controller = $controller;
