@@ -222,9 +222,6 @@ class UssForm extends AbstractUssForm
                     if($field->isCheckable()) {
                         $field->setWidgetChecked($field->getWidgetValue() == $value);
                     } else {
-                        if($name === 'status') {
-                            var_dump($field->getWidgetOptions());
-                        }
                         $field->setWidgetValue($value);
                     }
                 }

@@ -58,6 +58,8 @@ interface UssElementInterface
     
     public function close(): string;
 
+    public function setInvisible(bool $status): self;
+
     /**
      * Parent
      */

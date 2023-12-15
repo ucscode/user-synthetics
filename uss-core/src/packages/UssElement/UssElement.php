@@ -30,6 +30,15 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
+     * Hide element from browser DOM but make it available an accessible
+     */
+    public function setInvisible(bool $status): UssElementInterface
+    {
+        $this->invisible = $status;
+        return $this;
+    }
+
+    /**
      * Checks if an attribute exists on the element.
      *
      * @param string $attr The name of the attribute to check.

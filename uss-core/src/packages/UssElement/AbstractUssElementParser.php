@@ -6,16 +6,12 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
 {
     public readonly string $tagName;
     public readonly string $nodeName;
-
-    protected ?UssElementInterface $parentElement = null;
-
     protected array $attributes = [];
-
     protected array $children = [];
-
     protected ?string $content = null;
-
     protected bool $void = false;
+    protected bool $invisible = false;
+    protected ?UssElementInterface $parentElement = null;
 
     protected $voidTags = [
         self::NODE_AREA,
@@ -109,66 +105,70 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
 
     protected function buildNode(UssElement $node, ?int $indent)
     {
-        $nodename = strtolower($node->tagName);
-        $attributes = [];
+        if(!$node->invisible) {
 
-        foreach($node->attributes as $key => $values) {
-            $attributes[] = $key . "=\"" . htmlentities(implode(" ", $values)) . "\"";
-        }
+            $nodename = strtolower($node->tagName);
+            $attributes = [];
 
-        if(!is_null($indent)) {
-            $indentation = str_repeat("\t", $indent);
-            $carriage = "\n";
-        } else {
-            $indentation = $carriage = null;
-        }
+            foreach($node->attributes as $key => $values) {
+                $attributes[] = $key . "=\"" . htmlentities(implode(" ", $values)) . "\"";
+            }
 
-        $html = $indentation . "<" . $nodename;
+            if(!is_null($indent)) {
+                $indentation = str_repeat("\t", $indent);
+                $carriage = "\n";
+            } else {
+                $indentation = $carriage = null;
+            }
 
-        if(!empty($attributes)) {
-            $html .= " " . implode(" ", $attributes);
-        };
+            $html = $indentation . "<" . $nodename;
 
-        if(!$node->void) {
+            if(!empty($attributes)) {
+                $html .= " " . implode(" ", $attributes);
+            };
 
-            $html .= ">";
+            if(!$node->void) {
 
-            if(!$node->hasContent()) {
+                $html .= ">";
 
-                if(!empty($node->children)) {
+                if(!$node->hasContent()) {
 
-                    $html .= $carriage;
+                    if(!empty($node->children)) {
 
-                    foreach($node->children as $child) {
-                        if(is_null($indent)) {
-                            $index = null;
-                        } else {
-                            $index = $indent + 1;
+                        $html .= $carriage;
+
+                        foreach($node->children as $child) {
+                            if(is_null($indent)) {
+                                $index = null;
+                            } else {
+                                $index = $indent + 1;
+                            }
+                            $html .= $child->buildNode($child, $index) . $carriage;
                         }
-                        $html .= $child->buildNode($child, $index) . $carriage;
+
+                        $html .= $indentation;
+
                     }
 
-                    $html .= $indentation;
+                } else {
+
+                    // $html .= $carriage . $indentation . "\t";
+                    $html .= $node->getContent();
+                    // $html .= $carriage . $indentation;
 
                 }
 
+                $html .= "</" . $nodename . ">";
+
             } else {
 
-                // $html .= $carriage . $indentation . "\t";
-                $html .= $node->getContent();
-                // $html .= $carriage . $indentation;
+                $html .= "/>";
 
             }
 
-            $html .= "</" . $nodename . ">";
-
-        } else {
-
-            $html .= "/>";
-
         }
-
-        return $html;
+        
+        return $html ?? '';
     }
 
     protected function slice(?string $value = null): array
