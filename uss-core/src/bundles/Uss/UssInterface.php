@@ -22,4 +22,8 @@ interface UssInterface
 
     public function isAbsolutePath(string $path): bool;
     public function render(string $templatePath, array $variables): ?string;
+
+    public function addGlobalTwigOption(string $name, mixed $value): void;
+    public function getGlobalTwigOption(string $name): mixed;
+    public function getGlobalTwigOptions(): array;
 }

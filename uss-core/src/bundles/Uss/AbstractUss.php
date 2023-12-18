@@ -9,6 +9,7 @@ abstract class AbstractUss extends AbstractUssUtils
     public readonly FilesystemLoader $filesystemLoader;
     public readonly Environment $twigEnvironment;
     protected array $consoleJS = [];
+    protected array $globalTwigOptions = [];
 
     protected function __construct()
     {
@@ -65,6 +66,21 @@ abstract class AbstractUss extends AbstractUssUtils
             unset($this->consoleJS[$key]);
         }
         return $value;
+    }
+
+    public function addGlobalTwigOption(string $name, mixed $value): void
+    {
+        $this->globalTwigOptions[$name] = $value;
+    }
+
+    public function getGlobalTwigOption(string $name): mixed
+    {
+        return $this->globalTwigOptions[$name] ?? null;
+    }
+
+    public function getGlobalTwigOptions(): array
+    {
+        return $this->globalTwigOptions;
     }
 
     /**
