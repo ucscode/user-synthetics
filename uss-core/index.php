@@ -29,6 +29,7 @@
 
 // Define the root directory for the project
 define('ROOT_DIR', realpath(__DIR__ . "/../"));
+define('INSTALLATION_PATH', str_replace($_SERVER['DOCUMENT_ROOT'], '', ROOT_DIR));
 
 // Include constant files
 require_once __DIR__ . "/database.php";

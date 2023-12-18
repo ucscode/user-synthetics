@@ -14,13 +14,12 @@ abstract class AbstractUss extends AbstractUssUtils
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::VIEW_DIR]);
         $this->filesystemLoader->addPath(UssImmutable::VIEW_DIR, self::NAMESPACE);
-        
+
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
             'debug' => UssImmutable::DEBUG
         ]);
 
         $this->twigEnvironment->addExtension(new DebugExtension());
-        $this->twigEnvironment->addGlobal(self::NAMESPACE, new UssTwigExtension($this));
 
         $this->twigComponentLoader();
     }

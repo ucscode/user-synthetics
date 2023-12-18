@@ -12,7 +12,7 @@ class UrlGenerator
     {
         $uss = Uss::instance();
         $this->base = $uss->filterContext($base);
-        $this->host = $uss->abspathToUrl(ROOT_DIR);
+        $this->host = $uss->abspathToUrl($_SERVER['DOCUMENT_ROOT']);
         $this->polyfill($path);
         foreach($query as $key => $value) {
             $this->setQuery($key, $value);
@@ -47,6 +47,7 @@ class UrlGenerator
     public function getResult(bool $ignoreHost = false)
     {
         $result = $ignoreHost ? '' : $this->host;
+        $result .= INSTALLATION_PATH;
         if(!empty($this->base)) {
             $result .= '/' . $this->base;
         }

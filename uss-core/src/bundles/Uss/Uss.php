@@ -19,8 +19,9 @@ final class Uss extends AbstractUss
      */
     public function render(string $templateFile, array $variables = [], $return = false): ?string
     {
+        $this->twigEnvironment->addGlobal(self::NAMESPACE, new UssTwigExtension($this));
         $result = $this->twigEnvironment->render($templateFile, $variables);
-        return $return ? $result : call_user_func(function() use($result) {
+        return $return ? $result : call_user_func(function () use ($result) {
             print($result);
             die();
         });
