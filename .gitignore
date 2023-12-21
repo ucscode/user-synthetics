@@ -5,3 +5,5 @@
 /**/.git/
 /**/git/
 /docs/
+/tests/test-results
+/tests/unit/*.php
