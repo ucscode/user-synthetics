@@ -1,6 +1,12 @@
-<phpunit bootstrap="./tests/bootstrap.php" cacheDirectory="./tests/" colors="true">
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    bootstrap="./tests/bootstrap.php" 
+    cacheDirectory="./tests/" 
+    colors="true"
+>
     <testsuites>
-        <testsuite name="uss-test-suite">
+        <testsuite name="Uss Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
