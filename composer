@@ -1,18 +1,8 @@
 {
     "name": "ucscode/user-synthetics",
     "type": "project",
-    "description": "User Synthetics is an open-source PHP web application framework used for developing web applications. It follows the Model-View-Controller (MVC) architectural pattern and utilizes a concept of modularity to help developers build robust and scalable web applications.",
-    "keywords": [ 
-        "user-synthetics", 
-        "cms", 
-        "open-source", 
-        "simple", 
-        "content-management", 
-        "website", 
-        "php", 
-        "twig", 
-        "composer-project" 
-    ],
+    "description": "The User Synthetics open-source PHP web application framework used for developing robust and scalable web applications.",
+    "keywords": ["user-synthetics", "cms", "open-source", "framework"],
     "homepage": "http://ucscode.me/",
     "license": "MIT",
     "authors": [
@@ -28,6 +18,7 @@
         "issues": "https://github.com/ucscode/user-synthetics/issues"
     },
     "require": {
+        "php": ">=8.1",
         "twig/twig": "^3.0",
         "erusev/parsedown-extra": "^0.8.1",
         "jasongrimes/paginator": "^1.0",
@@ -37,5 +28,18 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ucscode\\Uss\\": "cores/",
+            "Ucscode\\": "cores/Packages/",
+            "Uss\\Component\\": "cores/Component/",
+            "Uss\\Module\\": "modules/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Uss\\Tests\\": "tests/files"
+        }
     }
 }

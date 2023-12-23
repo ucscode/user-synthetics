@@ -1,0 +1,21 @@
+{% macro index_card(item) %}
+    <div class="col-lg-4 col-sm-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex">
+                    <h2 class="me-3">
+                        <i class="{{ item.icon }}"></i>
+                    </h2>
+                    <div class="flex-grow-1 border-start ps-3">
+                        <h2 class="fw- border-bottom mb-3 pb-2">
+                            {{ item.value }}
+                        </h2>
+                        <h6 class='mb-0 fw-light fst-italic text-end'>
+                            <i class="bi bi-info-circle"></i> {{ item.name }}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

@@ -1,4 +1,5 @@
 /uss-modules/*/
+/modules/*/
 /vendor/
 /composer.json
 /composer.lock
@@ -6,4 +7,4 @@
 /**/git/
 /docs/
 /tests/test-results
-/tests/unit/*.php
+/tests/*/

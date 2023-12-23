@@ -1,0 +1,20 @@
+.sidebar-nav-wrapper {
+    background: #201c2e !important;
+}
+
+.sidebar-nav-wrapper .sidebar-nav ul .nav-item.active > a, .sidebar-nav-wrapper .sidebar-nav ul .nav-item.active > a.collapsed, .sidebar-nav-wrapper .sidebar-nav ul .nav-item:hover > a, .sidebar-nav-wrapper .sidebar-nav ul .nav-item:hover > a.collapsed {
+    color: #c4c8d1 !important;
+}
+
+.sidebar-nav-wrapper .sidebar-nav ul .nav-item,
+.sidebar-nav-wrapper .navbar-logo {
+    border-bottom: none !important;
+}
+
+.header {
+    background: #bc95df !important;
+}
+
+body {
+    background: #dce2e7 !important;
+}
