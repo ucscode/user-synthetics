@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\Uss;
+namespace Uss\Component;
 
 if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
 

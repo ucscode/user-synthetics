@@ -19,7 +19,7 @@ final class UssTwigExtension
         $this->uss->addJsProperty('url', $this->uss->abspathToUrl(ROOT_DIR));
         $jsonElement = json_encode($this->uss->getJsProperty());
         $this->jsElement = base64_encode($jsonElement);
-        $this->globals = Uss::$globals;
+        $this->globals = $this->uss->localStorage;
     }
 
     /**
