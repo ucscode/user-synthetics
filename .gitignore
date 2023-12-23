@@ -7,4 +7,5 @@
 /**/git/
 /docs/
 /tests/test-results
-/tests/*/
+/tests/*/*
+!/tests/*/.gitkeep
