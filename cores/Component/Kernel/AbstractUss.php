@@ -20,9 +20,9 @@ abstract class AbstractUss implements UssInterface
     public readonly ?Pairs $options;
     public readonly ?\mysqli $mysqli;
 
-    public readonly array $localStorage; // Basic local storage
-    public readonly array $jsStorage; // Send data to JavaScript scope
-    public readonly array $templateStorage; // Send global variable to Twig template
+    public array $localStorage; // Basic local storage
+    public array $jsStorage; // Send data to JavaScript scope
+    public array $templateStorage; // Send global variable to Twig template
 
     protected function __construct(bool $kernel = false)
     {

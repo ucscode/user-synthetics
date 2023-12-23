@@ -75,64 +75,6 @@ final class Uss extends AbstractUss
     }
 
     /**
-     * Pass a variable from PHP to JavaScript.
-     *
-     * @param string $key  The key or identifier for the data to be passed.
-     * @param mixed $value The value to be associated with the given key.
-     * @return void
-     */
-    public function addJsProperty(string $key, mixed $value): void
-    {
-        $this->consoleJS[$key] = $value;
-    }
-
-    /**
-     * Get a registered JavaScript variable
-     *
-     * @param string $key The key or identifier of the value to retrieve
-     * @return mixed
-     */
-    public function getJsProperty(?string $key = null): mixed
-    {
-        if(is_null($key)) {
-            return $this->consoleJS;
-        };
-        return $this->consoleJS[$key] ?? null;
-    }
-
-
-    /**
-     * Remove a value from the list of consoled data.
-     *
-     * @param string $key The key or identifier of the value to be removed
-     * @return mixed value of the removed property
-     */
-    public function removeJsProperty(string $key): mixed
-    {
-        $value = null;
-        if(isset($this->consoleJS[$key])) {
-            $value = $this->consoleJS[$key];
-            unset($this->consoleJS[$key]);
-        }
-        return $value;
-    }
-
-    public function addGlobalTwigOption(string $name, mixed $value): void
-    {
-        $this->globalTwigOptions[$name] = $value;
-    }
-
-    public function getGlobalTwigOption(string $name): mixed
-    {
-        return $this->globalTwigOptions[$name] ?? null;
-    }
-
-    public function getGlobalTwigOptions(): array
-    {
-        return $this->globalTwigOptions;
-    }
-
-    /**
      * Exit the script and print a JSON response.
      * @return void
      */

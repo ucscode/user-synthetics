@@ -15,9 +15,9 @@ final class UssTwigExtension
 
     public function __construct(private Uss $uss)
     {
-        $this->uss->addJsProperty('platform', UssImmutable::PROJECT_NAME);
-        $this->uss->addJsProperty('url', $this->uss->abspathToUrl(ROOT_DIR));
-        $jsonElement = json_encode($this->uss->getJsProperty());
+        $this->uss->jsStorage['platform'] = UssImmutable::PROJECT_NAME;
+        $this->uss->jsStorage['url'] = $this->uss->abspathToUrl(ROOT_DIR);
+        $jsonElement = json_encode($this->uss->jsStorage);
         $this->jsElement = base64_encode($jsonElement);
         $this->globals = $this->uss->localStorage;
     }
