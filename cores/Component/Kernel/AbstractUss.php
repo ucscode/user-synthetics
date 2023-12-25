@@ -2,11 +2,8 @@
 
 namespace Uss\Component\Kernel;
 
-use mysqli;
 use Ucscode\Pairs\Pairs;
 use Ucscode\SQuery\SQuery;
-use Ucscode\UssElement\UssElement;
-use Uss\Component\Manager\BlockManager;
 use Uss\Component\Database;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
