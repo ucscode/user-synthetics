@@ -2,35 +2,28 @@
 
 namespace Ucscode\SQuery;
 
+use mysqli;
+
 spl_autoload_register(function ($classname) {
     $basename = basename(str_replace("\\", "/", $classname));
     require_once __DIR__ . "/{$basename}.php";
 });
 
+$mysqli = new mysqli('localhost','root', '12345678', 'www_uss');
+
 $condition = (new Condition())
-    ->add("film", "nude")
+    ->add("film", "musa's")
     ->or("game", ["post", "class", "video"])
     ->and("user.name", ['voldka', "spider.crown"], null)
     ->customFilter("AND (username LIKE orange)")
     ->or('slash', ['model'], 'LIKE')
-    ->and('slope', null)
-    ->and('SUM(cols)', 'false', '>', null);
+    ->and('slope', '5', 'IS NOT')
+    ->and('SUM(cols)', ['g', 4, 2.2, 'Game'], '>');
 
 $squery = (new SQuery())
-    ->select(['`table`.name as `pork`', 'name AS g', 'smith', '`code`', 'model.work As GOLD'])
-    ->from('users', 'p')
-    ->where($condition)
-    ->groupBy("u.name")
-    ->groupBy(['p.face', 'polar'])
-    ->having(
-        (new Condition())
-            ->and("face", "clous", 'REGEXP')
-            ->or("mate", "gaze", "sport")
-    )
-    ->orderBy("name", "ASC")
-    ->orderBy("class", "DESC")
-    ->offset(5)
-    ->limit(4);
+    ->select()
+    ->from("frame", 'p')
+    ->where($condition);
 
 var_dump($squery->build());
 

@@ -13,6 +13,7 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
         const USERNAME = 'root';
         const PASSWORD = '12345678';
         const NAME = 'www_uss';
+        const PORT = 3306;
     };
 
 } else {
@@ -24,6 +25,7 @@ if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
         const USERNAME = '';
         const PASSWORD = '';
         const NAME = '';
+        const PORT = null;
     }
 
 };

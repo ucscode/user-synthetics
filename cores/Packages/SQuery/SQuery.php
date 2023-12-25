@@ -21,8 +21,8 @@ class SQuery extends AbstractSQuery
         if(is_string($columns)) {
             $columns = [$columns];
         };
-        $this->columns = array_map(function($value) {
-            $value = array_map(function($entity) {
+        $this->columns = array_map(function ($value) {
+            $value = array_map(function ($entity) {
                 return $this->tick($entity);
             }, preg_split("/as/i", $value));
             return implode(" AS ", $value);
@@ -38,7 +38,7 @@ class SQuery extends AbstractSQuery
 
     public function from(string $table, ?string $alias = null): self
     {
-        $this->table = implode(" AS ", array_map([$this, 'tick'], array_filter([$table, $alias])));
+        $this->table = array_map([$this, 'tick'], array_filter([$table, $alias]));
         return $this;
     }
 
@@ -70,7 +70,10 @@ class SQuery extends AbstractSQuery
         if(!is_array($group)) {
             $group = [$group];
         }
-        $this->group_by = array_merge($this->group_by, array_values($group));
+        $group = array_map(function ($value) {
+            return $this->tick($value);
+        }, array_values($group));
+        $this->group_by = array_merge($this->group_by, $group);
         return $this;
     }
 
@@ -87,7 +90,10 @@ class SQuery extends AbstractSQuery
 
     public function orderBy(string $order, string $direction = 'ASC'): self
     {
-        $this->order_by[] = implode(" ", array_map('trim', [$order, $direction]));
+        $this->order_by[] = implode(" ", array_map('trim', [
+            $this->tick($order),
+            $direction
+        ]));
         return $this;
     }
 

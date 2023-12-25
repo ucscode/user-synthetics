@@ -24,7 +24,8 @@ final class Prime
                     Database::HOST, 
                     Database::USERNAME, 
                     Database::PASSWORD,
-                    Database::NAME
+                    Database::NAME,
+                    Database::PORT
                 );
             } catch(mysqli_sql_exception $e) {
                 $this->uss->render('@Uss/db.error.html.twig', [
