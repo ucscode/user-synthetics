@@ -2,239 +2,115 @@
 
 namespace Ucscode\Pairs;
 
+use Ucscode\SQuery\Condition;
 use Ucscode\SQuery\SQuery;
 
 /**
  * A Meta Data Storage System
  *
- * The Pairs class represents a utility for managing a meta table that stores key-value pairs.
- * It provides methods to create the meta table, link it to a parent table, add or update reference data,
- * retrieve reference data based on keys and reference IDs, remove reference data, and retrieve all data
- * associated with a specific reference ID or matching a certain pattern.
- *
- * The class relies on the `sQuery` class to execute SQL queries. It requires a valid instance of the `MYSQLI` class
- * and the name of the meta table to work with.
- *
- * ### Usage example:
- * ```php
- * $mysqli = new mysqli('localhost', 'username', 'password', 'database');
- * $pairs = new Pairs($mysqli, 'meta_table');
- * $pairs->set('key1', 'value1', 1); // Add or update reference data with key 'key1' and reference ID 1
- * $data = $pairs->get('key1', 1); // Retrieve the value associated with key 'key1' and reference ID 1
- * $pairs->remove('key1', 1); // Remove the reference data with key 'key1' and reference ID 1
- * ```
- *
- * @package pairs
  * @author ucscode
  * @see sQuery https://github.com/ucscode/sQuery
  * @link https://github.com/ucscode/pairs
  */
-class Pairs
+class Pairs extends AbstractPairs
 {
-    /** @ignore */
-    private $tablename;
-
-    /** @ignore */
-    private $mysqli;
-
     /**
-     * Constructor Method
+     * Add or update a reference data
      *
-     * Initializes a new instance of the Pairs class.
-     * It requires an instance of the `MYSQLI` class and the name of the meta table to work with.
-     *
-     * - Throws an exception if the required `sQuery` class is not found.
-     * - Automatically creates the meta table if it doesn't already exist.
-     *
-     * @param MYSQLI $mysqli An instance of the MYSQLI class for database connection.
-     * @param string $tablename The name of the meta table.
-     *
-     * @throws \Exception If the `sQuery` class is not found.
-     *
-     * @return void
+     * @param string $key The key of the reference data.
+     * @param mixed $value The value of the reference data.
+     * @param int|null $ref The ID of the reference data. Defaults to `null`.
+     * 
+     * @return bool
      */
-    public function __construct(\MYSQLI $mysqli, string $tablename)
+    public function set(string $key, mixed $value, ?int $ref = null): bool
     {
-        if(!class_exists(SQuery::class)) {
-            throw new \Exception(__CLASS__ . "::__construct() relies on class `sQuery` to operate");
-        }
-
-        $this->tablename = $tablename;
-        $this->mysqli = $mysqli;
-
-        $this->createTable();
+        $data = [
+            '_key' => $this->mysqli->real_escape_string($key),
+            '_value' => $this->mysqli->real_escape_string(json_encode($value)),
+            '_ref' => $ref,
+        ];
+        
+        $SQL = (new SQuery())
+            ->select()
+            ->from($this->table)
+            ->where(
+                (new Condition())
+                    ->add("_key", $data['_key'])
+                    ->and("_ref", $data['_ref'])
+            )
+            ->build();
+        
+        $exists = $this->mysqli->query($SQL)->num_rows;
+        
+        if(!$exists) {
+            $squery = (new SQuery())->insert($this->table, $data);
+        } else {
+            $squery = (new SQuery())
+                ->update($this->table, $data)
+                ->where(
+                    (new Condition())
+                        ->add("_key", $data['_key'])
+                        ->and("_ref", $data['_ref'])
+                );
+        };
+        
+        $SQL = $squery->build();
+        return $this->mysqli->query($SQL);
     }
 
     /**
-     * Link to parent table
+     * Retrieve a reference data or epoch by key and reference ID
      *
-     * Applies a foreign key constraint to the `_ref` column of the meta table. Thus, referencing the parent table.
-     *
-     * @param string $parent_table The name of the parent table.
-     * @param string $constraint The unique constraint name for the foreign key.
-     * @param string $primary_key The primary key column of the parent table. Default column is assumed to be `id`.
-     * @param string $action The action to take on delete (CASCADE, RESTRICT, SET NULL). Default is 'CASCADE'.
-     * @return bool Returns `true` if the foreign key constraint is added or already exists, `false` otherwise.
+     * @param string $key The key of the reference data to retrieve.
+     * @param int|null $ref The ID of the reference data. Defaults to `null`.
+     * @param bool $epoch return the timestamp when data was inserted.
      */
-    public function linkToParentTable(array $data): ?bool
+    public function get(string $key, ?int $ref = null, bool $epoch = false): mixed
     {
-        // Default Options
-        $data += [
-            'primaryKey' => 'id',
-            'type' => 'INT UNSIGNED NOT NULL',
-            'action' => 'CASCADE',
-            'constraint' => 'constraint__' . $data['parentTable'],
-        ];
+        $SQL = (new SQuery())->select()
+            ->from($this->table)
+            ->where(
+                (new Condition())
+                    ->add("_key", $key)
+                    ->and("_ref", $ref)
+            )
+            ->build();
+        
+        $result = $this->mysqli->query($SQL)->fetch_assoc();
 
-        if(empty($data['parentTable'])) {
-            throw new \Exception(__METHOD__ . '(): Array parameter expects an index "parentTable"');
-        };
-
-        // Check if the constraint exists
-        $SQL = "SELECT NULL 
-        FROM information_schema.TABLE_CONSTRAINTS 
-        WHERE 
-            CONSTRAINT_SCHEMA = DATABASE() 
-            AND CONSTRAINT_NAME = '{$data['constraint']}' 
-            AND CONSTRAINT_TYPE = 'FOREIGN KEY' 
-            AND TABLE_NAME = '{$this->tablename}'";
-
-        $result = $this->mysqli->query($SQL);
-
-        // If the constraint doesn't exist, add it
-
-        if ($result->num_rows == 0) {
-
-            $SQL = "ALTER TABLE `{$this->tablename}`
-            MODIFY `_ref` {$data['type']},
-            ADD CONSTRAINT `{$data['constraint']}`
-            FOREIGN KEY (`_ref`)
-            REFERENCES `{$data['parentTable']}`(`{$data['primaryKey']}`)
-            ON DELETE {$data['action']};";
-
-            return $this->mysqli->query($SQL);
+        if($result) {
+            $offset = $epoch ? 'epoch' : '_value';
+            $value = json_decode($result[$offset], true);
+            return $value;
         }
 
         return null;
     }
 
     /**
-     * Add or update a reference data
-     *
-     * This method adds a new reference data if it does not exist. Otherwise, it updates the existing reference data.
-     * The reference data is considered unique if **both** the key and the reference ID exist and do not match any other key/reference ID in the table.
-     *
-     * The value of the reference data can be of any type, as it will be encoded into `JSON` format before being stored in the database.
-     *
-     * Note that if an `object` is passed as the value, it will be returned as an `array` when retrieved.
-     * It is important to ensure that the value being passed does not require additional escaping, as the method already applies the necessary escaping using `real_escape_string()`.
-     *
-     * @param string $key The key of the reference data.
-     * @param mixed $value The value of the reference data.
-     * @param int|null $ref The ID of the reference data. Defaults to `null`.
-     * @return mixed Returns the result of the query execution. That is, `true` on success, `false` on failure.
-     */
-    public function set(string $key, $value, ?int $ref = null)
-    {
-        $value = json_encode($value);
-        $value = $this->mysqli->real_escape_string($value);
-
-        $SQL = (new SQuery())
-            ->select()
-            ->from($this->tablename)
-            ->where("_key", $key)
-            ->and("_ref", $this->valueOf($ref));
-
-        $data = [
-            "_key" => $key,
-            "_value" => $value,
-            "_ref" => $ref
-        ];
-
-        if(!$this->mysqli->query($SQL)->num_rows) {
-            $SQL->clear()
-                ->insert($this->tablename, $data);
-        } else {
-            $SQL->clear()
-                ->update($this->tablename, $data)
-                ->where("_key", $key)
-                ->and("_ref", $this->valueOf($ref));
-        };
-
-        $result = $this->mysqli->query($SQL);
-        return $result;
-    }
-
-    /**
-     * Retrieve a reference data by key and reference ID
-     *
-     * This method retrieves a reference data from the table based on the provided key and reference ID.
-     * If the reference data exists, it is returns. Otherwise, it returns `null`.
-     *
-     * If the third parameter is set to `true`, the unix timestamp at which the data was
-     * inserted will be returned instead of the value.
-     *
-     * @param string $key The key of the reference data to retrieve.
-     * @param int|null $ref The ID of the reference data. Defaults to `null`.
-     * @param bool $epoch Determines whether to retrieve the reference data or a unix timestamp which indicates the date of insertion. Defaults to `false`.
-     * @return mixed|null Returns the reference data as an associative array if found. Returns null if no matching reference data is found.
-     */
-    public function get(string $key, ?int $ref = null, bool $epoch = false)
-    {
-        $Query = (new SQuery())->select()
-            ->from($this->tablename)
-            ->where("_key", $key)
-            ->and("_ref", $this->valueOf($ref));
-
-        $result = $this->mysqli->query($Query)->fetch_assoc();
-
-        if($result) {
-            $value = json_decode($result[ $epoch ? 'epoch' : '_value' ], true);
-            return $value;
-        }
-    }
-
-    /**
      * Remove reference data by key and reference ID
-     *
-     * This method removes the reference data from the table based on the provided key and reference ID.
-     * If the reference data matching the key and reference ID is found, it will be deleted from the table.
      *
      * @param string $key The key of the reference data to remove.
      * @param int|null $ref The ID of the reference data. Defaults to null.
-     * @return bool Returns `true` if the reference data is successfully removed. Returns `false` otherwise.
+     * 
+     * @return bool
      */
-    public function remove(string $key, ?int $ref = null)
+    public function remove(string $key, ?int $ref = null): bool
     {
-        $SQL = (new SQuery())->delete($this->tablename)
-            ->where("_key", $key)
-            ->and("_ref", $this->valueOf($ref));
-
+        $SQL = (new SQuery())
+            ->delete()
+            ->from($this->table)
+            ->where(
+                (new Condition())
+                    ->add("_key", $key)
+                    ->and("_ref", $ref)
+            )
+            ->build();
+        
         $result = $this->mysqli->query($SQL);
         return $result;
     }
-
-    /**
-     * Return all the data that matches a reference id (or/and) a particular pattern
-     *
-     * ##### Example:
-     * If the meta table is used to store additional detail of a set registered users, then you can get all the data associated to a particular user by passing only the reference id of the user.
-     *
-     * You can also pass `regular expression` string as the second argument to get only values that matches a particular key.
-     *
-     * Note: Regular expression should not begin with a delimeter. By default, all expressions are case insensitive
-     *
-     * ```php
-     * $pairs->get(1, "/^wallet[\w+]$/i"); // Wrong
-     * $pairs->get(1, "^wallet[\w+]$"); // Right
-     * ```
-     *
-     * @param int|null $ref The reference id
-     * @param string|null $regex A regular expression of matching keys
-     *
-     * @return mixed
-     *
-     */
 
     /**
      * Return all the data that matches a reference id (or/and) a particular pattern
@@ -284,7 +160,7 @@ class Pairs
 
         // Prepare Query;
         $SQL = (new SQuery())->select()
-            ->from($this->tablename);
+            ->from($this->table);
 
         // Prepare Reference;
         if($ref === false) {
@@ -330,43 +206,4 @@ class Pairs
         return ($ref === false) ? $group : ($group[$ref] ?? []);
 
     }
-
-    /**
-     * Create a meta table
-     *
-     * Creates a meta table in the database if it doesn't already exist.
-     *
-     * @return bool Returns `true` if the table creation query is successful, `false` otherwise.
-     */
-    protected function createTable()
-    {
-
-        $SQL = "
-			CREATE TABLE IF NOT EXISTS `{$this->tablename}` (
-				`id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-				`_ref` INT,
-				`_key` VARCHAR(255) NOT NULL,
-				`_value` TEXT,
-				`epoch` BIGINT NOT NULL DEFAULT (UNIX_TIMESTAMP())
-			);
-		";
-
-        return $this->mysqli->query($SQL);
-
-    }
-
-    /**
-     * Check comparism type
-     *
-     * Determines the comparison type based on the provided reference ID.
-     *
-     * @param int|null $ref The reference ID to check.
-     * @return string Returns the comparison string for the reference ID. If the reference ID is null, it returns 'IS NULL', otherwise ' = [reference ID]'.
-     * @ignore
-     */
-    private function valueOf(?int $ref = null)
-    {
-        return is_null($ref) ? SQuery::IS_NULL : $ref;
-    }
-
 }

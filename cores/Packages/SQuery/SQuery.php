@@ -88,13 +88,19 @@ class SQuery extends AbstractSQuery
         return $this->having;
     }
 
-    public function orderBy(string $order, string $direction = 'ASC'): self
+    public function orderBy(string|array $order, string $direction = 'ASC'): self
     {
-        $this->order_by[] = implode(" ", array_map('trim', [
-            $this->tick($order),
-            $direction
-        ]));
-        return $this;
+        if(is_array($order)) {
+            foreach($order as $key => $direction) {
+                if(is_numeric($key)) {
+                    $key = $direction;
+                    $direction = 'ASC';
+                }
+                $this->createOrder($key, $direction);
+            }
+            return $this;
+        }
+        return $this->createOrder($order, $direction);
     }
 
     public function limit(?int $limit, ?int $offset = null): self

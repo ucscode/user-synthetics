@@ -26,17 +26,19 @@ trait SQueryTrait
      * @param string $value - The text to be surrounded
      * @param string $char - The character used to surround the text
      */
-    protected function surround(string $value, string $char): string
+    protected function surround(?string $value, string $char): ?string
     {
-        $char = trim($char);
-        $pattern = sprintf('/^%s.*%s$/', $char, $char);
-        $wrapped = preg_match($pattern, $value);
-        if(!$wrapped) {
-            if(in_array($char, ["'", '"'])) {
-                $escDevice = sprintf("/(?<!\\\\)%s/", $char);
-                $value = preg_replace($escDevice, "\\{$char}", $value);
+        if(!is_null($value)) {
+            $char = trim($char);
+            $pattern = sprintf('/^%s.*%s$/', $char, $char);
+            $wrapped = preg_match($pattern, $value);
+            if(!$wrapped) {
+                if(in_array($char, ["'", '"'])) {
+                    $escDevice = sprintf("/(?<!\\\\)%s/", $char);
+                    $value = preg_replace($escDevice, "\\{$char}", $value);
+                }
+                $value = ($char . $value . $char);
             }
-            $value = ($char . $value . $char);
         }
         return $value;
     }

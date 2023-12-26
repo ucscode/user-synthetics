@@ -12,18 +12,28 @@ spl_autoload_register(function ($classname) {
 $mysqli = new mysqli('localhost', 'root', '12345678', 'www_uss');
 
 $condition = (new Condition())
-    ->add("film", 'musa\'s')
+    ->add("film", "musa's")
     ->or("game", ["post", "class", "video"])
     ->and("user.name", ['voldka', "spider.crown"], null)
     ->customFilter("AND (username LIKE orange)")
     ->or('slash', ['model'], 'LIKE')
-    ->and('slope', '5', 'IS NOT')
+    ->and('slope', '5, 6', 'BETWEEN', null)
     ->and('SUM(cols)', ['g', 4, 2.2, 'Game'], '>');
 
 $squery = (new SQuery())
     ->select()
     ->from("frame", 'p')
-    ->where($condition);
+    ->where($condition)
+    ->orderBy([
+        "user.name" => 'ASC',
+        "portal" => "DESC",
+        "gold",
+        "frog",
+        "model" => "DESC"
+    ])
+    ->orderBy("frame")
+    ->offset(20)
+    ->limit(5);
 
 var_dump($squery->build());
 

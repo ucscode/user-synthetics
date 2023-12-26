@@ -87,7 +87,7 @@ abstract class AbstractSQuery implements SQueryInterface
         if($this->DMLS) {
             throw new \Exception(
                 sprintf(
-                    'Cannot modify the "%s" Data Manipulation Language Statement (DMLS) in the current instance of "%s". Please create a new instance for any additional operations.',
+                    "Cannot modify Data Manipulation Language Statement (DMLS). '%s' statement already in use. Please create a new instance of %s for a different operation.",
                     $this->DMLS,
                     get_called_class()
                 )
@@ -100,7 +100,21 @@ abstract class AbstractSQuery implements SQueryInterface
     {
         $this->from($table);
         $this->columns = array_map(fn ($value) => $this->tick($value), array_keys($data));
-        $this->values = array_map(fn ($value) => $this->surround($value, "'"), array_values($data));
+        $this->values = array_map(function($value) {
+            if(!is_numeric($value)) {
+                $value = is_null($value) ? 'NULL' : $this->surround($value, "'");
+            }
+            return $value;
+        }, array_values($data));
+        return $this;
+    }
+
+    protected function createOrder(string $order, string $direction): self 
+    {
+        $this->order_by[] = implode(" ", array_map('trim', [
+            $this->tick($order),
+            strtoupper($direction)
+        ]));
         return $this;
     }
 }
