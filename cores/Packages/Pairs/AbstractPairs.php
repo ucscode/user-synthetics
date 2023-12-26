@@ -6,6 +6,8 @@ use mysqli;
 
 abstract class AbstractPairs
 {
+    public const ALL = ':ALL';
+
     /**
      * Initializes a new instance of the Pairs class.
      * 

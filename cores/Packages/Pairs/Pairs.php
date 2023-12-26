@@ -20,7 +20,7 @@ class Pairs extends AbstractPairs
      * @param string $key The key of the reference data.
      * @param mixed $value The value of the reference data.
      * @param int|null $ref The ID of the reference data. Defaults to `null`.
-     * 
+     *
      * @return bool
      */
     public function set(string $key, mixed $value, ?int $ref = null): bool
@@ -30,7 +30,7 @@ class Pairs extends AbstractPairs
             '_value' => $this->mysqli->real_escape_string(json_encode($value)),
             '_ref' => $ref,
         ];
-        
+
         $SQL = (new SQuery())
             ->select()
             ->from($this->table)
@@ -40,9 +40,9 @@ class Pairs extends AbstractPairs
                     ->and("_ref", $data['_ref'])
             )
             ->build();
-        
+
         $exists = $this->mysqli->query($SQL)->num_rows;
-        
+
         if(!$exists) {
             $squery = (new SQuery())->insert($this->table, $data);
         } else {
@@ -54,7 +54,7 @@ class Pairs extends AbstractPairs
                         ->and("_ref", $data['_ref'])
                 );
         };
-        
+
         $SQL = $squery->build();
         return $this->mysqli->query($SQL);
     }
@@ -76,7 +76,7 @@ class Pairs extends AbstractPairs
                     ->and("_ref", $ref)
             )
             ->build();
-        
+
         $result = $this->mysqli->query($SQL)->fetch_assoc();
 
         if($result) {
@@ -93,7 +93,7 @@ class Pairs extends AbstractPairs
      *
      * @param string $key The key of the reference data to remove.
      * @param int|null $ref The ID of the reference data. Defaults to null.
-     * 
+     *
      * @return bool
      */
     public function remove(string $key, ?int $ref = null): bool
@@ -107,103 +107,50 @@ class Pairs extends AbstractPairs
                     ->and("_ref", $ref)
             )
             ->build();
-        
+
         $result = $this->mysqli->query($SQL);
         return $result;
     }
 
     /**
-     * Return all the data that matches a reference id (or/and) a particular pattern
+     * Return all data in collective pattern
      *
-     * This method retrieves all reference data from the table that matches the specified reference ID and regular expression pattern (optional).
-     *
-     * If a reference ID is provided, any array containing reference data of the matching reference ID will be retrieved.
-     * If a regular expression pattern is provided, only reference data with matching keys matching will be retrieved.
-     *
-     * @param int|null $ref The ID of the reference data to retrieve. Defaults to `null`.
-     * @param string|null $regex The regular expression pattern to match against the keys. Defaults to `null`.
-     * @return array An associative array containing the retrieved reference data. The keys of the array represent the reference data keys,
-     * and the values can be of mixed types including strings, numbers, or arrays.
+     * @param int|null|string $ref - The reference ID of sequences to retrieve. 
+     * use `Pairs::ALL` to get all values
+     * @param string|null $like - A LIKE expression pattern to filter returned values
+     * 
+     * @return array
      */
-    public function all($ref = null, ?string $regex = null)
+    public function getSequence(null|int|string $ref = self::ALL, ?string $like = null): array
     {
-        // Check if argument 1 is given;
-        if(!empty(func_get_args())) {
+        $sequence = [];
 
-            $ref = func_get_arg(0);
+        $squery = (new SQuery())
+            ->select()
+            ->from($this->table)
+            ->orderBy(['_ref', '_key']);
 
-            if(!is_null($ref)) {
-
-                if(is_numeric($ref)) {
-
-                    $ref = (int)$ref;
-
-                } else {
-
-                    $type = gettype($ref);
-                    $backtrace = debug_backtrace();
-
-                    $callerPath = $backtrace[0]['file'];
-                    $errorLine = $backtrace[0]['line'];
-
-                    $error = __METHOD__ . "(): Argument #1 (\$ref) must be of type ?int, {$type} given, called in {$callerPath} on line {$errorLine}";
-
-                    throw new \TypeError($error);
-
-                };
-
-            };
-
-        } else {
-            $ref = false;
+        if(!empty($like)) {
+            $squery->getWhereCondition()
+                ->add("_key", '%' . $like . '%', 'LIKE');
         }
 
-        // Prepare Query;
-        $SQL = (new SQuery())->select()
-            ->from($this->table);
-
-        // Prepare Reference;
-        if($ref === false) {
-            $SQL->where(1);
-        } else {
-            $SQL->where("_ref", $this->valueOf($ref));
-        }
-
-        // Prepare Regular Expression;
-        if(!empty($regex)) {
-            $regex = str_replace("\\", "\\\\", $regex);
-            $SQL->and("_key", $regex, 'REGEXP');
-        };
-
-        // Order Query
-        $SQL->orderBy('_ref');
-
-        # Execute Query;
-        $result = $this->mysqli->query($SQL);
-        $group = [];
-
+        $result = $this->mysqli->query($squery->build());
+        
         if($result->num_rows) {
+            while($item = $result->fetch_assoc()) 
+            {
+                $offset = $item['_ref'] ?? '';
+                $index = $item['_key'];
+                $sequence[$offset] ??= [];
 
-            while($pair = $result->fetch_assoc()) {
-
-                $refId = $pair['_ref'];
-                $refId = is_numeric($refId) ? (int)$refId : null;
-
-                // Create group for each reference
-                if(!isset($group[$refId])) {
-                    $group[$refId] = array();
-                };
-
-                $key = $pair['_key'];
-                $value = json_decode($pair['_value'], true);
-
-                $group[$refId][$key] = $value;
-
-            };
-
-        };
-
-        return ($ref === false) ? $group : ($group[$ref] ?? []);
-
+                $sequence[$offset][$index] = [
+                    'value' => json_decode($item['_value'], true),
+                    'epoch' => (int)$item['epoch']
+                ];
+            }
+        }
+        
+        return $ref === self::ALL ? $sequence : ($sequence[$ref ?? ''] ?? []);
     }
 }

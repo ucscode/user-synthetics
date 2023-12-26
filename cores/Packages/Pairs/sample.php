@@ -20,4 +20,12 @@ $constraint = (new ForeignConstraint('uss_users'))
 
 $pairs->setForeignConstraint($constraint);
 
-var_dump($pairs->remove("balance", 1));
+call_user_func(function () use ($pairs) {
+    return;
+    $limit = 20;
+    for($x = 0; $x < $limit; $x++) {
+        $pairs->set('sample:' . rand(0, $limit), rand(), rand(1, $limit));
+    }
+});
+
+var_dump($pairs->getSequence(19, ':11'));

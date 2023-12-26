@@ -16,7 +16,7 @@ class ForeignConstraint
      */
     public function __construct(protected string $table)
     {
-        $this->constraint = 'CONST_' . $table;
+        $this->constraint = strtoupper('CONSTR_' . $table);
     }
 
     /**
@@ -85,7 +85,7 @@ class ForeignConstraint
     }
 
     /**
-     * Get the signature status of the primary key 
+     * Get the signature status of the primary key
      */
     public function isPrimaryKeyUnsigned(): bool
     {
@@ -102,7 +102,7 @@ class ForeignConstraint
     }
 
     /**
-     * Get the signature status of the primary key 
+     * Get the signature status of the primary key
      */
     public function isPrimaryKeyNullable(): bool
     {
