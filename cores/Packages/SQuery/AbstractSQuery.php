@@ -22,10 +22,10 @@ abstract class AbstractSQuery implements SQueryInterface
 
     abstract public function from(string $table);
 
-    public function __construct(protected ?mysqli $mysqli = null)
+    public function __construct()
     {
-        $this->where = new Condition($mysqli);
-        $this->having = new Condition($mysqli);
+        $this->where = new Condition();
+        $this->having = new Condition();
     }
 
     public function build(): string
@@ -56,7 +56,7 @@ abstract class AbstractSQuery implements SQueryInterface
             case self::KEYWORD_UPDATE:
                 $syntax = [
                     $this->DMLS . ' ' . $this->table[0] . ' SET',
-                    call_user_func(function() {
+                    call_user_func(function () {
                         $formation = [];
                         foreach(array_combine($this->columns, $this->values) as $key => $value) {
                             $formation[] = "{$key} = {$value}";

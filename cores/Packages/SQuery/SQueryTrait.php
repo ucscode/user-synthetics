@@ -28,11 +28,16 @@ trait SQueryTrait
      */
     protected function surround(string $value, string $char): string
     {
+        $char = trim($char);
         $pattern = sprintf('/^%s.*%s$/', $char, $char);
         $wrapped = preg_match($pattern, $value);
-        if($this->mysqli && $char === "'" && !$wrapped) {
-            $value = $this->mysqli->real_escape_string($value);
+        if(!$wrapped) {
+            if(in_array($char, ["'", '"'])) {
+                $escDevice = sprintf("/(?<!\\\\)%s/", $char);
+                $value = preg_replace($escDevice, "\\{$char}", $value);
+            }
+            $value = ($char . $value . $char);
         }
-        return !$wrapped ? ($char . $value . $char) : $value;
+        return $value;
     }
 }

@@ -9,10 +9,10 @@ spl_autoload_register(function ($classname) {
     require_once __DIR__ . "/{$basename}.php";
 });
 
-$mysqli = new mysqli('localhost','root', '12345678', 'www_uss');
+$mysqli = new mysqli('localhost', 'root', '12345678', 'www_uss');
 
 $condition = (new Condition())
-    ->add("film", "musa's")
+    ->add("film", 'musa\'s')
     ->or("game", ["post", "class", "video"])
     ->and("user.name", ['voldka', "spider.crown"], null)
     ->customFilter("AND (username LIKE orange)")

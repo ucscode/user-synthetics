@@ -10,9 +10,6 @@ class Condition
 
     protected array $condition = [];
 
-    public function __construct(protected ?mysqli $mysqli = null)
-    {}
-
     /**
      * Add a new condition
      *
