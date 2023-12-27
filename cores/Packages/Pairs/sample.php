@@ -28,4 +28,4 @@ call_user_func(function () use ($pairs) {
     }
 });
 
-var_dump($pairs->getSequence(19, ':11'));
+var_dump($pairs->getSequence(Proxy::ALL, ':11'));

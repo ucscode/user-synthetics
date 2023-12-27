@@ -115,13 +115,13 @@ class Pairs extends AbstractPairs
     /**
      * Return all data in collective pattern
      *
-     * @param int|null|string $ref - The reference ID of sequences to retrieve. 
+     * @param int|null|string $ref - The reference ID of sequences to retrieve.
      * use `Pairs::ALL` to get all values
      * @param string|null $like - A LIKE expression pattern to filter returned values
-     * 
+     *
      * @return array
      */
-    public function getSequence(null|int|string $ref = self::ALL, ?string $like = null): array
+    public function getSequence(null|int|Proxy $ref = Proxy::ALL, ?string $like = null): array
     {
         $sequence = [];
 
@@ -136,10 +136,9 @@ class Pairs extends AbstractPairs
         }
 
         $result = $this->mysqli->query($squery->build());
-        
+
         if($result->num_rows) {
-            while($item = $result->fetch_assoc()) 
-            {
+            while($item = $result->fetch_assoc()) {
                 $offset = $item['_ref'] ?? '';
                 $index = $item['_key'];
                 $sequence[$offset] ??= [];
@@ -150,7 +149,7 @@ class Pairs extends AbstractPairs
                 ];
             }
         }
-        
-        return $ref === self::ALL ? $sequence : ($sequence[$ref ?? ''] ?? []);
+
+        return $ref === Proxy::ALL ? $sequence : ($sequence[$ref ?? ''] ?? []);
     }
 }

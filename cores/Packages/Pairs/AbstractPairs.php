@@ -6,11 +6,9 @@ use mysqli;
 
 abstract class AbstractPairs
 {
-    public const ALL = ':ALL';
-
     /**
      * Initializes a new instance of the Pairs class.
-     * 
+     *
      * @param mysqli $mysqli An instance of the MYSQLI class for database connection.
      * @param string $table The name of the meta table.
      */
@@ -20,11 +18,11 @@ abstract class AbstractPairs
     }
 
     /**
-     * Applies a Foreign Key Constraint to the `_ref` column of the meta table. 
+     * Applies a Foreign Key Constraint to the `_ref` column of the meta table.
      * Thus, referencing the parent table.
      *
      * @param array $data - configuration data
-     * @return bool 
+     * @return bool
      */
     public function setForeignConstraint(ForeignConstraint $foreignConstraint): ?bool
     {
@@ -41,7 +39,7 @@ abstract class AbstractPairs
             $this->table,
             $foreignConstraint->getConstraint()
         );
-    
+
         if($this->mysqli?->query($SQL)?->num_rows === 0) {
 
             $placeholder = "ALTER TABLE `%s`
@@ -62,16 +60,16 @@ abstract class AbstractPairs
                 $foreignConstraint->getPrimaryKeyColumn(),
                 $foreignConstraint->getOnDeleteAction()
             );
-            
+
             return $this->mysqli->query($SQL);
         }
-        
+
         return true;
     }
 
     /**
      * Create meta table if it doesn't exist.
-     * 
+     *
      * @return bool
      */
     protected function createNonExistingTable(): bool
