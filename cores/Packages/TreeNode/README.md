@@ -23,13 +23,13 @@ To add a child node, use the `add` method of the `TreeNode` class. There are sev
 1. Automatic creation of child Node (without attribute): This will create a new instance of `TreeNode` (without attribute) and append it as child of the current Node
 
 ```php
-$treeNode->add('main-node');
+$treeNode->addChild('main-node');
 ```
 
 2. Automatic creation of child Node with attributes: This will create a new instance of `TreeNode` with attributes and append it as child of the current Node.
 
 ```php
-$treeNode->add("main-node", [
+$treeNode->addChild("main-node", [
 	"label" => "dashboard",
 	"key" => "value"
 ]);
@@ -41,74 +41,74 @@ $childNode = new TreeNode('child-name', [
     'attribute' => 'value'
 ]);
 
-$treeNode->add("main-node", $childNode);
+$treeNode->addChild("main-node", $childNode);
 ```
 
-The `add` method returns an instance of the child node (`TreeNode`) that was added, allowing you to create a parent-child relationship and build a hierarchy of items.
+The `addChild` method returns an instance of the child node (`TreeNode`) that was added, allowing you to create a parent-child relationship and build a hierarchy of items.
 
 ### Accessing Child Nodes
 
-To access a specific child node, you can use the `get` method and pass the child reference name as an argument. For example:
+To access a specific child node, you can use the `getChild` method and pass the child reference name as an argument. For example:
 
 ```php
-$child_node = $treeNode->get("main-node");
+$child_node = $treeNode->getChild("main-node");
 ```
 
 This will return the child node that is referenced as `"main-node"`. You can traverse multiple levels of nodes using this method. For example:
 
 ```php
-$treeNode->get('main-node')->get('another-node'); // and so on
+$treeNode->getChild('main-node')->getChild('another-node'); // and so on
 ```
 
 ### Accessing All Child Nodes
 
-`TreeNode` uses the `__get` magic method to retrieve property publicly. Therefore, you can access all direct child nodes using the `children` property.
+`TreeNode` uses the `getChildren` method to retrieve the children nodes.
 
 ```php
-$treeNode->children; // An array containing all child nodes
+$treeNode->getChildren(); // An array containing all child nodes
 ```
 
 ### Obtaining Parent Node
 
-You can obtain the parent node of a child node by accessing the `parentNode` property:
+You can obtain the parent node of a child node by calling the `getParent()` method:
 
 ```php
-$child_node->parentNode; // The parent TreeNode
+$childNode->getParent(); // The parent TreeNode
 ```
 
 This code retrieves the `TreeNode` instance of the parent node.
 
 ### Removing Nodes
 
-The `remove` method allows you to remove a child `TreeNode` object from its parent. You can remove a node by providing its name:
+The `removeChild` method allows you to remove a child `TreeNode` object from its parent. You can remove a node by providing its name:
 
 ```php
-$treeNode->remove("main-node"); // remove "main-node" and all its children
+$treeNode->removeChild("main-node"); // remove "main-node" and all its children
 ```
 
-The `remove` method provides a way to dynamically remove specific nodes from the hierarchy when needed.
+The `removechild` method provides a way to dynamically remove specific nodes from the hierarchy when needed.
 
 ### Managing Attributes
 
 TreeNode allows you to manage attributes associated with nodes:
 
-- To retrieve the value of a specific attribute, you can use the `getAttr` method:
+- To retrieve the value of a specific attribute, you can use the `getAttribute` method:
 
   ```php
-  $main_node->getAttr('label'); // returns "dashboard" (if exists)
+  $main_node->getAttribute('label'); // returns "dashboard" (if exists)
   ```
 
-- To set the value of an attribute, you can use the `setAttr` method:
+- To set the value of an attribute, you can use the `setAttribute` method:
 
   ```php
-  $main_node->setAttr('label', "profile"); // overwrite or add new label attribute
-  $main_node->setAttr('title', "Node Title"); // create a new attribute named "title"
+  $main_node->setAttribute('label', "profile"); // overwrite or add new label attribute
+  $main_node->setAttribute('title', "Node Title"); // create a new attribute named "title"
   ```
 
-- To remove an attribute from a node, you can use the `removeAttr` method:
+- To remove an attribute from a node, you can use the `removeAttribute` method:
 
   ```php
-  $main_node->removeAttr('label'); // label attribute removed
+  $main_node->removeAttribute('label'); // label attribute removed
   ```
 
 ## Node Structure Demonstration:
@@ -118,17 +118,17 @@ Here's an example of how TreeNode can be used to create a dynamic node with a pa
 ```php
 $treeNode = new TreeNode();
 	
-$treeNode->add("node-ref", [
+$treeNode->addChild("node-ref", [
     "label" => "Home",
     "href" => "//example.com"
 ]);
 
-$nodeChild = $treeNode->get("node-ref")->add("node-child", [
+$nodeChild = $treeNode->getChild("node-ref")->addChild("node-child", [
     "label" => "About",
     "href" => "//example.com/about"
 ]);
 
-$innerNode = $nodeChild->add("inner-node", [
+$innerNode = $nodeChild->addChild("inner-node", [
     "label" => "Services",
     "href" => "//example.com/services"
 ]);
