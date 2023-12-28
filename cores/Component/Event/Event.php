@@ -6,7 +6,7 @@ final class Event
 {
     private static $eventList = [];
 
-    public static function emit(string $name, array $data = [])
+    public static function emit(string $name, array|object $data = [])
     {
         self::execAll(self::$eventList[$name] ?? [], $data);
     }

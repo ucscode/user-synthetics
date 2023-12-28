@@ -13,7 +13,7 @@ interface UssInterface
     public function exit(bool|int|null $status, ?string $message, array $data): void;
     public function die(bool|int|null $status, ?string $message, array $data): void;
 
-    public function filterContext(string|array $path, string $divider = '/'): string;
+    public function filterContext(string|array $path, bool $trim = false, string $divider = '/'): string;
     public function abspathToUrl(string $pathname, bool $hidebase = false): string;
     public function keygen(int $length, bool $use_special_char): string;
     public function replaceVar(string $string, array $data): string;

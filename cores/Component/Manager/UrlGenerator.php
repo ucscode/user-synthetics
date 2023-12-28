@@ -72,7 +72,7 @@ class UrlGenerator
                 };
                 return $value;
             }, $this->path);
-            $result .= "/{$path}";
+            $result .= "/" . trim($path, "/");
         };
         if(!empty($this->query)) {
             $result .= "?" . http_build_query($this->query);
