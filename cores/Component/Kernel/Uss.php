@@ -100,13 +100,12 @@ final class Uss extends AbstractUss
     /**
      * Explode a content by a seperator and rejoin the filtered value
      */
-    public function filterContext(string|array $path, bool $trim = false, string $divider = '/'): string
+    public function filterContext(string|array $path, string $divider = '/'): string
     {
         if(is_array($path)) {
             $path = implode($divider, $path);
         };
-        $normalize = preg_replace(sprintf('#\s*%s\s*#', $divider), $divider, $path);
-        $normalize =  preg_replace(sprintf('#%s{2,}#', $divider), $divider, $normalize);
-        return $trim ? trim($normalize, $divider) : $normalize;
+        $explosion = array_filter(array_map('trim', explode("/", $path)));
+        return implode("/", $explosion);
     }
 };

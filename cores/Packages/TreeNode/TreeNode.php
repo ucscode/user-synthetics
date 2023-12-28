@@ -55,6 +55,14 @@ class TreeNode
     }
 
     /**
+     * Get unique identity of current node
+     */
+    public function getIdentity(): string
+    {
+        return $this->identity;
+    }
+
+    /**
      * Adds a child node to the current TreeNode object.
      *
      * @param string $name The name of the child node.
@@ -66,14 +74,14 @@ class TreeNode
         if (!empty($this->children[$name])) {
             throw new Exception("Duplicate Child: '{$name}' already added to '{$this->name}'");
         }
-        
+
         $child = ($component instanceof TreeNode) ? $component : new self($name, $component);
         $child->parent = $this;
         $child->level = $this->level + 1;
 
         $this->synchronizeChildren(
-            $child->children, 
-            fn($child) => $child->level = ($child->parent->level + 1)
+            $child->children,
+            fn ($child) => $child->level = ($child->parent->level + 1)
         );
 
         return $this->children[$name] = $child;
@@ -129,7 +137,7 @@ class TreeNode
      */
     public function findIndexChild(int $index): ?TreeNode
     {
-        return $this->synchronizeChildren($this->children, function($child) use($index) {
+        return $this->synchronizeChildren($this->children, function ($child) use ($index) {
             if($child->index === $index) {
                 return $child;
             }
@@ -193,7 +201,7 @@ class TreeNode
      * Recursively processes an array of children using a callback function.
      *
      * @param array $children The array of children to process.
-     * @param callable $process The callback function to apply to each child. 
+     * @param callable $process The callback function to apply to each child.
      *                          This function should take a child as a parameter and return a value.
      *                          If the function returns false for a child, the current iteration is skipped and the loop continues with the next child.
      *                          If the function returns null for a child, the recursion continues with the current child's children.
@@ -207,7 +215,7 @@ class TreeNode
         foreach($children as $child) {
             if(($value = $process($child)) === false) {
                 continue; // Continue to the next child
-            } 
+            }
             $value ??= $this->synchronizeChildren($child->children, $process);
             if($value !== null) {
                 return $value; // Return the value and stop processing
@@ -229,11 +237,10 @@ class TreeNode
             'index' => $this->index,
             'level' => $this->level,
         ];
-        
+
         $optional = [
-            'attributes' => $this->attributes, 
+            'attributes' => $this->attributes,
             'children' => $this->children,
-            '::parent' => !$this->parent ? null : $this->parent->identity,
         ];
 
         foreach($optional as $name => $value) {
@@ -241,6 +248,9 @@ class TreeNode
                 $debugInfo[$name] = $value;
             }
         };
+
+        $parentName = $this->parent->name ?? 'NULL';
+        $debugInfo['::parent'] = !$this->parent ? null : $this->parent->identity . " ({$parentName})";
 
         return $debugInfo;
     }

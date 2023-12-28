@@ -5,7 +5,7 @@ namespace Ucscode\Pairs;
 class ForeignConstraint
 {
     protected string $constraint;
-    protected string $primaryKeyColumn = 'id';
+    protected string $primaryKeyColumnName = 'id';
     protected string $primaryKeyDataType = 'INT';
     protected bool $primaryKeyUnsigned = false;
     protected bool $primaryKeyNullable = false;
@@ -44,24 +44,24 @@ class ForeignConstraint
     /**
      * Define the primary key column of the foreign table
      */
-    public function setPrimaryKeyColumn(string $column): self
+    public function describePrimaryKeyColumnName(string $columnName): self
     {
-        $this->primaryKeyColumn = trim($column);
+        $this->primaryKeyColumnName = trim($columnName);
         return $this;
     }
 
     /**
      * Get the primay key column of the foreign table
      */
-    public function getPrimaryKeyColumn(): string
+    public function getPrimaryKeyColumnName(): string
     {
-        return $this->primaryKeyColumn;
+        return $this->primaryKeyColumnName;
     }
 
     /**
      * Define the primary key datatype of the foreign table
      */
-    public function setPrimaryKeyDataType(string $dataType): self
+    public function describePrimaryKeyDataType(string $dataType): self
     {
         $this->primaryKeyDataType = trim($dataType);
         return $this;
@@ -78,7 +78,7 @@ class ForeignConstraint
     /**
      * Define the primary key signature status of the foreign table
      */
-    public function setPrimaryKeyUnsigned(bool $unsigned): self
+    public function describePrimaryKeyUnsigned(bool $unsigned): self
     {
         $this->primaryKeyUnsigned = $unsigned;
         return $this;
@@ -95,7 +95,7 @@ class ForeignConstraint
     /**
      * Define the primary key signature status of the foreign table
      */
-    public function setPrimaryKeyNullable(bool $nullable): self
+    public function describePrimaryKeyNullable(bool $nullable): self
     {
         $this->primaryKeyNullable = $nullable;
         return $this;

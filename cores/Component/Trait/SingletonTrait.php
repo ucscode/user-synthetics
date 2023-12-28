@@ -6,7 +6,7 @@ trait SingletonTrait
 {
     private static $instance;
 
-    public static function instance(...$args)
+    public static function instance(...$args): self
     {
         if(is_null(self::$instance)) {
             self::$instance = new self(...$args);
