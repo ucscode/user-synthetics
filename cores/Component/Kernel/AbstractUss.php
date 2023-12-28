@@ -8,6 +8,7 @@ use Uss\Component\Database;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
+use Ucscode\SQuery\Condition;
 use Uss\Component\Kernel\Prime as KernelPrime;
 
 abstract class AbstractUss implements UssInterface
@@ -52,33 +53,41 @@ abstract class AbstractUss implements UssInterface
     /**
      * @method fetchData
      */
-    public function fetchItem(string $table, mixed $value, $column = 'id'): ?array
+    public function fetchItem(string $table, string|array $value, $column = 'id'): ?array
     {
-        $parameter = is_iterable($value) ? $value : $column;
-        $SQL = (new SQuery())->select()
+        $state = is_array($value) ? $value : [$column => $value];
+        $condition = new Condition();
+        
+        foreach($state as $key => $input) {
+            $condition->add($key, $input);
+        }
+    
+        $squery = (new SQuery())
+            ->select()
             ->from($table)
-            ->where($parameter, $value);
+            ->where($condition);
+
+        $SQL = $squery->build();
         $result = $this->mysqli->query($SQL);
+
         return $result->fetch_assoc();
     }
 
     /**
      * @method sanitize
      */
-    public function sanitize(mixed $data, int $flags = self::SANITIZE_ENTITIES | self::SANITIZE_SQL): mixed
+    public function sanitize(mixed $data, bool $sqlEscape = false): mixed
     {
         if(is_iterable($data)) {
             foreach($data as $key => $value) {
                 $key = htmlentities($key);
-                $value = $this->sanitize($value, $flags);
-                if(is_object($data)) {
-                    $data->{$key} = $value;
-                } else {
-                    $data[$key] = $value;
-                };
+                $value = $this->sanitize($value, $sqlEscape);
+                is_object($data) ? $data->{$key} = $value : $data[$key] = $value;
             }
         } else {
-            $data = $this->purifyInput($data, $flags);
+            $data = !$sqlEscape ? 
+            htmlentities($data) : 
+            ($this->mysqli ? $this->mysqli->real_escape_string($data) : addslashes($data));
         };
         return $data;
     }
@@ -230,12 +239,17 @@ abstract class AbstractUss implements UssInterface
     {
         $columns = [];
 
-        $SQL = (new SQuery())
+        $squery = (new SQuery())
             ->select('COLUMN_NAME')
             ->from('information_schema.COLUMNS')
-            ->where('TABLE_SCHEMA', Database::NAME)
-            ->and('TABLE_NAME', $tableName);
-
+            ->where(
+                (new Condition())
+                    ->add('TABLE_SCHEMA', Database::NAME)
+                    ->and('TABLE_NAME', $tableName)
+            )
+            ->orderBy('ORDINAL_POSITION', null);
+        
+        $SQL = $squery->build();
         $result = Uss::instance()->mysqli->query($SQL);
 
         if($result->num_rows) {
@@ -312,39 +326,4 @@ abstract class AbstractUss implements UssInterface
     {
         return str_replace("\\", "/", $path);
     }
-
-    /**
-     * @method purifyInput
-     */
-    private function purifyInput($data, int $flags)
-    {
-        if(!is_bool($data) && !is_null($data)) {
-
-            $data = trim($data);
-
-            if($flags & self::SANITIZE_SCRIPT_TAGS) {
-                $tag = 'v' . sha1(mt_rand());
-                $data = preg_replace(
-                    '/(?:<script\b[^>]*>)|(?:<(\/)script>)/is',
-                    "<\$1{$tag}>",
-                    $data
-                );
-                $expression = "/<{$tag}>.*?<\/{$tag}>/s";
-                $data = preg_replace($expression, '', $data);
-            }
-
-            if($flags & self::SANITIZE_ENTITIES) {
-                $data = htmlentities($data, ENT_QUOTES);
-            };
-
-            if($flags & self::SANITIZE_SQL) {
-                if(isset($this->mysqli)) {
-                    $data = $this->mysqli->real_escape_string($data);
-                };
-            };
-
-        }
-        return $data;
-    }
-
 }

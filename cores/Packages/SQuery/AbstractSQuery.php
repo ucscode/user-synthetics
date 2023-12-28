@@ -109,12 +109,13 @@ abstract class AbstractSQuery implements SQueryInterface
         return $this;
     }
 
-    protected function createOrder(string $order, string $direction): self 
+    protected function createOrder(string $order, ?string $direction): self 
     {
-        $this->order_by[] = implode(" ", array_map('trim', [
+        $context = [
             $this->tick($order),
-            strtoupper($direction)
-        ]));
+            $direction ? strtoupper($direction) : $direction
+        ];
+        $this->order_by[] = implode(" ", array_filter(array_map('trim', $context)));
         return $this;
     }
 }
