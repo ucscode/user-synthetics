@@ -6,14 +6,17 @@ use mysqli;
 use mysqli_sql_exception;
 use Ucscode\Pairs\Pairs;
 use Ucscode\UssElement\UssElement;
+use Uss\Component\Block\Block;
+use Uss\Component\Block\BlockManager;
+use Uss\Component\Block\BlockTemplate;
 use Uss\Component\Kernel\UssImmutable;
-use Uss\Component\Manager\BlockManager;
 use Uss\Component\Database;
 
 final class Prime
 {
     public function __construct(protected Uss $uss)
     {
+        $this->registerSystemUnitBlocks();
     }
 
     public function getMysqliInstance(): ?mysqli
@@ -80,7 +83,7 @@ final class Prime
     public function loadHTMLResource(): void
     {
         $vendors = [
-            'head_css' => [
+            'head_resource' => [
                 'bootstrap' => 'css/bootstrap.min.css',
                 'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.min.css',
                 'animate' => 'css/animate.min.css',
@@ -89,7 +92,7 @@ final class Prime
                 'font-size' => "css/font-size.min.css",
                 'main-css' => 'css/main.css'
             ],
-            'body_js' => [
+            'body_javascript' => [
                 'jquery' => 'js/jquery-3.7.1.min.js',
                 'bootstrap' => 'js/bootstrap.bundle.min.js',
                 'bootbox' => 'js/bootbox.all.min.js',
@@ -101,27 +104,30 @@ final class Prime
             ]
         ];
 
-        $blockManager = BlockManager::instance();
-
-        foreach($vendors as $block => $contents) {
-
-            $contents = array_map(function ($key, $value) {
-                $type = explode(".", $value);
-                $value = $this->uss->pathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
-                if(strtolower(end($type)) === 'css') {
-                    $element = (new UssElement(UssElement::NODE_LINK))
-                        ->setAttribute('rel', 'stylesheet')
-                        ->setAttribute('href', $value);
+        array_walk($vendors, function($resource, $blockName) {
+            $block = BlockManager::instance()->getBlock($blockName);
+            foreach($resource as $name => $file) {
+                $link = $this->uss->pathToUrl(UssImmutable::ASSETS_DIR . '/' . $file);
+                if($blockName === 'head_resource') {
+                    $node = new UssElement(UssElement::NODE_LINK);
+                    $node->setAttribute("rel", "stylesheet");
+                    $node->setAttribute("href", $link);
                 } else {
-                    $element = (new UssElement(UssElement::NODE_SCRIPT))
-                        ->setAttribute('type', 'text/javascript')
-                        ->setAttribute('src', $value);
-                };
-                return $element->getHTML();
-            }, array_keys($contents), $contents);
+                    $node = new UssElement(UssElement::NODE_SCRIPT);
+                    $node->setAttribute("type", "text/javascript");
+                    $node->setAttribute("src", $link);
+                }
+                $block->addContent($name, $node->getHTML(true));
+            }
+        });
+    }
 
-            $blockManager->appendTo($block, $contents);
-
-        };
+    protected function registerSystemUnitBlocks(): void
+    {
+        $blocks = ["head_resource", "head_javascript", "body_javascript"];
+        array_walk(
+            $blocks, 
+            fn ($blockName) => BlockManager::instance()->addBlock($blockName, new Block(true))
+        );
     }
 };

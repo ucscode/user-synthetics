@@ -3,23 +3,24 @@
 <head>
     
     <script>const Uss = JSON.parse(atob('{{ Uss.jsCollectionEncoded }}'));</script>
+    
     <title>{{ page_title|default('User synthetics') }}</title>
 
     {% block head %}
 
-        {% block head_metas %}
+        {% block head_meta %}
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <meta name='description' content='{{ page_description }}'>
             <link rel="icon" href="{{ favicon }}" type="image/x-icon">
         {% endblock %}
 
-        {% block head_css %}
-            {{ Uss.renderBlocks('head_css')|raw }} 
+        {% block head_resource %}
+            {{ Uss.renderBlockContents('head_resource')|raw }} 
         {% endblock %}
 
-        {% block head_js %}
-            {{ Uss.renderBlocks('head_js')|raw }}
+        {% block head_javascript %}
+            {{ Uss.renderBlockContents('head_javascript')|raw }} 
         {% endblock %}
 
     {% endblock %}
@@ -29,16 +30,14 @@
 
     {% block body %}
         
-        {{ Uss.renderBlocks('body_intro')|raw }}
-
-        {% block body_main %}{% endblock %}
-
-        {% block body_js %}
-            {{ Uss.renderBlocks('body_js')|raw }}
+        {% block body_main %}
+            {{ Uss.renderBlockContents('body_main')|raw }}
         {% endblock %}
 
-        {{ Uss.renderBlocks('body_outro')|raw }}
-
+        {% block body_javascript %}
+            {{ Uss.renderBlockContents('body_javascript')|raw }}
+        {% endblock %}
+        
     {% endblock body %}
 
 </body>

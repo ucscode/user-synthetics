@@ -2,7 +2,9 @@
 
 namespace Uss\Component\Kernel;
 
-use Uss\Component\Manager\BlockManager;
+use Twig\TemplateWrapper;
+use Uss\Component\Block\BlockManager;
+use Uss\Component\Block\BlockTemplate;
 
 /**
  * This extension is a minified version of Uss class for twig
@@ -29,6 +31,34 @@ final class Extension
     }
 
     /**
+     * Self Methods
+     */
+    public function renderBlockContents(string $name): ?string
+    {
+        $outputs = [];
+
+        if($block = BlockManager::instance()->getBlock($name)) {
+            // Render Templates First
+            $templates = $block->getTemplates();
+            usort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
+            array_walk($templates, function(BlockTemplate $blockTemplate) use (&$outputs) {
+                $outputs[] = $this->uss->twigEnvironment
+                    ->resolveTemplate($blockTemplate->getTemplate())
+                    ->render($blockTemplate->getContext());
+            });
+
+            // Render Contents Next;
+            $contents = $block->getContents();
+            usort($contents, fn ($a, $b) => $a['priority'] <=> $b['priority']);
+            array_walk($contents, function(array $content) use (&$outputs) {
+                $outputs[] = $content['content'];
+            });
+        }
+
+        return implode("\n", $outputs);
+    }
+
+    /**
      * Generate random unique character
      */
     public function keygen(int $length = 10, bool $use_spec_chars = false): string
@@ -50,20 +80,6 @@ final class Extension
     public function call_user_func(string|array $callback, ...$args): mixed
     {
         return call_user_func($callback, ...$args);
-    }
-
-    /**
-     * Self Methods
-     */
-    public function renderBlocks(string $name, int $indent = 1): ?string
-    {
-        $blockManager = BlockManager::instance();
-        $blocks = $blockManager->getBlocks($name);
-        if(is_array($blocks)) {
-            $indent = str_repeat("\t", abs($indent));
-            return implode("\n{$indent}", $blocks);
-        };
-        return null;
     }
 
     # Get an option
