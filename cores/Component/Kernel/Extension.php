@@ -8,26 +8,24 @@ use Uss\Component\Manager\BlockManager;
  * This extension is a minified version of Uss class for twig
  * It provides only limited properties and methods from the Uss class to the twig template
  */
-final class UssTwigExtension
+final class Extension
 {
-    public string $jsElement;
-    public array $globals;
+    public readonly string $jsCollectionEncoded;
 
     public function __construct(private Uss $uss)
     {
-        $this->uss->jsStorage['platform'] = UssImmutable::PROJECT_NAME;
-        $this->uss->jsStorage['url'] = $this->uss->abspathToUrl(ROOT_DIR);
-        $jsonElement = json_encode($this->uss->jsStorage);
-        $this->jsElement = base64_encode($jsonElement);
-        $this->globals = $this->uss->localStorage;
+        $this->uss->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
+        $this->uss->jsCollection['url'] = $this->uss->pathToUrl(ROOT_DIR);
+        $this->jsCollectionEncoded = base64_encode(json_encode($this->uss->jsCollection));
+        $this->uss->twigContext['favicon'] ??= $this->uss->twigContext['page_icon'];
     }
 
     /**
      * Conver absolute path to Url
      */
-    public function abspathToUrl(string $path, bool $base = false): string
+    public function pathToUrl(string $path, bool $base = false): string
     {
-        return $this->uss->abspathToUrl($path, $base);
+        return $this->uss->pathToUrl($path, $base);
     }
 
     /**

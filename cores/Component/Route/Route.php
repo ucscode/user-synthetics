@@ -95,7 +95,7 @@ class Route
         $uss = Uss::instance();
 
         $this->route = $uss->filterContext($this->route);
-        $this->path = $uss->filterContext($uss->splitUri());
+        $this->path = $uss->filterContext($uss->getUrlSegments());
         $this->query = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ?? '';
         $this->request = $this->path . '?' . $this->query;
 

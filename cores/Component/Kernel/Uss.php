@@ -13,13 +13,12 @@ final class Uss extends AbstractUss
      *
      * @param string $templateFile: Reference to the twig template.
      * @param array $variables:     A list of variables that will be passed to the template
-     *
-     * @return void
+     * @param bool $return          Whether to return or print the output
      */
-    public function render(string $templateFile, array $variables = [], $return = false): ?string
+    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
     {
-        $variables += $this->templateStorage;
-        $this->twigEnvironment->addGlobal(self::NAMESPACE, new UssTwigExtension($this));
+        $this->twigEnvironment->addGlobal(self::NAMESPACE, new Extension($this));
+        $variables += $this->twigContext;
         $result = $this->twigEnvironment->render($templateFile, $variables);
         return $return ? $result : call_user_func(function () use ($result) {
             print($result);
@@ -30,18 +29,15 @@ final class Uss extends AbstractUss
     /**
      * Retrieve URL request path segments.
      *
-     * @param int|null $index       Optional: index of the segment to retrieve. If not provided, returns the entire array of segments.
-     * @return array|string|null    The array of URL path segments if no index is provided, the segment at the specified index, or `null` if the index is out of range or the request string is not set.
+     * @param int|null $index - index of the segment to retrieve. If not provided, returns the entire array of segments.
+     * @return array|string|null
      */
-    public function splitUri(?int $index = null): array|string|null
+    public function getUrlSegments(?int $index = null): array|string|null
     {
-        $documentRoot = $this->slash($_SERVER['DOCUMENT_ROOT']);
-        $projectRoot = $this->slash(ROOT_DIR);
-        $requestUri = explode("?", $_SERVER['REQUEST_URI']);
-        $path = $requestUri[0] ?? '';
-        $path = str_replace($projectRoot, '', $documentRoot . $path);
+        $path = explode("?", $_SERVER['REQUEST_URI'])[0] ?? '';
+        $path = str_replace($this->slash(ROOT_DIR), '', $this->slash($_SERVER['DOCUMENT_ROOT']) . $path);
         $request = array_values(array_filter(array_map('trim', explode("/", $path))));
-        return is_numeric($index) ? ($request[$index] ?? null) : $request;
+        return !is_null($index) ? ($request[$index] ?? null) : $request;
     }
 
     /**
@@ -57,44 +53,36 @@ final class Uss extends AbstractUss
         $algorithm = 'ripemd160';
         $salt = bin2hex(random_bytes(3));
         $dataToHash = $input . $salt . $secretKey;
-
         $nonce = hash_hmac($algorithm, $dataToHash, $secretKey);
 
-        if($receivedNonce === null) {
-            return $nonce . ':' . $salt;
-        } else {
+        if($receivedNonce !== null) {
             $token = explode(':', $receivedNonce);
             if(count($token) === 2) {
                 list($expectedNonce, $expectedSalt) = $token;
                 $computedNonce = hash_hmac($algorithm, $input . $expectedSalt . $secretKey, $secretKey);
                 return hash_equals($computedNonce, $expectedNonce);
-            } else {
-                return false;
             }
+            return false;
         }
+
+        return $nonce . ':' . $salt;
     }
 
     /**
-     * Exit the script and print a JSON response.
-     * @return void
+     * Terminate the script and print a JSON response.
+     *
+     * @param bool|int|null $status   The status of the response.
+     * @param string|null   $message  The optional message associated with the response.
+     * @param array         $data     Additional data to include in the response.
      */
-    public function exit(bool|int|null $status, ?string $message = null, array $data = []): void
+    public function terminate(bool|int|null $status, ?string $message = null, array $data = []): void
     {
-        $output = json_encode([
+        $response = [
             "status" => $status,
             "message" => $message,
             "data" => $data
-        ], JSON_PRETTY_PRINT);
-        exit($output);
-    }
-
-    /**
-    * Kill the script and print a JSON response.
-    * @return void
-    */
-    public function die(bool|int|null $status, ?string $message = null, array $data = []): void
-    {
-        $this->exit($status, $message, $data);
+        ];
+        exit(json_encode($response, JSON_PRETTY_PRINT));
     }
 
     /**

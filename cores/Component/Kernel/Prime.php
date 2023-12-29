@@ -10,19 +10,20 @@ use Uss\Component\Kernel\UssImmutable;
 use Uss\Component\Manager\BlockManager;
 use Uss\Component\Database;
 
-final class Prime 
+final class Prime
 {
     public function __construct(protected Uss $uss)
-    {}
+    {
+    }
 
-    public function getMysqliInstance(): mysqli
+    public function getMysqliInstance(): ?mysqli
     {
         $mysqli = null;
         if(Database::ENABLED) {
             try {
                 $mysqli = @new mysqli(
-                    Database::HOST, 
-                    Database::USERNAME, 
+                    Database::HOST,
+                    Database::USERNAME,
                     Database::PASSWORD,
                     Database::NAME,
                     Database::PORT
@@ -106,7 +107,7 @@ final class Prime
 
             $contents = array_map(function ($key, $value) {
                 $type = explode(".", $value);
-                $value = $this->uss->abspathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
+                $value = $this->uss->pathToUrl(UssImmutable::ASSETS_DIR . "/" . $value);
                 if(strtolower(end($type)) === 'css') {
                     $element = (new UssElement(UssElement::NODE_LINK))
                         ->setAttribute('rel', 'stylesheet')

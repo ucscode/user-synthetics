@@ -16,7 +16,7 @@ class UrlGenerator
     {
         $uss = Uss::instance();
         $this->base = $uss->filterContext($base);
-        $this->host = $uss->abspathToUrl($_SERVER['DOCUMENT_ROOT']);
+        $this->host = $uss->pathToUrl($_SERVER['DOCUMENT_ROOT']);
         $this->polyfill($path);
         foreach($query as $key => $value) {
             $this->setQuery($key, $value);

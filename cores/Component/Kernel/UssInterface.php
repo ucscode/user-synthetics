@@ -6,18 +6,11 @@ interface UssInterface
 {
     public const NAMESPACE = 'Uss';
 
-    public const SANITIZE_ENTITIES = 1;
-    public const SANITIZE_SQL = 2;
-    public const SANITIZE_SCRIPT_TAGS = 4;
-
-    public function exit(bool|int|null $status, ?string $message, array $data): void;
-    public function die(bool|int|null $status, ?string $message, array $data): void;
-
+    public function terminate(bool|int|null $status, ?string $message, array $data = []): void;
     public function filterContext(string|array $path, string $divider = '/'): string;
-    public function abspathToUrl(string $pathname, bool $hidebase = false): string;
+    public function pathToUrl(string $pathname, bool $hidebase = false): string;
     public function keygen(int $length, bool $use_special_char): string;
-    public function replaceVar(string $string, array $data): string;
-
     public function isAbsolutePath(string $path): bool;
     public function render(string $templatePath, array $variables): ?string;
+    public function getUrlSegments(?int $index = null): array|string|null;
 }

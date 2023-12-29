@@ -60,3 +60,8 @@ User Synthetics is released under the GNU General Public License (GPL) version 3
 
 User Synthetics is developed and maintained by [ucscode](https://ucscode.me). If you have any questions, suggestions, or need assistance, please feel free to reach out.
 
+## Useful PHP Libraries
+
+- [jaybizzle/crawler-detect](https://github.com/JayBizzle/Crawler-Detect): CrawlerDetect is a PHP class for detecting bots/crawlers/spiders via the user agent and http_from header.
+
+- [FakerPHP](https://fakerphp.github.io/): Faker is a PHP library that generates fake data for you. 

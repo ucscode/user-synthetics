@@ -1,13 +1,10 @@
 {% extends '@Uss/base.html.twig' %}
 
-{% set assets_path = constant('Uss\\Component\\Kernel\\UssImmutable::ASSETS_DIR') %}
-{% set project_name = constant("Uss\\Component\\Kernel\\UssImmutable::PROJECT_NAME") %}
-
 {% block body_main %}
 
 	<div class='px-3 py-2 my-2 text-center'>
 		
-		{% set logo = Uss.abspathToUrl(assets_path ~ '/images/origin.png') %}
+		{% set logo = Uss.pathToUrl(__dashboard.immutable.ASSETS_DIR ~ '/images/origin.png') %}
 		
 		<img class='d-block mx-auto mb-4' src="{{ logo }}" alt='user synthetics logo' height='76'>
 		
@@ -44,7 +41,12 @@
 			</div>
 			
 			<div class='mb-2'>
-				<div class='mb-1'> Powered By <a href='{{ url }}' target='_blank'>{{ project_name }}</a> </div> 
+				<div class='mb-1'> 
+					Powered By 
+					<a href='{{ url }}' target='_blank'>
+						{{ __dashboard.immutable.PROJECT_NAME }}
+					</a> 
+				</div> 
 				<div>&copy; 2022</div>
 			</div>
 			
