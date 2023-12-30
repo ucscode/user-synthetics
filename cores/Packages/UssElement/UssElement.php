@@ -30,7 +30,7 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
-     * Hide element from browser DOM but make it available an accessible
+     * Hide element from browser DOM while still available and accessible
      */
     public function setInvisible(bool $status): UssElementInterface
     {
@@ -366,15 +366,23 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
+     * @method sortChildren
+     */
+    public function sortChildren(callable $callback): void
+    {
+        usort($this->children, $callback);
+    }
+
+    /**
      * @method openTag
      */
     public function open(): string
     {
-        $form = new UssElement($this->nodeName);
+        $element = new UssElement($this->nodeName);
         foreach($this->getAttributes() as $key => $value) {
-            $form->setAttribute($key, $value);
+            $element->setAttribute($key, $value);
         }
-        return preg_replace("/<\/" . strtolower($this->nodeName) . ">$/", '', $form->getHTML());
+        return preg_replace("/<\/" . strtolower($this->nodeName) . ">$/", '', $element->getHTML());
     }
 
     /**

@@ -1,16 +1,16 @@
 {% extends '@Uss/base.html.twig' %}
 
+{% set ASSETS_DIR = constant('Uss\\Component\\Kernel\\UssImmutable::ASSETS_DIR') %}
+{% set PROJECT_NAME = constant('Uss\\Component\\Kernel\\UssImmutable::PROJECT_NAME') %}
+{% set logo = Uss.pathToUrl(ASSETS_DIR ~ '/images/origin.png') %}
+
 {% block body_main %}
 
 	<div class='px-3 py-2 my-2 text-center'>
 		
-		{% set logo = Uss.pathToUrl(__dashboard.immutable.ASSETS_DIR ~ '/images/origin.png') %}
-		
 		<img class='d-block mx-auto mb-4' src="{{ logo }}" alt='user synthetics logo' height='76'>
 		
-		<h1 class='display-6 fw-light mb-3'>
-			Database Connection Failed
-		</h1>
+		<h1 class='display-6 fw-light mb-3'>Database Connection Failed</h1>
 		
 		<h5 class='fw-light mb-4'>
 			<i class='bi bi-arrow-right me-1 animate__animated animate__shakeX d-inline-block text-warning'></i> 
@@ -44,7 +44,7 @@
 				<div class='mb-1'> 
 					Powered By 
 					<a href='{{ url }}' target='_blank'>
-						{{ __dashboard.immutable.PROJECT_NAME }}
+						{{ PROJECT_NAME }}
 					</a> 
 				</div> 
 				<div>&copy; 2022</div>
