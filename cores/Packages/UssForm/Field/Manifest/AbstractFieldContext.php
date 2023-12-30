@@ -2,12 +2,12 @@
 
 namespace Ucscode\UssForm\Field\Manifest;
 
-use Ucscode\UssForm\Resource\Context\AbstractContext;
+use Ucscode\UssForm\Resource\Context\AbstractContextResolver;
 
-abstract class AbstractElementHandler extends AbstractContext
+abstract class AbstractFieldContext extends AbstractContextResolver
 {
     public function __construct(public readonly ElementContext $elementContext)
     {
-        
+
     }
 }

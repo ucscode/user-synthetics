@@ -20,13 +20,19 @@ class UssElement extends AbstractUssElementParser
 
     /**
      * Indicate whether the element should have a closing tag or not.
-     *
-     * @return bool `true` if the element is void (no closing tag), `false`s otherwise.
      */
     public function setVoid(bool $void): self
     {
         $this->void = $void;
         return $this;
+    }
+
+    /**
+     * Confirm if element is void
+     */
+    public function isVoid(): bool
+    {
+        return $this->void;
     }
 
     /**
@@ -36,6 +42,14 @@ class UssElement extends AbstractUssElementParser
     {
         $this->invisible = $status;
         return $this;
+    }
+
+    /**
+     * Check if element is hidden in DOM
+     */
+    public function isInvisible(): bool
+    {
+        return $this->invisible;
     }
 
     /**

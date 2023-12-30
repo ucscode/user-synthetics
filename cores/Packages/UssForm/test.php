@@ -41,4 +41,4 @@ $widget->removeOption('voice');
 $widget->setOption("name", "coding");
 $widget->setOption("name", "MODEL::SPONGE");
 
-var_dump($field);
+var_dump($context);

@@ -2,9 +2,15 @@
 
 namespace Ucscode\UssForm\Collection\Manifest;
 
+use PHPUnit\TestRunner\TestResult\Collector;
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Collection\Collection;
+use Ucscode\UssForm\Collection\Element\ContainerHandler;
+use Ucscode\UssForm\Collection\Element\InstructionHandler;
+use Ucscode\UssForm\Collection\Element\SubTitleHandler;
+use Ucscode\UssForm\Collection\Element\TitleHandler;
+use Ucscode\UssForm\Collection\Element\WrapperHandler;
 use Ucscode\UssForm\Resource\Context\Context;
-use Ucscode\UssForm\Resource\Context\AbstractContext;
 
 /**
  * An ElementContext is a container that holds multiple predefined "Context" Object
@@ -19,77 +25,36 @@ class ElementContext
     public readonly Context $instruction;
     public readonly Context $container;
 
-    public function __construct()
-    {
-        $this->buildWrapperContext();
-        $this->buildTitleContext();
-        $this->buildSubTitleContext();
-        $this->buildInstructionContext();
-        $this->buildContainerContext();
-    }
-
-    protected function buildWrapperContext(): void
+    public function __construct(protected Collection $collection)
     {
         $this->fieldset = new Context(
             UssElement::NODE_FIELDSET,
-            new class ($this) extends AbstractContext {
-                public function initialize(UssElement $element): void
-                {
-                    $element->setAttribute('class', 'collection wrapper col-12');
-                }
-            }
+            new WrapperHandler($this)
         );
-    }
 
-    protected function buildTitleContext(): void
-    {
         $this->title = new Context(
             UssElement::NODE_LEGEND,
-            new class () extends AbstractContext {
-                public function initialize(UssElement $element): void
-                {
-                    $element->setAttribute('class', 'title');
-                }
-            }
+            new TitleHandler($this)
         );
-    }
 
-    protected function buildSubTitleContext(): void
-    {
         $this->subtitle = new Context(
             UssElement::NODE_P,
-            new class () extends AbstractContext {
-                public function initialize(UssElement $element): void
-                {
-                    $element->setAttribute('class', 'subtitle small');
-                }
-            }
+            new SubTitleHandler($this)
         );
-    }
 
-    protected function buildInstructionContext(): void
-    {
         $this->instruction = new Context(
             UssElement::NODE_DIV,
-            new class () extends AbstractContext {
-                public function initialize(UssElement $element): void
-                {
-                    $element->setAttribute('class', 'instruction alert alert-info');
-                }
-            }
+            new InstructionHandler($this)
+        );
+
+        $this->container = new Context(
+            UssElement::NODE_DIV,
+            new ContainerHandler($this)
         );
     }
 
-    protected function buildContainerContext(): void
+    public function getCollection(): Collection
     {
-        $this->container = new Context(
-            UssElement::NODE_DIV,
-            new class () extends AbstractContext {
-                public function initialize(UssElement $element): void
-                {
-                    $element->setAttribute('class', 'row container');
-                }
-            }
-        );
+        return $this->collection;
     }
 }

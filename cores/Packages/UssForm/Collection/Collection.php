@@ -13,7 +13,7 @@ class Collection extends AbstractCollection
 
     public function __construct()
     {
-        $this->elementContext = new ElementContext();
+        $this->elementContext = new ElementContext($this);
     }
 
     public function addField(string $name, Field $field): self

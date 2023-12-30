@@ -13,12 +13,11 @@ class Context
     protected UssElement $element;
 
     public function __construct(
-        string|UssElement $element, 
-        protected AbstractContext $abstractContext
-    ) 
-    {
+        string|UssElement $element,
+        protected AbstractContextResolver $contextResolver
+    ) {
         $this->element = $element instanceof UssElement ? $element : new UssElement($element);
-        $this->abstractContext->onCreate($this->element, $this);
+        $this->contextResolver->onCreate($this);
     }
 
     public function setAttribute(string $name, ?string $value, bool $append = false): self
@@ -44,26 +43,26 @@ class Context
 
     public function setValue(?string $value): self
     {
-        $this->abstractContext->onSetValue($value, $this);
+        $this->contextResolver->onSetValue($value, $this);
         return $this;
     }
 
     public function getValue(): ?string
     {
-        return $this->abstractContext ? $this->abstractContext->onGetValue($this) : null;
+        return $this->contextResolver->onGetValue($this);
     }
 
     public function setHidden(bool $hidden): self
     {
-        $this->abstractContext->onSetHidden($hidden, $this);
+        $this->contextResolver->onSetHidden($hidden, $this);
         return $this;
     }
 
     public function isHidden(): bool
     {
-        return $this->abstractContext->onIsHidden($this);
+        return $this->contextResolver->onIsHidden($this);
     }
-    
+
     public function getElement(): UssElement
     {
         return $this->element;

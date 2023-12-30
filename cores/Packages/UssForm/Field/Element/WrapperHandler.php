@@ -2,13 +2,13 @@
 
 namespace Ucscode\UssForm\Field\Element;
 
-use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Field\Manifest\AbstractElementHandler;
+use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
+use Ucscode\UssForm\Resource\Context\Context;
 
-class WrapperHandler extends AbstractElementHandler
+class WrapperHandler extends AbstractFieldContext
 {
-    public function onCreate(UssElement $element): void
+    public function onCreate(Context $context): void
     {
-        $element->setAttribute('class', 'wrapper');
+        $context->getElement()->setAttribute('class', 'wrapper');
     }
 }

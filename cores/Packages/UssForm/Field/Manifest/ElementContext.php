@@ -3,7 +3,6 @@
 namespace Ucscode\UssForm\Field\Manifest;
 
 use Ucscode\UssForm\Resource\Context\Context;
-use Ucscode\UssForm\Resource\Context\AbstractContext;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Context\WidgetContext;
 use Ucscode\UssForm\Field\Element\ContainerHandler;
@@ -23,14 +22,14 @@ use Ucscode\UssForm\Field\Field;
 class ElementContext
 {
     public readonly WidgetContext $widget;
+    public readonly Context $label;
     public readonly Context $frame;
     public readonly Context $wrapper;
-    public readonly Context $label;
     public readonly Context $info;
     public readonly Context $container;
     public readonly Context $validation;
 
-    public function __construct(public readonly Field $field)
+    public function __construct(protected Field $field)
     {
         $this->widget = new WidgetContext(
             $this->field->nodeName,
@@ -41,30 +40,42 @@ class ElementContext
             UssElement::NODE_DIV,
             new FrameHandler($this)
         );
-        
+
         $this->wrapper = new Context(
             UssElement::NODE_DIV,
             new WrapperHandler($this)
-        );
-        
-        $this->label = new Context(
-            UssElement::NODE_LABEL,
-            new LabelHandler($this)
-        );
-        
-        $this->info = new Context(
-            UssElement::NODE_DIV,
-            new InfoHandler($this)
         );
 
         $this->container = new Context(
             UssElement::NODE_DIV,
             new ContainerHandler($this)
         );
-        
+
+        $this->label = new Context(
+            UssElement::NODE_LABEL,
+            new LabelHandler($this)
+        );
+
+        $this->info = new Context(
+            UssElement::NODE_DIV,
+            new InfoHandler($this)
+        );
+
         $this->validation = new Context(
             UssElement::NODE_DIV,
             new ValidationHandler($this)
         );
+
+        $this->groupContextElements();
+    }
+
+    public function getField(): Field
+    {
+        return $this->field;
+    }
+
+    protected function groupContextElements(): void
+    {
+
     }
 }
