@@ -4,18 +4,12 @@ namespace Ucscode\UssForm\Resource\Context;
 
 use Ucscode\UssElement\UssElement;
 
-/**
- * A Context is an API for manipulating object in an isolated manner
- * It defines custom logics to which a particular element can be controlled
- */
-class Context
+abstract class AbstractContext
 {
     protected UssElement $element;
 
-    public function __construct(
-        string|UssElement $element,
-        protected AbstractContextResolver $contextResolver
-    ) {
+    public function __construct(string|UssElement $element, protected AbstractContextResolver $contextResolver) 
+    {
         $this->element = $element instanceof UssElement ? $element : new UssElement($element);
         $this->contextResolver->onCreate($this);
     }
@@ -52,15 +46,15 @@ class Context
         return $this->contextResolver->onGetValue($this);
     }
 
-    public function setHidden(bool $hidden): self
+    public function setDOMHidden(bool $hidden = true): self
     {
-        $this->contextResolver->onSetHidden($hidden, $this);
+        $this->contextResolver->onSetDOMHidden($hidden, $this);
         return $this;
     }
 
-    public function isHidden(): bool
+    public function isDOMHidden(): bool
     {
-        return $this->contextResolver->onIsHidden($this);
+        return $this->contextResolver->onIsDOMHidden($this);
     }
 
     public function getElement(): UssElement

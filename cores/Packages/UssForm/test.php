@@ -12,7 +12,7 @@ $form = new Form();
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
 
-$field = new Field(Field::NODE_INPUT, Field::TYPE_SWITCH);
+$field = new Field(Field::NODE_INPUT, Field::TYPE_HIDDEN);
 $collection->addField("user[name]", $field);
 
 $context = $collection->getElementContext();
@@ -22,7 +22,6 @@ $context->container
     ->setAttribute('name', 'electoral', true)
     ->removeAttribute('name', 'true')
     ->setValue('name')
-    ->setHidden(false)
     ->getAttribute('name')
 ;
 
@@ -41,4 +40,6 @@ $widget->removeOption('voice');
 $widget->setOption("name", "coding");
 $widget->setOption("name", "MODEL::SPONGE");
 
-var_dump($context);
+$fieldContext = $field->getElementContext();
+$fieldContext->widget->setHidden(false);
+var_dump($fieldContext->frame->getElement()->getHTML(1));

@@ -103,11 +103,12 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
 
     }
 
-    protected function buildNode(UssElement $node, ?int $indent)
+    protected function buildNode(UssElement $node, ?int $indent): string
     {
         if(!$node->invisible) {
 
             $nodename = strtolower($node->tagName);
+            $indentation = $carriage = null;
             $attributes = [];
 
             foreach($node->attributes as $key => $values) {
@@ -117,15 +118,10 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
             if(!is_null($indent)) {
                 $indentation = str_repeat("\t", $indent);
                 $carriage = "\n";
-            } else {
-                $indentation = $carriage = null;
             }
 
             $html = $indentation . "<" . $nodename;
-
-            if(!empty($attributes)) {
-                $html .= " " . implode(" ", $attributes);
-            };
+            $html .= !empty($attributes) ? " " . implode(" ", $attributes) : '';
 
             if(!$node->void) {
 
@@ -136,14 +132,11 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
                     if(!empty($node->children)) {
 
                         $html .= $carriage;
-
+                        
                         foreach($node->children as $child) {
-                            if(is_null($indent)) {
-                                $index = null;
-                            } else {
-                                $index = $indent + 1;
-                            }
-                            $html .= $child->buildNode($child, $index) . $carriage;
+                            $index = is_null($indent) ? null : $indent + 1;
+                            $content = $child->buildNode($child, $index);
+                            $html .= !empty($content) ? ($content . $carriage) : '';
                         }
 
                         $html .= $indentation;
@@ -167,7 +160,7 @@ abstract class AbstractUssElementParser implements UssElementInterface, UssEleme
             }
 
         }
-        
+
         return $html ?? '';
     }
 

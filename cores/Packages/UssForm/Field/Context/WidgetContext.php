@@ -4,13 +4,12 @@ namespace Ucscode\UssForm\Field\Context;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
-use Ucscode\UssForm\Resource\Context\Context;
 
-class WidgetContext extends Context
+class WidgetContext extends FieldContext
 {
-    public function isCheckable(): bool 
+    public function isCheckable(): bool
     {
-        return 
+        return
             $this->element->nodeName === Field::NODE_INPUT &&
             in_array(
                 $this->element->getAttribute('type'),
@@ -22,9 +21,9 @@ class WidgetContext extends Context
         return false;
     }
 
-    public function isButton(): bool 
+    public function isButton(): bool
     {
-        return 
+        return
             $this->element->nodeName === Field::NODE_BUTTON ||
             (
                 $this->element->nodeName === Field::NODE_INPUT &&
@@ -36,6 +35,11 @@ class WidgetContext extends Context
                     ]
                 )
             );
+    }
+
+    public function isSelective(): bool
+    {
+        return $this->element->nodeName === Field::NODE_SELECT;
     }
 
     public function setChecked(bool $checked = true): self
@@ -61,12 +65,12 @@ class WidgetContext extends Context
         return $this;
     }
 
-    public function isDisabled(): bool 
+    public function isDisabled(): bool
     {
         return $this->element->hasAttribute('disabled');
     }
 
-    public function setReadonly(bool $status = U_TRUNCATED_CHAR_FOUND): self 
+    public function setReadonly(bool $status = true): self
     {
         $status ?
             $this->element->setAttribute('readonly') :
@@ -74,12 +78,12 @@ class WidgetContext extends Context
         return $this;
     }
 
-    public function isReadonly(): bool 
+    public function isReadonly(): bool
     {
         return $this->element->hasAttribute('readonly');
     }
-    
-    public function setRequired(bool $status = true): self 
+
+    public function setRequired(bool $status = true): self
     {
         $status ?
             $this->element->setAttribute('required') :
@@ -92,17 +96,34 @@ class WidgetContext extends Context
         return $this->element->hasAttribute('required');
     }
 
-    public function setOptions(array $options): self 
+    public function setHidden(bool $hidden = true): self
+    {
+        if($this->element->nodeName === Field::NODE_INPUT) {
+            $hidden ?
+                $this->element->setAttribute('type', 'hidden') :
+                $this->element->setAttribute('type', Field::NODE_INPUT);
+        }
+        return $this;
+    }
+
+    public function isHidden(): bool
+    {
+        return
+            $this->element->nodeName === Field::NODE_INPUT &&
+            $this->element->getAttribute('type') === Field::TYPE_HIDDEN;
+    }
+
+    public function setOptions(array $options): self
     {
         if($this->isSelective()) {
-            array_walk($options, function($value, $key) {
+            array_walk($options, function ($value, $key) {
                 $value = is_scalar($value) ? (is_bool($value) ? (int)$value : $value) : "[" . ucfirst(gettype($value)) . "]";
                 $this->setOption($key, $value);
             });
         }
         return $this;
     }
-    
+
     public function setOption(string $key, ?string $value): self
     {
         if($this->isSelective()) {
@@ -113,7 +134,7 @@ class WidgetContext extends Context
         }
         return $this;
     }
-    
+
     public function removeOption(string $key): self
     {
         if($this->isSelective()) {
@@ -123,7 +144,7 @@ class WidgetContext extends Context
         }
         return $this;
     }
-    
+
     public function getOptions(): array
     {
         $options = [];
@@ -135,12 +156,12 @@ class WidgetContext extends Context
         }
         return $options;
     }
-    
+
     public function hasOption(string $key): bool
     {
         return !!$this->getOptionElement($key);
     }
-    
+
     public function getOptionElement(string $key): ?UssElement
     {
         foreach($this->element->getChildren() as $option) {
@@ -155,45 +176,12 @@ class WidgetContext extends Context
     {
         if(is_bool($callback)) {
             $asc = $callback;
-            $callback = function(UssElement $a, UssElement $b) use ($asc) {
-                return $asc ? 
-                    strcmp($a->getContent(), $b->getContent()) : 
+            $callback = function (UssElement $a, UssElement $b) use ($asc) {
+                return $asc ?
+                    strcmp($a->getContent(), $b->getContent()) :
                     strcmp($b->getContent(), $a->getContent());
             };
         }
         $this->element->sortChildren($callback);
-    }
-    
-    public function setPrefix(string|UssElement $prefix): self
-    {
-        return $this;
-    }
-    
-    public function getPrefix() 
-    {}
-    
-    public function removePrefix(): self
-    {
-        return $this;
-    }
-
-    public function setSuffix(string|UssElement $suffix): self
-    {
-        return $this;
-    }
-
-    public function getSuffix()
-    {
-        
-    }
-
-    public function removeSuffix(): self
-    {
-        return $this;
-    }
-
-    protected function isSelective(): bool
-    {
-        return $this->element->nodeName === Field::NODE_SELECT;
     }
 }

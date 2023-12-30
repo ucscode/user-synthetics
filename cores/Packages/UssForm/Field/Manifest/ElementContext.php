@@ -2,68 +2,83 @@
 
 namespace Ucscode\UssForm\Field\Manifest;
 
-use Ucscode\UssForm\Resource\Context\Context;
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Field\Context\FieldContext;
 use Ucscode\UssForm\Field\Context\WidgetContext;
-use Ucscode\UssForm\Field\Element\ContainerHandler;
-use Ucscode\UssForm\Field\Element\FrameHandler;
-use Ucscode\UssForm\Field\Element\InfoHandler;
-use Ucscode\UssForm\Field\Element\LabelHandler;
-use Ucscode\UssForm\Field\Element\ValidationHandler;
-use Ucscode\UssForm\Field\Element\WidgetHandler;
-use Ucscode\UssForm\Field\Element\WrapperHandler;
+use Ucscode\UssForm\Field\Element\ContainerResolver;
+use Ucscode\UssForm\Field\Element\FrameResolver;
+use Ucscode\UssForm\Field\Element\InfoResolver;
+use Ucscode\UssForm\Field\Element\LabelResolver;
+use Ucscode\UssForm\Field\Element\PrefixResolver;
+use Ucscode\UssForm\Field\Element\SuffixResolver;
+use Ucscode\UssForm\Field\Element\ValidationResolver;
+use Ucscode\UssForm\Field\Element\WidgetResolver;
+use Ucscode\UssForm\Field\Element\WrapperResolver;
 use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
 /**
  * An ElementContext is a container that holds multiple predefined "Context" Object
  *
  * ElementContext for FIELD
  */
-class ElementContext
+class ElementContext extends AbstractElementContext
 {
     public readonly WidgetContext $widget;
-    public readonly Context $label;
-    public readonly Context $frame;
-    public readonly Context $wrapper;
-    public readonly Context $info;
-    public readonly Context $container;
-    public readonly Context $validation;
+    public readonly FieldContext $label;
+    public readonly FieldContext $frame;
+    public readonly FieldContext $wrapper;
+    public readonly FieldContext $info;
+    public readonly FieldContext $container;
+    public readonly FieldContext $validation;
+    public readonly FieldContext $prefix;
+    public readonly FieldContext $suffix;
 
     public function __construct(protected Field $field)
     {
         $this->widget = new WidgetContext(
             $this->field->nodeName,
-            new WidgetHandler($this)
+            new WidgetResolver($this)
         );
 
-        $this->frame = new Context(
+        $this->frame = new FieldContext(
             UssElement::NODE_DIV,
-            new FrameHandler($this)
+            new FrameResolver($this)
         );
 
-        $this->wrapper = new Context(
+        $this->wrapper = new FieldContext(
             UssElement::NODE_DIV,
-            new WrapperHandler($this)
+            new WrapperResolver($this)
         );
 
-        $this->container = new Context(
+        $this->container = new FieldContext(
             UssElement::NODE_DIV,
-            new ContainerHandler($this)
+            new ContainerResolver($this)
         );
 
-        $this->label = new Context(
+        $this->label = new FieldContext(
             UssElement::NODE_LABEL,
-            new LabelHandler($this)
+            new LabelResolver($this)
         );
 
-        $this->info = new Context(
+        $this->info = new FieldContext(
             UssElement::NODE_DIV,
-            new InfoHandler($this)
+            new InfoResolver($this)
         );
 
-        $this->validation = new Context(
+        $this->validation = new FieldContext(
             UssElement::NODE_DIV,
-            new ValidationHandler($this)
+            new ValidationResolver($this)
+        );
+
+        $this->prefix = new FieldContext(
+            UssElement::NODE_SPAN,
+            new PrefixResolver($this)
+        );
+
+        $this->suffix = new FieldContext(
+            UssElement::NODE_SPAN,
+            new SuffixResolver($this)
         );
 
         $this->groupContextElements();
@@ -76,6 +91,22 @@ class ElementContext
 
     protected function groupContextElements(): void
     {
+        $element = $this->getContextElements();
 
+        $element['frame']->appendChild($element['wrapper']);
+        $element['wrapper']->appendChild($element['info']);
+        $element['wrapper']->appendChild($element['container']);
+        $element['wrapper']->appendChild($element['validation']);
+        $element['container']->appendChild($element['widget']);
+
+        if(!$this->widget->isButton() && !$this->widget->isHidden()) {
+            $this->widget->isCheckable() ?
+                $element['container']->appendChild($element['label']) :
+                $element['wrapper']->prependChild($element['label']);
+        } else {
+            $this->label->setDOMHidden(true);
+            $this->info->setDOMHidden(true);
+            $this->validation->setDOMHidden(true);
+        }
     }
 }
