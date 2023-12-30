@@ -6,12 +6,14 @@ use Ucscode\UssElement\UssElement;
 
 abstract class AbstractContext
 {
+    abstract protected function created();
+    
     protected UssElement $element;
 
-    public function __construct(string|UssElement $element, protected AbstractContextResolver $contextResolver) 
+    public function __construct(string|UssElement $element) 
     {
         $this->element = $element instanceof UssElement ? $element : new UssElement($element);
-        $this->contextResolver->onCreate($this);
+        $this->created();
     }
 
     public function setAttribute(string $name, ?string $value, bool $append = false): self
@@ -35,26 +37,26 @@ abstract class AbstractContext
         return $this;
     }
 
-    public function setValue(?string $value): self
+    public function setDOMHidden(bool $value): self
     {
-        $this->contextResolver->onSetValue($value, $this);
-        return $this;
-    }
-
-    public function getValue(): ?string
-    {
-        return $this->contextResolver->onGetValue($this);
-    }
-
-    public function setDOMHidden(bool $hidden = true): self
-    {
-        $this->contextResolver->onSetDOMHidden($hidden, $this);
+        $this->element->setInvisible($value);
         return $this;
     }
 
     public function isDOMHidden(): bool
     {
-        return $this->contextResolver->onIsDOMHidden($this);
+        return $this->element->isInvisible();
+    }
+
+    public function setValue(?string $value): self
+    {
+        $this->element->setContent($value);
+        return $this;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->element->getContent();
     }
 
     public function getElement(): UssElement

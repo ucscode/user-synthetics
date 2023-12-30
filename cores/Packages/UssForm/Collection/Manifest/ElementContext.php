@@ -4,12 +4,11 @@ namespace Ucscode\UssForm\Collection\Manifest;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Collection\Collection;
-use Ucscode\UssForm\Collection\Context\CollectionContext;
-use Ucscode\UssForm\Collection\Element\ContainerResolver;
-use Ucscode\UssForm\Collection\Element\InstructionResolver;
-use Ucscode\UssForm\Collection\Element\SubTitleResolver;
-use Ucscode\UssForm\Collection\Element\TitleResolver;
-use Ucscode\UssForm\Collection\Element\WrapperResolver;
+use Ucscode\UssForm\Collection\Context\ContainerContext;
+use Ucscode\UssForm\Collection\Context\FieldsetContext;
+use Ucscode\UssForm\Collection\Context\InstructionContext;
+use Ucscode\UssForm\Collection\Context\SubtitleContext;
+use Ucscode\UssForm\Collection\Context\TitleContext;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
 /**
@@ -19,37 +18,37 @@ use Ucscode\UssForm\Resource\Context\AbstractElementContext;
  */
 class ElementContext extends AbstractElementContext
 {
-    public readonly CollectionContext $fieldset;
-    public readonly CollectionContext $title;
-    public readonly CollectionContext $subtitle;
-    public readonly CollectionContext $instruction;
-    public readonly CollectionContext $container;
+    public readonly FieldsetContext $fieldset;
+    public readonly TitleContext $title;
+    public readonly SubtitleContext $subtitle;
+    public readonly InstructionContext $instruction;
+    public readonly ContainerContext $container;
 
     public function __construct(protected Collection $collection)
     {
-        $this->fieldset = new CollectionContext(
-            UssElement::NODE_FIELDSET,
-            new WrapperResolver($this)
+        $this->fieldset = new FieldsetContext(
+            $this,
+            UssElement::NODE_FIELDSET
         );
 
-        $this->title = new CollectionContext(
-            UssElement::NODE_LEGEND,
-            new TitleResolver($this)
+        $this->title = new TitleContext(
+            $this,
+            UssElement::NODE_LEGEND
         );
 
-        $this->subtitle = new CollectionContext(
-            UssElement::NODE_P,
-            new SubTitleResolver($this)
+        $this->subtitle = new SubtitleContext(
+            $this,
+            UssElement::NODE_P
         );
 
-        $this->instruction = new CollectionContext(
-            UssElement::NODE_DIV,
-            new InstructionResolver($this)
+        $this->instruction = new InstructionContext(
+            $this,
+            UssElement::NODE_DIV
         );
 
-        $this->container = new CollectionContext(
-            UssElement::NODE_DIV,
-            new ContainerResolver($this)
+        $this->container = new ContainerContext(
+            $this,
+            UssElement::NODE_DIV
         );
 
         $this->groupContextElements();

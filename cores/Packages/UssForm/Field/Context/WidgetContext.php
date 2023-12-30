@@ -4,9 +4,20 @@ namespace Ucscode\UssForm\Field\Context;
 
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
 
-class WidgetContext extends FieldContext
+class WidgetContext extends AbstractFieldContext
 {
+    protected function created(): void
+    {
+        if($nodeType = $this->elementContext->getField()->nodeType) {
+            $this->element->setAttribute(
+                'type',
+                $nodeType == Field::TYPE_SWITCH ? Field::TYPE_CHECKBOX : $nodeType
+            );
+        }
+    }
+    
     public function isCheckable(): bool
     {
         return
@@ -101,7 +112,10 @@ class WidgetContext extends FieldContext
         if($this->element->nodeName === Field::NODE_INPUT) {
             $hidden ?
                 $this->element->setAttribute('type', 'hidden') :
-                $this->element->setAttribute('type', Field::NODE_INPUT);
+                $this->element->setAttribute(
+                    'type', 
+                    $this->elementContext->getField()->nodeType
+                );
         }
         return $this;
     }

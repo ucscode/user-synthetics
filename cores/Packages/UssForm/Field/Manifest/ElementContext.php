@@ -3,8 +3,16 @@
 namespace Ucscode\UssForm\Field\Manifest;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Field\Context\ContainerContext;
 use Ucscode\UssForm\Field\Context\FieldContext;
+use Ucscode\UssForm\Field\Context\FrameContext;
+use Ucscode\UssForm\Field\Context\InfoContext;
+use Ucscode\UssForm\Field\Context\LabelContext;
+use Ucscode\UssForm\Field\Context\PrefixContext;
+use Ucscode\UssForm\Field\Context\SuffixContext;
+use Ucscode\UssForm\Field\Context\ValidationContext;
 use Ucscode\UssForm\Field\Context\WidgetContext;
+use Ucscode\UssForm\Field\Context\WrapperContext;
 use Ucscode\UssForm\Field\Element\ContainerResolver;
 use Ucscode\UssForm\Field\Element\FrameResolver;
 use Ucscode\UssForm\Field\Element\InfoResolver;
@@ -25,60 +33,60 @@ use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 class ElementContext extends AbstractElementContext
 {
     public readonly WidgetContext $widget;
-    public readonly FieldContext $label;
-    public readonly FieldContext $frame;
-    public readonly FieldContext $wrapper;
-    public readonly FieldContext $info;
-    public readonly FieldContext $container;
-    public readonly FieldContext $validation;
-    public readonly FieldContext $prefix;
-    public readonly FieldContext $suffix;
+    public readonly LabelContext $label;
+    public readonly FrameContext $frame;
+    public readonly WrapperContext $wrapper;
+    public readonly InfoContext $info;
+    public readonly ContainerContext $container;
+    public readonly ValidationContext $validation;
+    public readonly PrefixContext $prefix;
+    public readonly SuffixContext $suffix;
 
     public function __construct(protected Field $field)
     {
         $this->widget = new WidgetContext(
-            $this->field->nodeName,
-            new WidgetResolver($this)
+            $this, 
+            $this->field->nodeName
         );
 
-        $this->frame = new FieldContext(
-            UssElement::NODE_DIV,
-            new FrameResolver($this)
+        $this->frame = new FrameContext(
+            $this, 
+            UssElement::NODE_DIV
         );
 
-        $this->wrapper = new FieldContext(
-            UssElement::NODE_DIV,
-            new WrapperResolver($this)
+        $this->wrapper = new WrapperContext(
+            $this, 
+            UssElement::NODE_DIV
         );
 
-        $this->container = new FieldContext(
-            UssElement::NODE_DIV,
-            new ContainerResolver($this)
+        $this->container = new ContainerContext(
+            $this, 
+            UssElement::NODE_DIV
         );
 
-        $this->label = new FieldContext(
-            UssElement::NODE_LABEL,
-            new LabelResolver($this)
+        $this->label = new LabelContext(
+            $this, 
+            UssElement::NODE_LABEL
         );
 
-        $this->info = new FieldContext(
-            UssElement::NODE_DIV,
-            new InfoResolver($this)
+        $this->info = new InfoContext(
+            $this, 
+            UssElement::NODE_DIV
         );
 
-        $this->validation = new FieldContext(
-            UssElement::NODE_DIV,
-            new ValidationResolver($this)
+        $this->validation = new ValidationContext(
+            $this, 
+            UssElement::NODE_DIV
         );
 
-        $this->prefix = new FieldContext(
-            UssElement::NODE_SPAN,
-            new PrefixResolver($this)
+        $this->prefix = new PrefixContext(
+            $this, 
+            UssElement::NODE_SPAN
         );
 
-        $this->suffix = new FieldContext(
-            UssElement::NODE_SPAN,
-            new SuffixResolver($this)
+        $this->suffix = new SuffixContext(
+            $this, 
+            UssElement::NODE_SPAN
         );
 
         $this->groupContextElements();
