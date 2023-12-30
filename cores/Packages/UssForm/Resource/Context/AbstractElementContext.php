@@ -7,7 +7,9 @@ use ReflectionProperty;
 
 abstract class AbstractElementContext
 {
-    abstract protected function groupContextElements(): void;
+    abstract public function export(): string;
+    abstract public function visualizeContextElements(): void;
+    abstract protected function assembleContextElements(): void;
 
     protected function getContextElements(): array
     {

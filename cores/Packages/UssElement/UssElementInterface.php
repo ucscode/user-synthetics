@@ -30,21 +30,21 @@ interface UssElementInterface
 
     // Child Management
 
-    public function freeElement(): void;
+    public function freeElement(): self;
 
-    public function appendChild(UssElement $child): void;
+    public function appendChild(UssElement $child): self;
 
-    public function prependChild(UssElement $child): void;
+    public function prependChild(UssElement $child): self;
 
-    public function insertBefore(UssElement $child, UssElement $refNode): void;
+    public function insertBefore(UssElement $child, UssElement $refNode): self;
 
-    public function insertAfter(UssElement $child, UssElement $refNode): void;
+    public function insertAfter(UssElement $child, UssElement $refNode): self;
 
-    public function replaceChild(UssElement $child, UssElement $refNode): void;
+    public function replaceChild(UssElement $child, UssElement $refNode): self;
 
-    public function firstChild(): ?UssElement;
+    public function getFirstChild(): ?UssElement;
 
-    public function lastChild(): ?UssElement;
+    public function getLastChild(): ?UssElement;
 
     public function getChild(int $index): ?UssElement;
 

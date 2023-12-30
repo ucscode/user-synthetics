@@ -2,6 +2,7 @@
 
 namespace Ucscode\UssForm\Resource\Context;
 
+use stdClass;
 use Ucscode\UssElement\UssElement;
 
 abstract class AbstractContext
@@ -9,8 +10,9 @@ abstract class AbstractContext
     abstract protected function created();
     
     protected UssElement $element;
+    protected UssElement|string|null $value = null;
 
-    public function __construct(string|UssElement $element) 
+    public function __construct(string|UssElement $element, protected stdClass $store) 
     {
         $this->element = $element instanceof UssElement ? $element : new UssElement($element);
         $this->created();
@@ -48,15 +50,17 @@ abstract class AbstractContext
         return $this->element->isInvisible();
     }
 
-    public function setValue(?string $value): self
+    public function setValue(string|UssElement|null $value): self
     {
-        $this->element->setContent($value);
+        $this->value = $value;
+        $this->element->freeElement();
+        $value instanceof UssElement ? $this->element->appendChild($value) : $this->element->setContent($value);
         return $this;
     }
 
-    public function getValue(): ?string
+    public function getValue(): null|UssElement|string
     {
-        return $this->element->getContent();
+        return $this->value;
     }
 
     public function getElement(): UssElement

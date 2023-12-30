@@ -2,6 +2,7 @@
 
 namespace Ucscode\UssForm\Collection\Manifest;
 
+use stdClass;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Collection\Context\ContainerContext;
@@ -26,32 +27,40 @@ class ElementContext extends AbstractElementContext
 
     public function __construct(protected Collection $collection)
     {
+        $store = new stdClass();
+
         $this->fieldset = new FieldsetContext(
             $this,
-            UssElement::NODE_FIELDSET
+            UssElement::NODE_FIELDSET,
+            $store
         );
 
         $this->title = new TitleContext(
             $this,
-            UssElement::NODE_LEGEND
+            UssElement::NODE_LEGEND,
+            $store
         );
 
         $this->subtitle = new SubtitleContext(
             $this,
-            UssElement::NODE_P
+            UssElement::NODE_P,
+            $store
         );
 
         $this->instruction = new InstructionContext(
             $this,
-            UssElement::NODE_DIV
+            UssElement::NODE_DIV,
+            $store
         );
 
         $this->container = new ContainerContext(
             $this,
-            UssElement::NODE_DIV
+            UssElement::NODE_DIV,
+            $store
         );
 
-        $this->groupContextElements();
+        $this->assembleContextElements();
+        $this->visualizeContextElements();
     }
 
     public function getCollection(): Collection
@@ -59,7 +68,17 @@ class ElementContext extends AbstractElementContext
         return $this->collection;
     }
 
-    protected function groupContextElements(): void
+    public function export(): string
+    {
+        return 'EXPORTING COLLECTION ELEMENT CONTEXT';
+    }
+
+    public function visualizeContextElements(): void
+    {
+        
+    }
+
+    protected function assembleContextElements(): void
     {
         
     }

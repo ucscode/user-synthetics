@@ -2,6 +2,7 @@
 
 namespace Ucscode\UssForm;
 
+use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Form\Form;
 
@@ -12,7 +13,7 @@ $form = new Form();
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
 
-$field = new Field(Field::NODE_INPUT, Field::TYPE_HIDDEN);
+$field = new Field(Field::NODE_INPUT, Field::TYPE_NUMBER);
 $collection->addField("user[name]", $field);
 
 $context = $collection->getElementContext();
@@ -41,5 +42,20 @@ $widget->setOption("name", "coding");
 $widget->setOption("name", "MODEL::SPONGE");
 
 $fieldContext = $field->getElementContext();
+$fieldContext->widget->setHidden(true);
 $fieldContext->widget->setHidden(false);
-var_dump($fieldContext->frame->getElement()->getHTML(1));
+$fieldContext->prefix
+    ->setValue("click")
+    ;
+$fieldContext->suffix
+    ->setValue(new UssElement(UssElement::NODE_BUTTON))
+    ->setValue("cole")
+    ->setValue(new UssElement(UssElement::NODE_BUTTON))
+    ->setValue(null);
+
+$fieldContext->widget
+    ->setValue("color")
+    ->setDOMHidden(1)
+;
+
+var_dump($fieldContext->export());

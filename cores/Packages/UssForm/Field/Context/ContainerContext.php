@@ -2,6 +2,7 @@
 
 namespace Ucscode\UssForm\Field\Context;
 
+use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
 
@@ -10,6 +11,16 @@ class ContainerContext extends AbstractFieldContext
     public function created(): void
     {
         $this->element->setAttribute('class', $this->defineClass());
+    }
+
+    public function setValue(string|UssElement|null $value): self
+    {
+        return $this;
+    }
+
+    public function setDOMHidden(bool $value): self
+    {
+        return $this;
     }
 
     protected function defineClass(): string

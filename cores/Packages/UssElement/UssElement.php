@@ -38,7 +38,7 @@ class UssElement extends AbstractUssElementParser
     /**
      * Hide element from browser DOM while still available and accessible
      */
-    public function setInvisible(bool $status): UssElementInterface
+    public function setInvisible(bool $status): self
     {
         $this->invisible = $status;
         return $this;
@@ -222,24 +222,26 @@ class UssElement extends AbstractUssElementParser
      * Appends a child element to the current element.
      *
      * @param UssElement $child The child element to append.
-     * @return void
+     * @return self
      */
-    public function appendChild(UssElement $child): void
+    public function appendChild(UssElement $child): self
     {
         $child = $this->scan($child, __METHOD__);
         $this->children[] = $child;
+        return $this;
     }
 
     /**
      * Prepends a child element to the current element.
      *
      * @param UssElement $child The child element to prepend.
-     * @return void
+     * @return self
      */
-    public function prependChild(UssElement $child): void
+    public function prependChild(UssElement $child): self
     {
         $child = $this->scan($child, __METHOD__);
         array_unshift($this->children, $child);
+        return $this;
     }
 
     /**
@@ -249,14 +251,14 @@ class UssElement extends AbstractUssElementParser
      * @param UssElement $refNode The reference element before which the child will be inserted.
      * @return void
      */
-    public function insertBefore(UssElement $child, UssElement $refNode): void
+    public function insertBefore(UssElement $child, UssElement $refNode): self
     {
         $key = array_search($refNode, $this->children, true);
-        if($key === false) {
-            return;
-        };
-        $child = $this->scan($child, __METHOD__);
-        array_splice($this->children, $key, 0, [$child]);
+        if($key !== false) {
+            $child = $this->scan($child, __METHOD__);
+            array_splice($this->children, $key, 0, [$child]);
+        }
+        return $this;
     }
 
     /**
@@ -266,14 +268,14 @@ class UssElement extends AbstractUssElementParser
      * @param UssElement $refNode The reference element after which the child will be inserted.
      * @return void
      */
-    public function insertAfter(UssElement $child, UssElement $refNode): void
+    public function insertAfter(UssElement $child, UssElement $refNode): self
     {
         $key = array_search($refNode, $this->children, true);
-        if($key === false) {
-            return;
+        if($key !== false) {
+            $child = $this->scan($child, __METHOD__);
+            array_splice($this->children, ($key + 1), 0, [$child]);
         }
-        $child = $this->scan($child, __METHOD__);
-        array_splice($this->children, ($key + 1), 0, [$child]);
+        return $this;
     }
 
     /**
@@ -283,14 +285,14 @@ class UssElement extends AbstractUssElementParser
      * @param UssElement $refNode The reference element to be replaced.
      * @return void
      */
-    public function replaceChild(UssElement $child, UssElement $refNode): void
+    public function replaceChild(UssElement $child, UssElement $refNode): self
     {
         $key = array_search($refNode, $this->children, true);
-        if($key === false) {
-            return;
+        if($key !== false) {
+            $child = $this->scan($child, __METHOD__);
+            $this->children[$key] = $child;
         }
-        $child = $this->scan($child, __METHOD__);
-        $this->children[$key] = $child;
+        return $this;
     }
 
     /**
@@ -298,7 +300,7 @@ class UssElement extends AbstractUssElementParser
      *
      * @return UssElement|null The first child element as a UssElement object, or null if there are no children.
      */
-    public function firstChild(): ?UssElement
+    public function getFirstChild(): ?UssElement
     {
         return $this->children[0] ?? null;
     }
@@ -308,7 +310,7 @@ class UssElement extends AbstractUssElementParser
      *
      * @return UssElement|null The last child element as a UssElement object, or null if there are no children.
      */
-    public function lastChild(): ?UssElement
+    public function getLastChild(): ?UssElement
     {
         $index = count($this->children) - 1;
         return $this->children[$index] ?? null;
@@ -344,10 +346,11 @@ class UssElement extends AbstractUssElementParser
      * Remove all child elements and context from the element
      * @return void
      */
-    public function freeElement(): void
+    public function freeElement(): self
     {
         $this->children = [];
         $this->content = null;
+        return $this;
     }
 
     /**

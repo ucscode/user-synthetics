@@ -5,47 +5,68 @@ namespace Ucscode\UssForm\Field\Context;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
+use Ucscode\UssForm\Resource\FormUtils;
 
 class WidgetContext extends AbstractFieldContext
 {
     protected function created(): void
     {
-        if($nodeType = $this->elementContext->getField()->nodeType) {
-            $this->element->setAttribute(
-                'type',
-                $nodeType == Field::TYPE_SWITCH ? Field::TYPE_CHECKBOX : $nodeType
-            );
+        switch($this->element->nodeName) {
+            case Field::NODE_SELECT:
+                $elementClass = 'form-select';
+                break;
+            default:
+                $elementClass = 'form-control';
+                if($this->elementContext->getField()->nodeType) {
+                    $this->element->setAttribute('type', $this->getNodeType());
+                    $elementClass = $this->isCheckable() ? 
+                        'form-check-input' : 
+                        ($this->isButton() ? 'btn btn-primary' : $elementClass);
+                }
         }
+        $this->element->setAttribute('class', $elementClass ?? '');
     }
     
+    public function setDOMHidden(bool $value): self
+    {
+        return $this;
+    }
+
+    public function setValue(string|UssElement|null $value): self
+    {
+        $this->value = $value;
+        switch($this->element->nodeName) {
+            case Field::NODE_TEXTAREA:
+                parent::setValue($value);
+                break;
+            case Field::NODE_SELECT:
+                $value = $this->scalarize($value);
+                $this->deselectOption();
+                $this->getOptionElement($value)?->setAttribute('selected');
+                break;
+            default:
+                $value = $this->scalarize($value);
+                $this->element->setAttribute('value', $value);
+        }
+        return $this;
+    }
+
+    public function setButtonContent(string $content): self
+    {
+        if($this->element->nodeName === Field::NODE_BUTTON) {
+            $this->element->setContent($content);
+        }
+        return $this;
+    }
+
     public function isCheckable(): bool
     {
-        return
-            $this->element->nodeName === Field::NODE_INPUT &&
-            in_array(
-                $this->element->getAttribute('type'),
-                [
-                    Field::TYPE_CHECKBOX,
-                    Field::TYPE_RADIO
-                ]
-            );
-        return false;
+        return (new FormUtils())->isCheckable($this->element);
     }
 
     public function isButton(): bool
     {
-        return
-            $this->element->nodeName === Field::NODE_BUTTON ||
-            (
-                $this->element->nodeName === Field::NODE_INPUT &&
-                in_array(
-                    $this->element->getAttribute('type'),
-                    [
-                        Field::TYPE_BUTTON,
-                        Field::TYPE_SUBMIT
-                    ]
-                )
-            );
+        return (new FormUtils())->isButton($this->element);
     }
 
     public function isSelective(): bool
@@ -112,10 +133,8 @@ class WidgetContext extends AbstractFieldContext
         if($this->element->nodeName === Field::NODE_INPUT) {
             $hidden ?
                 $this->element->setAttribute('type', 'hidden') :
-                $this->element->setAttribute(
-                    'type', 
-                    $this->elementContext->getField()->nodeType
-                );
+                $this->element->setAttribute('type', $this->getNodeType());
+            $this->elementContext->visualizeContextElements();
         }
         return $this;
     }
@@ -131,7 +150,7 @@ class WidgetContext extends AbstractFieldContext
     {
         if($this->isSelective()) {
             array_walk($options, function ($value, $key) {
-                $value = is_scalar($value) ? (is_bool($value) ? (int)$value : $value) : "[" . ucfirst(gettype($value)) . "]";
+                $value = $this->scalarize($value);
                 $this->setOption($key, $value);
             });
         }
@@ -197,5 +216,29 @@ class WidgetContext extends AbstractFieldContext
             };
         }
         $this->element->sortChildren($callback);
+    }
+
+    protected function getNodeType(): string
+    {
+        $nodeType = $this->elementContext->getField()->nodeType;
+        return 
+            $nodeType === Field::TYPE_SWITCH ? 
+            Field::TYPE_CHECKBOX : 
+            $nodeType;
+    }
+
+    protected function scalarize(mixed $value): string
+    {
+        return is_scalar($value) ? 
+            (is_bool($value) ? (int)$value : $value) : 
+            "[" . ucfirst(gettype($value)) . "]";
+    }
+
+    protected function deselectOption(): void
+    {
+        if($this->isSelective()) {
+            $option = $this->element->find("[selected]");
+            array_walk($option, fn ($option) => $option->removeAttribute('selected'));
+        }
     }
 }
