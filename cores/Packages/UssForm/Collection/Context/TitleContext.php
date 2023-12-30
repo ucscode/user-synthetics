@@ -8,6 +8,6 @@ class TitleContext extends AbstractCollectionContext
 {
     protected function created(): void
     {
-        $this->element->setAttribute('class', 'title');
+        $this->element->setAttribute('class', 'collection-title');
     }
 }

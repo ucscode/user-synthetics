@@ -11,6 +11,8 @@ abstract class AbstractElementContext
     abstract public function visualizeContextElements(): void;
     abstract protected function assembleContextElements(): void;
 
+    protected bool $fixed = false;
+
     protected function getContextElements(): array
     {
         $elements = [];
@@ -23,5 +25,16 @@ abstract class AbstractElementContext
             }
         };
         return $elements;
+    }
+
+    public function setFixed(bool $status = true): self
+    {
+        $this->fixed = $status;
+        return $this;
+    }
+
+    public function isFixed(): bool
+    {
+        return $this->fixed;
     }
 }

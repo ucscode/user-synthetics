@@ -248,15 +248,18 @@ class UssElement extends AbstractUssElementParser
      * Inserts a child element before a specified reference element.
      *
      * @param UssElement $child The child element to insert.
-     * @param UssElement $refNode The reference element before which the child will be inserted.
+     * @param UssElement $reference The reference element before which the child will be inserted.
      * @return void
      */
-    public function insertBefore(UssElement $child, UssElement $refNode): self
+    public function insertBefore(UssElement $child, UssElement $reference): self
     {
-        $key = array_search($refNode, $this->children, true);
+        $key = array_search($reference, $this->children, true);
         if($key !== false) {
-            $child = $this->scan($child, __METHOD__);
-            array_splice($this->children, $key, 0, [$child]);
+            $this->sortChildren(function($a, $b) use($child, $reference) {
+                if($a === $child && $b === $reference) return -1;
+                if($b === $child && $a === $reference) return 1;
+                return 0;
+            });
         }
         return $this;
     }
@@ -265,15 +268,18 @@ class UssElement extends AbstractUssElementParser
      * Inserts a child element after a specified reference element.
      *
      * @param UssElement $child The child element to insert.
-     * @param UssElement $refNode The reference element after which the child will be inserted.
+     * @param UssElement $reference The reference element after which the child will be inserted.
      * @return void
      */
-    public function insertAfter(UssElement $child, UssElement $refNode): self
+    public function insertAfter(UssElement $child, UssElement $reference): self
     {
-        $key = array_search($refNode, $this->children, true);
+        $key = array_search($reference, $this->children, true);
         if($key !== false) {
-            $child = $this->scan($child, __METHOD__);
-            array_splice($this->children, ($key + 1), 0, [$child]);
+            $this->sortChildren(function($a, $b) use($child, $reference) {
+                if($a === $child && $b === $reference) return 1;
+                if($b === $child && $a === $reference) return -1;
+                return 0;
+            });
         }
         return $this;
     }
@@ -282,12 +288,12 @@ class UssElement extends AbstractUssElementParser
      * Replaces a child element with another element.
      *
      * @param UssElement $child The new child element to replace the reference element.
-     * @param UssElement $refNode The reference element to be replaced.
+     * @param UssElement $reference The reference element to be replaced.
      * @return void
      */
-    public function replaceChild(UssElement $child, UssElement $refNode): self
+    public function replaceChild(UssElement $child, UssElement $reference): self
     {
-        $key = array_search($refNode, $this->children, true);
+        $key = array_search($reference, $this->children, true);
         if($key !== false) {
             $child = $this->scan($child, __METHOD__);
             $this->children[$key] = $child;

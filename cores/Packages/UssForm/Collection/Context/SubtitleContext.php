@@ -8,6 +8,6 @@ class SubtitleContext extends AbstractCollectionContext
 {
     protected function created(): void
     {
-        $this->element->setAttribute('class', 'subtitle small');
+        $this->element->setAttribute('class', 'collection-subtitle small');
     }
 }

@@ -36,4 +36,10 @@ class FormUtils
             )
         );
     }
+
+    public function capitalizeContent(string $content): ?string
+    {
+        $content = str_replace(['-', '[', ']'], ' ', $content);
+        return ucwords($content);
+    }
 }

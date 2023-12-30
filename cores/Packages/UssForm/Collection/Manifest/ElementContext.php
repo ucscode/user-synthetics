@@ -70,7 +70,7 @@ class ElementContext extends AbstractElementContext
 
     public function export(): string
     {
-        return 'EXPORTING COLLECTION ELEMENT CONTEXT';
+        return $this->fieldset->getElement()->getHTML(true);
     }
 
     public function visualizeContextElements(): void
@@ -80,6 +80,13 @@ class ElementContext extends AbstractElementContext
 
     protected function assembleContextElements(): void
     {
+        $elements = $this->getContextElements();
+
+        $elements['fieldset']->appendChild($elements['title']);
+        $elements['fieldset']->appendChild($elements['subtitle']);
+        $elements['fieldset']->appendChild($elements['instruction']);
+        $elements['fieldset']->appendChild($elements['container']);
+
         
     }
 }

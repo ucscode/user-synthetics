@@ -11,6 +11,7 @@ abstract class AbstractContext
     
     protected UssElement $element;
     protected UssElement|string|null $value = null;
+    protected bool $fixed = false;
 
     public function __construct(string|UssElement $element, protected stdClass $store) 
     {
@@ -39,6 +40,11 @@ abstract class AbstractContext
         return $this;
     }
 
+    public function hasAttribute(string $name): bool
+    {
+        return $this->element->hasAttribute($name);
+    }
+
     public function setDOMHidden(bool $value): self
     {
         $this->element->setInvisible($value);
@@ -61,6 +67,25 @@ abstract class AbstractContext
     public function getValue(): null|UssElement|string
     {
         return $this->value;
+    }
+
+    public function hasValue(): bool
+    {
+        return !!$this->value;
+    }
+
+    /**
+     * Inform collection not to make changes to the context
+     */
+    public function setFixed(bool $status): self
+    {
+        $this->fixed = $status;
+        return $this;
+    }
+
+    public function isFixed(): bool
+    {
+        return $this->fixed;
     }
 
     public function getElement(): UssElement

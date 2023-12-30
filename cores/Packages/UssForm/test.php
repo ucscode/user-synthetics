@@ -3,6 +3,7 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Form\Form;
 
@@ -23,8 +24,12 @@ $context->container
     ->setAttribute('name', 'electoral', true)
     ->removeAttribute('name', 'true')
     ->setValue('name')
-    ->getAttribute('name')
 ;
+
+$context->container
+    ->setValue('space')
+    ->setDOMHidden(1)
+    ;
 
 $widget = $field->getElementContext()->widget;
 
@@ -58,4 +63,9 @@ $fieldContext->widget
     ->setDOMHidden(1)
 ;
 
-var_dump($fieldContext->export());
+$collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
+
+//$collection->removeField("user[name]");
+//$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
+
+var_dump($context->export());

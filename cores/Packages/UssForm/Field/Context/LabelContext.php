@@ -12,6 +12,5 @@ class LabelContext extends AbstractFieldContext
             'class',
             $this->elementContext->widget->isCheckable() ? 'form-check-label' : 'form-label'
         );
-        $this->element->setAttribute('for');
     }
 }
