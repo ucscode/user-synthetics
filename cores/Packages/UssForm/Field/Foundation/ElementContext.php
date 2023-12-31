@@ -17,6 +17,7 @@ use Ucscode\UssForm\Gadget\Context\PrefixContext;
 use Ucscode\UssForm\Gadget\Context\SuffixContext;
 use Ucscode\UssForm\Gadget\Context\WidgetContext;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 /**
  * An ElementContext is a container that holds multiple predefined "Context" Object
@@ -26,6 +27,7 @@ use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 class ElementContext extends AbstractElementContext
 {
     // Gadget Component;
+    public readonly GadgetContext $gadget;
     public readonly ContainerContext $container;
     public readonly WidgetContext $widget;
     public readonly LabelContext $label;
@@ -43,13 +45,13 @@ class ElementContext extends AbstractElementContext
     public function __construct(protected Field $field)
     {
         $store = new stdClass();
-        $gadget = new GadgetContext($this, $store);
-
-        $this->container = $gadget->container;
-        $this->widget = $gadget->widget;
-        $this->label = $gadget->label;
-        $this->prefix = $gadget->prefix;
-        $this->suffix = $gadget->suffix;
+        
+        $this->gadget = new GadgetContext($this, $store);
+        $this->container = $this->gadget->container;
+        $this->widget = $this->gadget->widget;
+        $this->label = $this->gadget->label;
+        $this->prefix = $this->gadget->prefix;
+        $this->suffix = $this->gadget->suffix;
 
         $this->frame = new FrameContext($this, UssElement::NODE_DIV, $store);
         $this->wrapper = new WrapperContext($this, UssElement::NODE_DIV, $store);

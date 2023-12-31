@@ -5,6 +5,7 @@ namespace Ucscode\UssForm\Field;
 use Ucscode\UssForm\Field\Manifest\AbstractField;
 use Ucscode\UssForm\Field\Foundation\ElementContext;
 use Ucscode\UssForm\Gadget\Gadget;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 class Field extends AbstractField
 {
@@ -17,21 +18,46 @@ class Field extends AbstractField
 
     public function addGadget(string $name, Gadget $gadget): self
     {
+        $oldGadget = $this->getGadget($name);
         $this->gadgets[$name] = $gadget;
         $this->swapField(
-            $gadget->container->getElement()
+            $gadget->container->getElement(),
+            $oldGadget?->container->getElement()
         );
+        (new FieldUtils())->welcomeGadget($name, $gadget);
         return $this;
     }
 
-    public function getGadget(string $name): Gadget
+    public function getGadget(string $name): ?Gadget
     {
         return $this->gadgets[$name] ?? null;
     }
 
+    public function removeGadget(string|Gadget $context): ?Gadget
+    {
+        if($this->hasGadget($context)) {
+            $gadget = $context instanceof Gadget ? $context : $this->getGadget($context);
+            $name = $this->getGadgetName($gadget);
+            unset($this->gadgets[$name]);
+            $element = $gadget->container->getElement();
+            $element->getParentElement()->removeChild($element);
+            return $gadget;
+        }
+        return null;
+    }
+
     public function hasGadget(string|Gadget $gadget): bool
     {
-        return false;
+        if($gadget instanceof Gadget) {
+            return in_array($gadget, $this->gadgets, true);
+        }
+        return !!$this->getGadget($gadget);
+    }
+
+    public function getGadgetName(Gadget $gadget): ?string
+    {
+        $name = array_search($gadget, $this->gadgets, true);
+        return $name !== false ? $name : null;
     }
 
     public function getGadgets(): array

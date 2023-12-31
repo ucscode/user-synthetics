@@ -73,7 +73,8 @@ class Collection extends AbstractCollection
 
     public function getFieldName(Field $field): ?string
     {
-        return array_search($field, $this->getFields(), true);
+        $name = array_search($field, $this->getFields(), true);
+        return $name !== false ? $name : null;
     }
 
     public function getElementContext(): ElementContext

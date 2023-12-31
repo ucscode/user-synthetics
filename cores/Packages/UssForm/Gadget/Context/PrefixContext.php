@@ -3,7 +3,7 @@
 namespace Ucscode\UssForm\Gadget\Context;
 
 use Ucscode\UssForm\Gadget\Foundation\AbstractGadgetContext;
-use Ucscode\UssForm\Resource\Service\FormUtils;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 use Ucscode\UssElement\UssElement;
 
 class PrefixContext extends AbstractGadgetContext
@@ -29,7 +29,7 @@ class PrefixContext extends AbstractGadgetContext
     {
         $containerContext = $this->gadget->container;
         $containerContext->removeClass('input-single')->addClass('input-group');
-        $valueIsButton = (new FormUtils())->isButton($this->value);
+        $valueIsButton = (new FieldUtils())->isButton($this->value);
         $classes = ['input-group-text', 'input-affix-custom'];
 
         array_walk($classes, fn ($value) => $this->removeClass($value));
@@ -41,7 +41,7 @@ class PrefixContext extends AbstractGadgetContext
 
     protected function detachElement(): void
     {
-        $valueIsButton = (new FormUtils())->isButton($this->value);
+        $valueIsButton = (new FieldUtils())->isButton($this->value);
         $container = $this->gadget->container->getElement();
         $container->removeChild($valueIsButton ? $this->value : $this->element);
         $this->store->{$this->name} = false;

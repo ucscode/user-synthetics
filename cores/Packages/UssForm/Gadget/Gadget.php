@@ -11,7 +11,7 @@ use Ucscode\UssForm\Gadget\Context\PrefixContext;
 use Ucscode\UssForm\Gadget\Context\SuffixContext;
 use Ucscode\UssForm\Gadget\Context\WidgetContext;
 use Ucscode\UssForm\Gadget\Manifest\AbstractGadget;
-use Ucscode\UssForm\Resource\Service\FormUtils;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 // In this case, Gadget is the ElementContext
 
@@ -28,7 +28,7 @@ class Gadget extends AbstractGadget
 
     public function __construct(string $nodeName = Field::NODE_INPUT, ?string $nodeType = Field::TYPE_TEXT)
     {
-        [$this->nodeName, $this->nodeType] = (new FormUtils())->regulateElementPrototype($nodeName, $nodeType);
+        [$this->nodeName, $this->nodeType] = (new FieldUtils())->regulateElementPrototype($nodeName, $nodeType);
 
         $this->store = new stdClass();
 

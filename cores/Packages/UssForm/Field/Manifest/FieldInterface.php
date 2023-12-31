@@ -10,7 +10,9 @@ interface FieldInterface extends FieldTypesInterface, UssElementNodeListInterfac
 {
     public function getElementContext(): ElementContext;
     public function addGadget(string $name, Gadget $gadget): self;
-    public function getGadget(string $name): Gadget;
+    public function getGadget(string $name): ?Gadget;
+    public function removeGadget(string|Gadget $context): ?Gadget;
+    public function getGadgetName(Gadget $gadget): ?string;
     public function hasGadget(string|Gadget $gadget): bool;
     public function getGadgets(): array;
 }

@@ -15,7 +15,7 @@ $form = new Form();
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
 
-$field = new Field(Field::NODE_INPUT, Field::TYPE_SWITCH);
+$field = new Field(Field::NODE_INPUT, Field::TYPE_NUMBER);
 $collection->addField("user[name]", $field);
 
 $context = $collection->getElementContext();
@@ -71,26 +71,18 @@ $fieldContext->info
 
 $collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
 
-$gadget = new Gadget(UssElement::NODE_SELECT);
-
-$gadget->widget
-    ->setOption("name", "opioro")
-    ->setValue("bow")
-    ;
-
-$gadget->prefix
-    ->setValue(new UssElement(UssElement::NODE_BUTTON))
-    ->setValue("crow")
-    ->setValue(null)
-    ;
-
-$gadget->suffix
-    ->setValue('corn')
-    ->setValue('Moulder')
-    ->setValue(null)
-    ;
+$gadget = new Gadget(UssElement::NODE_INPUT, Field::TYPE_CHECKBOX);
+$gadget->label->setValue("Platform");
 
 $field->addGadget("smile", $gadget);
+$field->addGadget(
+    "mould", 
+    (new Gadget(Field::NODE_INPUT, Field::TYPE_SWITCH))
+);
+
+$field->getGadget("mould")->label->setValue("Accounting");
+
+//$field->addGadget("smile", new Gadget());
 
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);

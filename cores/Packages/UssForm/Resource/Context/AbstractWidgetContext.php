@@ -2,7 +2,7 @@
 
 namespace Ucscode\UssForm\Resource\Context;
 
-use Ucscode\UssForm\Resource\Service\FormUtils;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssElement\UssElement;
 
@@ -13,7 +13,7 @@ abstract class AbstractWidgetContext extends AbstractContext
 
     public function __construct(string $nodeName = Field::NODE_INPUT, ?string $nodeType = Field::TYPE_TEXT)
     {
-        [$this->nodeName, $this->nodeType] = (new FormUtils())->regulateElementPrototype($nodeName, $nodeType);
+        [$this->nodeName, $this->nodeType] = (new FieldUtils())->regulateElementPrototype($nodeName, $nodeType);
         parent::__construct($this->nodeName);
     }
 
@@ -69,12 +69,12 @@ abstract class AbstractWidgetContext extends AbstractContext
 
     public function isCheckable(): bool
     {
-        return (new FormUtils())->isCheckable($this->element);
+        return (new FieldUtils())->isCheckable($this->element);
     }
 
     public function isButton(): bool
     {
-        return (new FormUtils())->isButton($this->element);
+        return (new FieldUtils())->isButton($this->element);
     }
 
     public function isSelective(): bool

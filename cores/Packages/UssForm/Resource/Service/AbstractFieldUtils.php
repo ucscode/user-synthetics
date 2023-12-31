@@ -7,7 +7,7 @@ use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Field\Manifest\FieldTypesInterface;
 
-class FormUtils
+abstract class AbstractFieldUtils
 {
     public function regulateElementPrototype(string $nodeName, ?string $nodeType): array
     {
