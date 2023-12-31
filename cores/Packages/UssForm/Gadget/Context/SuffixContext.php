@@ -4,12 +4,12 @@ namespace Ucscode\UssForm\Gadget\Context;
 
 class SuffixContext extends PrefixContext
 {
-    protected string $name = 'suffix';
+    protected string $name = 'suffixed';
     
     protected function created(): void
     {
         parent::created();
-        $this->store->suffixAppended = false;
+        $this->store->{$this->name} = false;
     }
 
     protected function coupleElement(bool $valueIsButton): void

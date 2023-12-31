@@ -8,7 +8,7 @@ use Ucscode\UssElement\UssElement;
 
 class PrefixContext extends AbstractGadgetContext
 {
-    protected string $name = 'prefix';
+    protected string $name = 'prefixed';
 
     protected function created(): void
     {
@@ -64,7 +64,7 @@ class PrefixContext extends AbstractGadgetContext
 
     protected function regulateComponent(): void
     {
-        if(!$this->store->prefixAppended && !$this->store->suffixAppended) {
+        if(!$this->store->prefixed && !$this->store->suffixed) {
             $this->gadget->container
                 ->removeClass('input-group')
                 ->addClass('input-single');

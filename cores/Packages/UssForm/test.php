@@ -73,15 +73,24 @@ $collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
 
 $gadget = new Gadget(UssElement::NODE_SELECT);
 
+$gadget->widget
+    ->setOption("name", "opioro")
+    ->setValue("bow")
+    ;
+
 $gadget->prefix
     ->setValue(new UssElement(UssElement::NODE_BUTTON))
+    ->setValue("crow")
+    ->setValue(null)
     ;
 
 $gadget->suffix
     ->setValue('corn')
+    ->setValue('Moulder')
+    ->setValue(null)
     ;
 
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
 
-var_dump($gadget->export());
+var_dump($context->export());
