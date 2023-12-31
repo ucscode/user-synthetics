@@ -73,18 +73,21 @@ $fieldContext->info
 
 $collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
 
-$gadget = new Gadget(UssElement::NODE_INPUT, Field::TYPE_CHECKBOX);
-$gadget->label->setValue("Platform");
+$checkbox = new Gadget(UssElement::NODE_INPUT, Field::TYPE_CHECKBOX);
+$checkbox->label->setValue("Checkbox");
+$field->addGadget("checkbox", $checkbox);
 
-$field->addGadget("smile", $gadget);
-$field->addGadget(
-    "mould", 
-    (new Gadget(Field::NODE_INPUT, Field::TYPE_SWITCH))
-);
+$field->addGadget("button", (new Gadget(Field::NODE_INPUT, Field::TYPE_BUTTON)));
+$button = $field->getGadget("button")->widget->setButtonContent("Button", true);
 
-$field->getGadget("mould")->label->setValue("Accounting");
+$field->addGadget("select", new Gadget(Field::NODE_SELECT));
+$select = $field->getGadget("select")->widget->setOptions([
+    "location" => "USA",
+    "Country" => "Africa",
+    "Position" => "Innert"
+]);
 
-//$field->addGadget("smile", new Gadget());
+$default = $field->getElementContext()->gadget;
 
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
@@ -96,7 +99,8 @@ $voltex->subtitle->setDOMHidden(true);
 $voltex->instruction->setDOMHidden(true);
 ;
 
-$form->setCollectionPosition($collection, Position::AFTER, "driver");
+$field->setGadgetPosition("select", Position::BEFORE, 'checkbox');
+$field->setGadgetPosition($fieldContext->gadget, Position::BEFORE, 'button');
 
 var_dump($form->export());
 

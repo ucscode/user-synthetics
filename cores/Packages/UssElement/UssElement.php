@@ -255,16 +255,7 @@ class UssElement extends AbstractUssElementParser
      */
     public function insertBefore(UssElement $child, UssElement $reference): self
     {
-        $key = array_search($reference, $this->children, true);
-        if($key !== false) {
-            $this->prependChild($child);
-            $this->sortChildren(function($a, $b) use($child, $reference) {
-                if($a === $child && $b === $reference) return -1;
-                if($b === $child && $a === $reference) return 1;
-                return 0;
-            });
-        }
-        return $this;
+        return $this->insertAtReferenceIndex($child, $reference, 0);
     }
 
     /**
@@ -276,16 +267,7 @@ class UssElement extends AbstractUssElementParser
      */
     public function insertAfter(UssElement $child, UssElement $reference): self
     {
-        $key = array_search($reference, $this->children, true);
-        if($key !== false) {
-            $this->appendChild($child);
-            $this->sortChildren(function($a, $b) use($child, $reference) {
-                if($a === $child && $b === $reference) return 1;
-                if($b === $child && $a === $reference) return -1;
-                return 0;
-            });
-        }
-        return $this;
+        return $this->insertAtReferenceIndex($child, $reference, 1);
     }
 
     /**
@@ -433,6 +415,24 @@ class UssElement extends AbstractUssElementParser
     }
 
     /**
+     * Change Position of element by adding it after or before a reference
+     * 
+     * @param UssElement $child - The element to move above or below a target
+     * @param UssElemnet $reference - The targeted element 
+     * @param integer $index - 0 to move before, 1 to move after
+     */
+    protected function insertAtReferenceIndex(UssElement $child, UssElement $reference, int $index = 0): self
+    {
+        if(array_search($reference, $this->children, true) !== false) {
+            $child = $this->inspectChild($child, __METHOD__);
+            $key = array_search($reference, $this->children, true);
+            array_splice($this->children, ($key + $index), 0, [$child]);
+            $this->children = array_values($this->children);
+        }
+        return $this;
+    }
+
+    /**
      * @ignore
      */
     private function evaluate(string $attr)
@@ -468,5 +468,4 @@ class UssElement extends AbstractUssElementParser
         $child->setParent($this);
         return $child;
     }
-
 }

@@ -2,9 +2,11 @@
 
 namespace Ucscode\UssForm\Resource\Context;
 
+use Exception;
 use Ucscode\UssForm\Resource\Service\FieldUtils;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Gadget\Context\WidgetContext;
 
 abstract class AbstractWidgetContext extends AbstractContext
 {
@@ -59,10 +61,12 @@ abstract class AbstractWidgetContext extends AbstractContext
         return $this;
     }
 
-    public function setButtonContent(string $content): self
+    public function setButtonContent(string $content, bool $ignoreException = false): self
     {
-        if($this->nodeName === Field::NODE_BUTTON) {
-            $this->element->setContent($content);
+        if($this->isButton()) {
+            $this->nodeName === Field::NODE_BUTTON ?
+                $this->element->setContent($content) : 
+                $this->setValue($content);
         }
         return $this;
     }

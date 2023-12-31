@@ -5,6 +5,7 @@ namespace Ucscode\UssForm\Field;
 use Ucscode\UssForm\Field\Manifest\AbstractField;
 use Ucscode\UssForm\Field\Foundation\ElementContext;
 use Ucscode\UssForm\Gadget\Gadget;
+use Ucscode\UssForm\Resource\Facade\Position;
 use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 class Field extends AbstractField
@@ -49,7 +50,7 @@ class Field extends AbstractField
     public function hasGadget(string|Gadget $gadget): bool
     {
         if($gadget instanceof Gadget) {
-            return in_array($gadget, $this->gadgets, true);
+            return in_array($gadget, $this->gadgets, true) || $gadget === $this->elementContext->gadget;
         }
         return !!$this->getGadget($gadget);
     }
@@ -63,5 +64,25 @@ class Field extends AbstractField
     public function getGadgets(): array
     {
         return $this->gadgets;
+    }
+
+    public function setGadgetPosition(string|Gadget $gadget, Position $position, string|Gadget $targetGadget): bool
+    {
+        $gadget = $gadget instanceof Gadget ? $gadget : $this->getGadget($gadget);
+        $targetGadget = $targetGadget instanceof Gadget ? $targetGadget : $this->getGadget($targetGadget);
+
+        if($this->hasGadget($gadget) && $this->hasGadget($targetGadget)) {
+            $gadgetElement = $gadget->container->getElement();
+            $targetElement = $targetGadget->container->getElement();
+            $gadgetWrapper = $this->getElementContext()->gadgetWrapper->getElement();
+            
+            $position === Position::AFTER ?
+                $gadgetWrapper->insertAfter($gadgetElement, $targetElement) :
+                $gadgetWrapper->insertBefore($gadgetElement, $targetElement);
+
+            return true;
+        }
+
+        return false;
     }
 }
