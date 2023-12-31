@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\UssForm\Collection\Manifest;
+namespace Ucscode\UssForm\Collection\Foundation;
 
 use stdClass;
 use Ucscode\UssElement\UssElement;
@@ -12,11 +12,6 @@ use Ucscode\UssForm\Collection\Context\SubtitleContext;
 use Ucscode\UssForm\Collection\Context\TitleContext;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
-/**
- * An ElementContext is a container that holds multiple predefined "Context" Object
- *
- * ElementContext for COLLECTION
- */
 class ElementContext extends AbstractElementContext
 {
     public readonly FieldsetContext $fieldset;
@@ -75,7 +70,7 @@ class ElementContext extends AbstractElementContext
 
     public function visualizeContextElements(): void
     {
-        
+
     }
 
     protected function assembleContextElements(): void
@@ -87,6 +82,6 @@ class ElementContext extends AbstractElementContext
         $elements['fieldset']->appendChild($elements['instruction']);
         $elements['fieldset']->appendChild($elements['container']);
 
-        
+
     }
 }

@@ -2,20 +2,19 @@
 
 namespace Ucscode\UssForm\Resource\Context;
 
-use stdClass;
 use Ucscode\UssElement\UssElement;
 
 abstract class AbstractContext
 {
     abstract protected function created();
-    
+
     protected UssElement $element;
     protected UssElement|string|null $value = null;
     protected bool $fixed = false;
 
-    public function __construct(string|UssElement $element, protected stdClass $store) 
+    public function __construct(string $nodeName)
     {
-        $this->element = $element instanceof UssElement ? $element : new UssElement($element);
+        $this->element = new UssElement($nodeName);
         $this->created();
     }
 

@@ -3,8 +3,8 @@
 namespace Ucscode\UssForm\Field\Context;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
-use Ucscode\UssForm\Resource\FormUtils;
+use Ucscode\UssForm\Field\Foundation\AbstractFieldContext;
+use Ucscode\UssForm\Resource\Service\FormUtils;
 
 class PrefixContext extends AbstractFieldContext
 {
@@ -28,7 +28,7 @@ class PrefixContext extends AbstractFieldContext
     protected function attachElement(): void
     {
         $containerContext = $this->elementContext->container;
-            
+
         $containerContext
             ->removeAttribute('class', 'input-single')
             ->setAttribute('class', 'input-group', true);
@@ -40,7 +40,7 @@ class PrefixContext extends AbstractFieldContext
         array_walk($classes, fn ($value) => $this->element->removeAttributeValue('class', $value));
 
         $this->element->addAttributeValue(
-            'class', 
+            'class',
             is_string($this->value) || !$valueIsButton ? $classes[0] : $classes[1]
         );
 
@@ -68,7 +68,7 @@ class PrefixContext extends AbstractFieldContext
     protected function isApplicable(): bool
     {
         $widgetContext = $this->elementContext->widget;
-        return 
+        return
             !$widgetContext->isCheckable() &&
             !$widgetContext->isHidden() &&
             !$widgetContext->isButton();

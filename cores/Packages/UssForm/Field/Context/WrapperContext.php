@@ -3,7 +3,7 @@
 namespace Ucscode\UssForm\Field\Context;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Field\Manifest\AbstractFieldContext;
+use Ucscode\UssForm\Field\Foundation\AbstractFieldContext;
 
 class WrapperContext extends AbstractFieldContext
 {

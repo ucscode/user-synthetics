@@ -4,7 +4,7 @@ namespace Ucscode\UssForm\Collection;
 
 use Ucscode\UssForm\Collection\Manifest\AbstractCollection;
 use Ucscode\UssForm\Field\Field;
-use Ucscode\UssForm\Collection\Manifest\ElementContext;
+use Ucscode\UssForm\Collection\Foundation\ElementContext;
 
 class Collection extends AbstractCollection
 {
@@ -13,7 +13,7 @@ class Collection extends AbstractCollection
         $oldField = $this->getField($name);
         $this->fields[$name] = $field;
         $this->swapField(
-            $field->getElementContext()->frame->getElement(), 
+            $field->getElementContext()->frame->getElement(),
             $oldField?->getElementContext()->frame->getElement()
         );
         $this->welcomeField($name, $field);
@@ -67,7 +67,7 @@ class Collection extends AbstractCollection
 
             return true;
         }
-        
+
         return false;
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\UssForm\Field\Manifest;
+namespace Ucscode\UssForm\Field\Foundation;
 
 use stdClass;
 use Ucscode\UssElement\UssElement;
@@ -38,59 +38,58 @@ class ElementContext extends AbstractElementContext
         $store = new stdClass();
 
         $this->widget = new WidgetContext(
-            $this, 
-            $this->field->nodeName,
+            $this,
             $store
         );
 
         $this->frame = new FrameContext(
-            $this, 
+            $this,
             UssElement::NODE_DIV,
             $store
         );
 
         $this->wrapper = new WrapperContext(
-            $this, 
+            $this,
             UssElement::NODE_DIV,
             $store
         );
 
         $this->container = new ContainerContext(
-            $this, 
+            $this,
             UssElement::NODE_DIV,
             $store
         );
 
         $this->label = new LabelContext(
-            $this, 
+            $this,
             UssElement::NODE_LABEL,
             $store
         );
 
         $this->info = new InfoContext(
-            $this, 
+            $this,
             UssElement::NODE_DIV,
             $store
         );
 
         $this->validation = new ValidationContext(
-            $this, 
+            $this,
             UssElement::NODE_DIV,
             $store
         );
 
         $this->prefix = new PrefixContext(
-            $this, 
+            $this,
             UssElement::NODE_SPAN,
             $store
         );
 
         $this->suffix = new SuffixContext(
-            $this, 
+            $this,
             UssElement::NODE_SPAN,
             $store
         );
-        
+
         $this->assembleContextElements();
         $this->visualizeContextElements();
     }

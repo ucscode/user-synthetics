@@ -3,8 +3,9 @@
 namespace Ucscode\UssForm\Collection\Manifest;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Collection\Foundation\ElementContext;
 use Ucscode\UssForm\Field\Field;
-use Ucscode\UssForm\Resource\FormUtils;
+use Ucscode\UssForm\Resource\Service\FormUtils;
 
 abstract class AbstractCollection implements CollectionInterface
 {
@@ -25,7 +26,7 @@ abstract class AbstractCollection implements CollectionInterface
             $collectionContainer->appendChild($fieldElement);
     }
 
-    protected function welcomeField(string $name, Field $field): void 
+    protected function welcomeField(string $name, Field $field): void
     {
         $context = $field->getElementContext();
 
@@ -34,17 +35,17 @@ abstract class AbstractCollection implements CollectionInterface
             // Update Widget Context
             if(!$context->widget->isFixed()) {
 
-                !$context->widget->hasAttribute('name') ? 
+                !$context->widget->hasAttribute('name') ?
                     $context->widget->setAttribute('name', $name) : null;
 
-                !$context->widget->hasAttribute('id') ? 
+                !$context->widget->hasAttribute('id') ?
                     $context->widget->setAttribute('id', 'field-widget-' . self::$fieldIndex++) : null;
             }
 
             // Update Label Context
             if(!$context->label->isFixed()) {
 
-                !$context->label->hasValue() ? 
+                !$context->label->hasValue() ?
                     $context->label->setValue((new FormUtils())->capitalizeContent($name)) : null;
 
                 !$context->label->hasAttribute('for') && $context->widget->hasAttribute('id') ?

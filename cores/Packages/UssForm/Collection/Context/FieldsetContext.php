@@ -3,7 +3,7 @@
 namespace Ucscode\UssForm\Collection\Context;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Collection\Manifest\AbstractCollectionContext;
+use Ucscode\UssForm\Collection\Foundation\AbstractCollectionContext;
 
 class FieldsetContext extends AbstractCollectionContext
 {

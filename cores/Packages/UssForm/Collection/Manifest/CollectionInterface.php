@@ -2,6 +2,7 @@
 
 namespace Ucscode\UssForm\Collection\Manifest;
 
+use Ucscode\UssForm\Collection\Foundation\ElementContext;
 use Ucscode\UssForm\Field\Field;
 
 interface CollectionInterface

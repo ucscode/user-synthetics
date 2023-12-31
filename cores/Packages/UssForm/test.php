@@ -14,7 +14,7 @@ $form = new Form();
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
 
-$field = new Field(Field::NODE_INPUT, Field::TYPE_NUMBER);
+$field = new Field(Field::NODE_INPUT, Field::TYPE_SWITCH);
 $collection->addField("user[name]", $field);
 
 $context = $collection->getElementContext();
@@ -25,11 +25,6 @@ $context->container
     ->removeAttribute('name', 'true')
     ->setValue('name')
 ;
-
-$context->container
-    ->setValue('space')
-    ->setDOMHidden(1)
-    ;
 
 $widget = $field->getElementContext()->widget;
 
@@ -51,7 +46,7 @@ $fieldContext->widget->setHidden(true);
 $fieldContext->widget->setHidden(false);
 $fieldContext->prefix
     ->setValue("click")
-    ;
+;
 $fieldContext->suffix
     ->setValue(new UssElement(UssElement::NODE_BUTTON))
     ->setValue("cole")
@@ -61,6 +56,11 @@ $fieldContext->suffix
 $fieldContext->widget
     ->setValue("color")
     ->setDOMHidden(1)
+    ->setAttribute("data-cold", "I'm not \"here\"")
+;
+
+$fieldContext->info
+    ->setValue("Please select one of the many options")
 ;
 
 $collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
