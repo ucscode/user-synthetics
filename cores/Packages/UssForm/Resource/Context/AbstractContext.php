@@ -99,4 +99,8 @@ abstract class AbstractContext
         return $this->element;
     }
     
+    public function export(): string
+    {
+        return $this->element->getHTML(true);
+    }
 }

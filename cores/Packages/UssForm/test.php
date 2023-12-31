@@ -18,7 +18,8 @@ $form->getAttribute()->setAction('block');
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
 
-$field = new Field(Field::NODE_INPUT, Field::TYPE_NUMBER);
+$field = new Field(Field::NODE_BUTTON, Field::TYPE_BUTTON);
+$field->getElementContext()->widget->setButtonContent('play');
 $collection->addField("user[name]", $field);
 
 $context = $collection->getElementContext();
@@ -111,7 +112,9 @@ $field->setGadgetPosition($select, Position::AFTER, 'checkbox');
 
 $collection->setFieldPosition("main", Position::AFTER, "user[name]");
 
-var_dump($form->export());
+echo $field->getElementContext()->container->export();
+
+//print_r($form->export());
 
 /*
 
