@@ -90,6 +90,8 @@ $gadget->suffix
     ->setValue(null)
     ;
 
+$field->addGadget("smile", $gadget);
+
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
 

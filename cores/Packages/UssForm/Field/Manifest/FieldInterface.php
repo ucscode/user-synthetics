@@ -9,8 +9,8 @@ use Ucscode\UssForm\Gadget\Gadget;
 interface FieldInterface extends FieldTypesInterface, UssElementNodeListInterface
 {
     public function getElementContext(): ElementContext;
-    public function addGadget(string $name, Gadget $Gadget): self;
+    public function addGadget(string $name, Gadget $gadget): self;
     public function getGadget(string $name): Gadget;
-    public function hasGadget(string|Gadget $Gadget): bool;
+    public function hasGadget(string|Gadget $gadget): bool;
     public function getGadgets(): array;
 }

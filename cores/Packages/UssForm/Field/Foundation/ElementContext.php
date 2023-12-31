@@ -6,6 +6,7 @@ use stdClass;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Context\FrameContext;
 use Ucscode\UssForm\Field\Context\GadgetContext;
+use Ucscode\UssForm\Field\Context\GadgetWrapperContext;
 use Ucscode\UssForm\Field\Context\InfoContext;
 use Ucscode\UssForm\Field\Context\ValidationContext;
 use Ucscode\UssForm\Field\Context\WrapperContext;
@@ -15,7 +16,6 @@ use Ucscode\UssForm\Gadget\Context\LabelContext;
 use Ucscode\UssForm\Gadget\Context\PrefixContext;
 use Ucscode\UssForm\Gadget\Context\SuffixContext;
 use Ucscode\UssForm\Gadget\Context\WidgetContext;
-use Ucscode\UssForm\Gadget\Gadget;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
 /**
@@ -36,6 +36,7 @@ class ElementContext extends AbstractElementContext
     public readonly FrameContext $frame;
     public readonly WrapperContext $wrapper;
     public readonly InfoContext $info;
+    public readonly GadgetWrapperContext $gadgetWrapper;
     public readonly ValidationContext $validation;
 
 
@@ -53,6 +54,7 @@ class ElementContext extends AbstractElementContext
         $this->frame = new FrameContext($this, UssElement::NODE_DIV, $store);
         $this->wrapper = new WrapperContext($this, UssElement::NODE_DIV, $store);
         $this->info = new InfoContext($this, UssElement::NODE_DIV, $store);
+        $this->gadgetWrapper = new GadgetWrapperContext($this, UssElement::NODE_DIV, $store);
         $this->validation = new ValidationContext($this, UssElement::NODE_DIV, $store);
 
         $this->assembleContextElements();
@@ -83,7 +85,8 @@ class ElementContext extends AbstractElementContext
 
         $element['frame']->appendChild($element['wrapper']);
         $element['wrapper']->appendChild($element['info']);
-        $element['wrapper']->appendChild($element['container']);
+        $element['wrapper']->appendChild($element['gadgetWrapper']);
+        $element['gadgetWrapper']->appendChild($element['container']);
         $element['wrapper']->appendChild($element['validation']);
         $element['container']->appendChild($element['widget']);
 

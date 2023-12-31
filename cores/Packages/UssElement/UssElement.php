@@ -2,6 +2,8 @@
 
 namespace Ucscode\UssElement;
 
+use Exception;
+
 /**
  * Uss Element Builder
  *
@@ -226,7 +228,7 @@ class UssElement extends AbstractUssElementParser
      */
     public function appendChild(UssElement $child): self
     {
-        $child = $this->scan($child, __METHOD__);
+        $child = $this->inspectChild($child, __METHOD__);
         $this->children[] = $child;
         return $this;
     }
@@ -239,7 +241,7 @@ class UssElement extends AbstractUssElementParser
      */
     public function prependChild(UssElement $child): self
     {
-        $child = $this->scan($child, __METHOD__);
+        $child = $this->inspectChild($child, __METHOD__);
         array_unshift($this->children, $child);
         return $this;
     }
@@ -255,6 +257,7 @@ class UssElement extends AbstractUssElementParser
     {
         $key = array_search($reference, $this->children, true);
         if($key !== false) {
+            $this->prependChild($child);
             $this->sortChildren(function($a, $b) use($child, $reference) {
                 if($a === $child && $b === $reference) return -1;
                 if($b === $child && $a === $reference) return 1;
@@ -275,6 +278,7 @@ class UssElement extends AbstractUssElementParser
     {
         $key = array_search($reference, $this->children, true);
         if($key !== false) {
+            $this->appendChild($child);
             $this->sortChildren(function($a, $b) use($child, $reference) {
                 if($a === $child && $b === $reference) return 1;
                 if($b === $child && $a === $reference) return -1;
@@ -295,7 +299,7 @@ class UssElement extends AbstractUssElementParser
     {
         $key = array_search($reference, $this->children, true);
         if($key !== false) {
-            $child = $this->scan($child, __METHOD__);
+            $child = $this->inspectChild($child, __METHOD__);
             $this->children[$key] = $child;
         }
         return $this;
@@ -443,16 +447,24 @@ class UssElement extends AbstractUssElementParser
     /**
      * @ignore
      */
-    private function scan(UssElement $child, string $method): UssElement
+    private function inspectChild(UssElement $child, string $method): UssElement
     {
         if($this === $child) {
-            throw new \Exception("Trying to add self as child in " . $method);
+            throw new Exception(
+                sprintf(
+                    "Trying to add self as child in %s", 
+                    $method
+                )
+            );
         };
+
         $key = array_search($child, $this->children, true);
+
         if($key !== false) {
             array_splice($this->children, $key, 1);
             $this->children = array_values($this->children);
         };
+
         $child->setParent($this);
         return $child;
     }

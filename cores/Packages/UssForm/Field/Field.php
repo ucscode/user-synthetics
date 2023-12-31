@@ -8,31 +8,34 @@ use Ucscode\UssForm\Gadget\Gadget;
 
 class Field extends AbstractField
 {
-    protected array $Gadgets = [];
+    protected array $gadgets = [];
 
     public function getElementContext(): ElementContext
     {
         return $this->elementContext;
     }
 
-    public function addGadget(string $name, Gadget $Gadget): self
+    public function addGadget(string $name, Gadget $gadget): self
     {
-        $this->Gadgets[$name] = $Gadget;
+        $this->gadgets[$name] = $gadget;
+        $this->swapField(
+            $gadget->container->getElement()
+        );
         return $this;
     }
 
     public function getGadget(string $name): Gadget
     {
-        return $this->Gadgets[$name] ?? null;
+        return $this->gadgets[$name] ?? null;
     }
 
-    public function hasGadget(string|Gadget $Gadget): bool
+    public function hasGadget(string|Gadget $gadget): bool
     {
         return false;
     }
 
     public function getGadgets(): array
     {
-        return $this->Gadgets;
+        return $this->gadgets;
     }
 }
