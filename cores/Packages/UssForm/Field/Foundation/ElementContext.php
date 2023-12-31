@@ -4,16 +4,17 @@ namespace Ucscode\UssForm\Field\Foundation;
 
 use stdClass;
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Field\Context\ContainerContext;
 use Ucscode\UssForm\Field\Context\FrameContext;
 use Ucscode\UssForm\Field\Context\InfoContext;
-use Ucscode\UssForm\Field\Context\LabelContext;
-use Ucscode\UssForm\Field\Context\PrefixContext;
-use Ucscode\UssForm\Field\Context\SuffixContext;
 use Ucscode\UssForm\Field\Context\ValidationContext;
-use Ucscode\UssForm\Field\Context\WidgetContext;
 use Ucscode\UssForm\Field\Context\WrapperContext;
 use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Gadget\Context\ContainerContext;
+use Ucscode\UssForm\Gadget\Context\LabelContext;
+use Ucscode\UssForm\Gadget\Context\PrefixContext;
+use Ucscode\UssForm\Gadget\Context\SuffixContext;
+use Ucscode\UssForm\Gadget\Context\WidgetContext;
+use Ucscode\UssForm\Gadget\Gadget;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
 /**
@@ -23,72 +24,35 @@ use Ucscode\UssForm\Resource\Context\AbstractElementContext;
  */
 class ElementContext extends AbstractElementContext
 {
+    // Gadget Component;
+    public readonly ContainerContext $container;
     public readonly WidgetContext $widget;
     public readonly LabelContext $label;
+    public readonly PrefixContext $prefix;
+    public readonly SuffixContext $suffix;
+
+    // Field Component;
     public readonly FrameContext $frame;
     public readonly WrapperContext $wrapper;
     public readonly InfoContext $info;
-    public readonly ContainerContext $container;
     public readonly ValidationContext $validation;
-    public readonly PrefixContext $prefix;
-    public readonly SuffixContext $suffix;
+
 
     public function __construct(protected Field $field)
     {
         $store = new stdClass();
+        $gadget = new Gadget($field->nodeName, $field->nodeType);
 
-        $this->widget = new WidgetContext(
-            $this,
-            $store
-        );
+        $this->container = $gadget->container;
+        $this->widget = $gadget->widget;
+        $this->label = $gadget->label;
+        $this->prefix = $gadget->prefix;
+        $this->suffix = $gadget->suffix;
 
-        $this->frame = new FrameContext(
-            $this,
-            UssElement::NODE_DIV,
-            $store
-        );
-
-        $this->wrapper = new WrapperContext(
-            $this,
-            UssElement::NODE_DIV,
-            $store
-        );
-
-        $this->container = new ContainerContext(
-            $this,
-            UssElement::NODE_DIV,
-            $store
-        );
-
-        $this->label = new LabelContext(
-            $this,
-            UssElement::NODE_LABEL,
-            $store
-        );
-
-        $this->info = new InfoContext(
-            $this,
-            UssElement::NODE_DIV,
-            $store
-        );
-
-        $this->validation = new ValidationContext(
-            $this,
-            UssElement::NODE_DIV,
-            $store
-        );
-
-        $this->prefix = new PrefixContext(
-            $this,
-            UssElement::NODE_SPAN,
-            $store
-        );
-
-        $this->suffix = new SuffixContext(
-            $this,
-            UssElement::NODE_SPAN,
-            $store
-        );
+        $this->frame = new FrameContext($this, UssElement::NODE_DIV, $store);
+        $this->wrapper = new WrapperContext($this, UssElement::NODE_DIV, $store);
+        $this->info = new InfoContext($this, UssElement::NODE_DIV, $store);
+        $this->validation = new ValidationContext($this, UssElement::NODE_DIV, $store);
 
         $this->assembleContextElements();
         $this->visualizeContextElements();

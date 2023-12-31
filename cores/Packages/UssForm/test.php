@@ -5,6 +5,8 @@ namespace Ucscode\UssForm;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Form\Form;
+use Ucscode\UssForm\Gadget\Gadget;
+use Ucscode\UssForm\Widget\Widget;
 
 require_once 'autoload.php';
 
@@ -69,7 +71,17 @@ $fieldContext->info
 
 $collection->addField("main2", (new Field(Field::NODE_TEXTAREA)));
 
+$gadget = new Gadget(UssElement::NODE_SELECT);
+
+$gadget->prefix
+    ->setValue(new UssElement(UssElement::NODE_BUTTON))
+    ;
+
+$gadget->suffix
+    ->setValue('corn')
+    ;
+
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
 
-var_dump($context->export());
+var_dump($gadget->export());

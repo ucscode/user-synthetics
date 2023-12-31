@@ -4,35 +4,35 @@ namespace Ucscode\UssForm\Field;
 
 use Ucscode\UssForm\Field\Manifest\AbstractField;
 use Ucscode\UssForm\Field\Foundation\ElementContext;
-use Ucscode\UssForm\Widget\Widget;
+use Ucscode\UssForm\Gadget\Gadget;
 
 class Field extends AbstractField
 {
-    protected array $widgets = [];
+    protected array $Gadgets = [];
 
     public function getElementContext(): ElementContext
     {
         return $this->elementContext;
     }
 
-    public function addWidget(string $name, Widget $widget): self
+    public function addGadget(string $name, Gadget $Gadget): self
     {
-        $this->widgets[$name] = $widget;
+        $this->Gadgets[$name] = $Gadget;
         return $this;
     }
 
-    public function getWidget(string $name): Widget
+    public function getGadget(string $name): Gadget
     {
-        return $this->widgets[$name] ?? null;
+        return $this->Gadgets[$name] ?? null;
     }
 
-    public function hasWidget(string|Widget $widget): bool
+    public function hasGadget(string|Gadget $Gadget): bool
     {
         return false;
     }
 
-    public function getWidgets(): array
+    public function getGadgets(): array
     {
-        return $this->widgets;
+        return $this->Gadgets;
     }
 }

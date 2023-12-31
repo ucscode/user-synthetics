@@ -1,6 +1,6 @@
 <?php
 
-namespace Ucscode\UssForm\Field\Context;
+namespace Ucscode\UssForm\Gadget\Context;
 
 class SuffixContext extends PrefixContext
 {
@@ -14,10 +14,7 @@ class SuffixContext extends PrefixContext
 
     protected function coupleElement(bool $valueIsButton): void
     {
-        $this->elementContext
-            ->container->getElement()
-            ->appendChild(
-                $valueIsButton ? $this->value : $this->element
-            );
+        $container = $this->gadget->container->getElement();
+        $container->appendChild($valueIsButton ? $this->value : $this->element);
     }
 }

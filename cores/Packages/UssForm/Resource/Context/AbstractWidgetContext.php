@@ -1,8 +1,7 @@
 <?php
 
-namespace Ucscode\UssForm\Widget\Foundation;
+namespace Ucscode\UssForm\Resource\Context;
 
-use Ucscode\UssForm\Resource\Context\AbstractContext;
 use Ucscode\UssForm\Resource\Service\FormUtils;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssElement\UssElement;
@@ -12,7 +11,7 @@ abstract class AbstractWidgetContext extends AbstractContext
     public readonly string $nodeName;
     public readonly ?string $nodeType;
 
-    public function __construct(string $nodeName, ?string $nodeType)
+    public function __construct(string $nodeName = Field::NODE_INPUT, ?string $nodeType = Field::TYPE_TEXT)
     {
         [$this->nodeName, $this->nodeType] = (new FormUtils())->regulateElementPrototype($nodeName, $nodeType);
         parent::__construct($this->nodeName);
