@@ -3,9 +3,11 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
+use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Form\Form;
 use Ucscode\UssForm\Gadget\Gadget;
+use Ucscode\UssForm\Resource\Facade\Position;
 use Ucscode\UssForm\Widget\Widget;
 
 require_once 'autoload.php';
@@ -86,6 +88,15 @@ $field->getGadget("mould")->label->setValue("Accounting");
 
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
+
+$form->addCollection("driver", new Collection());
+$voltex = $form->getCollection("driver")->getElementContext();
+$voltex->title->setValue("we are here");
+$voltex->subtitle->setDOMHidden(true);
+$voltex->instruction->setDOMHidden(true);
+;
+
+$form->setCollectionPosition($collection, Position::AFTER, "driver");
 
 var_dump($form->export());
 

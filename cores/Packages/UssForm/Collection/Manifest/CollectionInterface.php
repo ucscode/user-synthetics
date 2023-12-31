@@ -4,9 +4,9 @@ namespace Ucscode\UssForm\Collection\Manifest;
 
 use Ucscode\UssForm\Collection\Foundation\ElementContext;
 use Ucscode\UssForm\Field\Field;
-use Ucscode\UssForm\Resource\Facade\PositionInterface;
+use Ucscode\UssForm\Resource\Facade\Position;
 
-interface CollectionInterface extends PositionInterface
+interface CollectionInterface
 {
     public function addField(string $name, Field $field): self;
     public function getField(string $name): ?Field;
@@ -15,5 +15,5 @@ interface CollectionInterface extends PositionInterface
     public function getFieldName(Field $field): ?string;
     public function getFields(): array;
     public function getElementContext(): ElementContext;
-    public function setFieldPosition(string|Field $field, int $position, string|Field $targetField): bool;
+    public function setFieldPosition(string|Field $field, Position $position, string|Field $targetField): bool;
 }

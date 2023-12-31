@@ -5,6 +5,7 @@ namespace Ucscode\UssForm\Collection;
 use Ucscode\UssForm\Collection\Manifest\AbstractCollection;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Collection\Foundation\ElementContext;
+use Ucscode\UssForm\Resource\Facade\Position;
 
 class Collection extends AbstractCollection
 {
@@ -50,7 +51,7 @@ class Collection extends AbstractCollection
             !!$this->getField($context);
     }
 
-    public function setFieldPosition(string|Field $field, int $position, string|Field $targetField): bool
+    public function setFieldPosition(string|Field $field, Position $position, string|Field $targetField): bool
     {
         $field = $field instanceof Field ? $field : $this->getField($field);
         $targetField = $targetField instanceof Field ? $targetField : $this->getField($targetField);
@@ -61,7 +62,7 @@ class Collection extends AbstractCollection
             $targetElement = $targetField->getElementContext()->frame->getElement();
             $containerElement = $this->elementContext->container->getElement();
 
-            $position === self::POSITION_BEFORE ?
+            $position === Position::BEFORE ?
                 $containerElement->insertBefore($fieldElement, $targetElement) :
                 $containerElement->insertAfter($fieldElement, $targetElement);
 

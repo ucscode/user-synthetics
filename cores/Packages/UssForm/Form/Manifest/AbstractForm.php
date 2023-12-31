@@ -5,6 +5,7 @@ namespace Ucscode\UssForm\Form\Manifest;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Form\Attribute;
+use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 abstract class AbstractForm implements FormInterface
 {
@@ -17,8 +18,18 @@ abstract class AbstractForm implements FormInterface
         $this->addCollection("default", new Collection());
     }
 
-    protected function swapCollection(UssElement $collection): void
+    protected function swapCollection(UssElement $collection, ?UssElement $oldCollection): void
     {
-        $this->element->appendChild($collection);
+        $oldCollection ?
+            $this->element->replaceChild($collection, $oldCollection) :
+            $this->element->appendChild($collection);
+    }
+
+    protected function welcomeCollection(string $name, Collection $collection): void
+    {
+        $fieldsetContext = $collection->getElementContext()->fieldset;
+        if(!$fieldsetContext->isFixed()) {
+            $fieldsetContext->addClass((new FieldUtils())->simplifyContent($name, '-') . "-collection");
+        }
     }
 }

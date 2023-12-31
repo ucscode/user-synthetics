@@ -5,9 +5,9 @@ namespace Ucscode\UssForm\Form\Manifest;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Form\Attribute;
-use Ucscode\UssForm\Resource\Facade\PositionInterface;
+use Ucscode\UssForm\Resource\Facade\Position;
 
-interface FormInterface extends PositionInterface
+interface FormInterface
 {
     public function addCollection(string $name, Collection $collection): self;
     public function getCollection(string $name): ?Collection;
@@ -18,5 +18,5 @@ interface FormInterface extends PositionInterface
     public function getElement(): UssElement;
     public function getAttribute(): Attribute;
     public function export(): string;
-    public function setCollectionPosition(string|Collection $collection, int $position, string|Collection $targetCollection): bool;
+    public function setCollectionPosition(string|Collection $collection, Position $position, string|Collection $targetCollection): bool;
 }

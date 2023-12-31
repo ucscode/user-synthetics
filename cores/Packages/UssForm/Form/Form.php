@@ -5,15 +5,19 @@ namespace Ucscode\UssForm\Form;
 use Ucscode\UssElement\UssElement;
 use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Form\Manifest\AbstractForm;
+use Ucscode\UssForm\Resource\Facade\Position;
 
 class Form extends AbstractForm
 {
     public function addCollection(string $name, Collection $collection): self
     {
+        $oldCollection = $this->getCollection($name);
         $this->collections[$name] = $collection;
         $this->swapCollection(
-            $collection->getElementContext()->fieldset->getElement()
+            $collection->getElementContext()->fieldset->getElement(),
+            $oldCollection?->getElementContext()->fieldset->getElement()
         );
+        $this->welcomeCollection($name, $collection);
         return $this;
     }
 
@@ -24,17 +28,29 @@ class Form extends AbstractForm
     
     public function removeCollection(string|Collection $context): ?Collection
     {
-        return $context;
+        if($this->hasCollection($context)) {
+            $collection = $context instanceof Collection ? $context : $this->getCollection($context);
+            $name = $this->getCollectionName($collection);
+            unset($this->collections[$name]);
+            $element = $collection->getElementContext()->fieldset->getElement();
+            $element->getParentElement()->removeChild($element);
+            return $collection;
+        }
+        return null;
     }
 
     public function hasCollection(string|Collection $context): bool
     {
-        return false;
+        if($context instanceof Collection) {
+            return array_search($context, $this->collections, true) !== false;
+        }
+        return !!$this->getCollection($context);
     }
 
     public function getCollectionName(Collection $collection): ?string
     {
-        return '';
+        $name = array_search($collection, $this->collections, true);
+        return $name !== false ? $name : null;
     }
 
     public function getCollections(): array
@@ -57,8 +73,23 @@ class Form extends AbstractForm
         return $this->element->getHTML(true);
     }
 
-    public function setCollectionPosition(string|Collection $collection, int $position, string|Collection $targetCollection): bool
+    public function setCollectionPosition(string|Collection $collection, Position $position, string|Collection $targetCollection): bool
     {
+        $collection = $collection instanceof Collection ? $collection : $this->getCollection($collection);
+        $targetCollection = $targetCollection instanceof Collection ? $targetCollection : $this->getCollection($targetCollection);
+
+        if($this->hasCollection($collection) && $this->hasCollection($targetCollection)) {
+            
+            $collectionElement = $collection->getElementContext()->fieldset->getElement();
+            $targetElement = $targetCollection->getElementContext()->fieldset->getElement();
+
+            $position === Position::AFTER ?
+                $this->element->insertAfter($collectionElement, $targetElement) :
+                $this->element->insertBefore($collectionElement, $targetElement);
+
+            return true;
+        }
+
         return false;
     }
 }

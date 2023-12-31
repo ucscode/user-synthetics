@@ -27,6 +27,10 @@ abstract class AbstractCollection implements CollectionInterface
 
     protected function welcomeField(string $name, Field $field): void
     {
-        (new FieldUtils())->welcomeGadget($name, $field->getElementContext()->gadget);
+        $context = $field->getElementContext();
+        (new FieldUtils())->welcomeGadget($name, $context->gadget);
+        if(!$context->frame->isFixed()) {
+            $context->frame->addClass((new FieldUtils())->simplifyContent($name, '-') . "-field");
+        }
     }
 }

@@ -75,9 +75,9 @@ abstract class AbstractFieldUtils
             );
     }
 
-    public function capitalizeContent(string $content): ?string
+    public function simplifyContent(string $content, string $breaker = ' '): ?string
     {
-        $content = str_replace(['-', '[', ']'], ' ', $content);
-        return ucwords($content);
+        $content = str_replace(['-', '[', ']', ' '], $breaker, $content);
+        return trim(strtolower($content), $breaker);
     }
 }

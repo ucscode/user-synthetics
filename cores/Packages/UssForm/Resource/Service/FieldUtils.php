@@ -26,7 +26,7 @@ class FieldUtils extends AbstractFieldUtils
             if(!$gadget->label->isFixed()) {
 
                 !$gadget->label->hasValue() ?
-                    $gadget->label->setValue($this->capitalizeContent($name)) : null;
+                    $gadget->label->setValue(ucwords($this->simplifyContent($name))) : null;
 
                 !$gadget->label->hasAttribute('for') && $gadget->widget->hasAttribute('id') ?
                     $gadget->label->setAttribute('for', $gadget->widget->getAttribute('id')) : null;
