@@ -79,10 +79,12 @@ $checkbox->label->setValue("Checkbox");
 $field->addGadget("checkbox", $checkbox);
 
 $field->addGadget("button", (new Gadget(Field::NODE_INPUT, Field::TYPE_BUTTON)));
-$button = $field->getGadget("button")->widget->setButtonContent("Button", true);
+$button = $field->getGadget("button");
+$button->widget->setButtonContent("Button", true);
 
 $field->addGadget("select", new Gadget(Field::NODE_SELECT));
-$select = $field->getGadget("select")->widget->setOptions([
+$select = $field->getGadget("select");
+$select->widget->setOptions([
     "location" => "USA",
     "Country" => "Africa",
     "Position" => "Innert"
@@ -100,8 +102,14 @@ $voltex->subtitle->setDOMHidden(true);
 $voltex->instruction->setDOMHidden(true);
 ;
 
-$field->setGadgetPosition("select", Position::BEFORE, 'checkbox');
-$field->setGadgetPosition($fieldContext->gadget, Position::BEFORE, 'button');
+$fieldContext->lineBreak
+    ->setValue("booster")
+    ->setDOMHidden(false)
+;
+
+$field->setGadgetPosition($select, Position::AFTER, 'checkbox');
+
+$collection->setFieldPosition("main", Position::AFTER, "user[name]");
 
 var_dump($form->export());
 

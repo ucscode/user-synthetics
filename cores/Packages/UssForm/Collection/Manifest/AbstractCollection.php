@@ -17,20 +17,49 @@ abstract class AbstractCollection implements CollectionInterface
         $this->elementContext = new ElementContext($this);
     }
 
-    protected function swapField(UssElement $fieldElement, ?UssElement $oldFieldElement): void
+    protected function swapField(
+        UssElement $element, 
+        ?UssElement $oldElement, 
+        ?UssElement $oldLineBreak
+    ): void
     {
         $collectionContainer = $this->elementContext->container->getElement();
-        $oldFieldElement ?
-            $collectionContainer->replaceChild($fieldElement, $oldFieldElement) :
-            $collectionContainer->appendChild($fieldElement);
+        $collectionContainer->appendChild($element);
+        if($oldElement) {
+            $collectionContainer->replaceChild($element, $oldElement);
+            $oldLineBreak->hasParentElement() ? $oldLineBreak->getParentElement()->removeChild($oldLineBreak) : null;
+        }
     }
 
     protected function welcomeField(string $name, Field $field): void
     {
+        $this->anchorLineBreak($field);
+        $fieldUtils = new FieldUtils();
         $context = $field->getElementContext();
-        (new FieldUtils())->welcomeGadget($name, $context->gadget);
+        $simplifiedName = $fieldUtils->simplifyContent($name, '-');
+        $fieldUtils->welcomeGadget($name, $context->gadget);
         if(!$context->frame->isFixed()) {
-            $context->frame->addClass((new FieldUtils())->simplifyContent($name, '-') . "-field");
+            $context->frame->addClass($simplifiedName . "-field");
+            $context->lineBreak->addClass($simplifiedName . "-linebreak");
         }
+    }
+
+    protected function anchorLineBreak(Field|array $fields, bool $embed = true): bool
+    {
+        $collectionContainer = $this->elementContext->container->getElement();
+        !is_array($fields) ? $fields = [$fields] : null;
+        foreach($fields as $field) {
+            if($field instanceof Field) {
+                $context = $field->getElementContext();
+                $lineBreakElement = $context->lineBreak->getElement();
+                $embed ?
+                    $collectionContainer->insertAfter($lineBreakElement, $context->frame->getElement()) :
+                    ($lineBreakElement->hasParentElement() ? 
+                        $lineBreakElement->getParentElement()->removeChild($lineBreakElement) : 
+                        null
+                    );
+            }
+        }
+        return true;
     }
 }

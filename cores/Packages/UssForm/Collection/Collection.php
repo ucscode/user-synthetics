@@ -14,8 +14,9 @@ class Collection extends AbstractCollection
         $oldField = $this->getField($name);
         $this->fields[$name] = $field;
         $this->swapField(
-            $field->getElementContext()->frame->getElement(),
-            $oldField?->getElementContext()->frame->getElement()
+            $field->getElementContext()->frame->getElement(), 
+            $oldField?->getElementContext()->frame->getElement(),
+            $oldField?->getElementContext()->lineBreak->getElement()
         );
         $this->welcomeField($name, $field);
         return $this;
@@ -63,8 +64,10 @@ class Collection extends AbstractCollection
             $containerElement = $this->elementContext->container->getElement();
 
             $position === Position::BEFORE ?
-                $containerElement->insertBefore($fieldElement, $targetElement) :
-                $containerElement->insertAfter($fieldElement, $targetElement);
+                $containerElement->insertBefore($fieldElement, $targetElement) &&
+                $this->anchorLineBreak([$field, $targetField]) :
+                $containerElement->insertAfter($fieldElement, $targetElement) &&
+                $this->anchorLineBreak([$field, $targetField]);
 
             return true;
         }
