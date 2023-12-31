@@ -9,13 +9,19 @@ use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 abstract class AbstractForm implements FormInterface
 {
-    public readonly UssElement $element;
+    protected readonly UssElement $element;
     protected array $collections = [];
 
     public function __construct(protected Attribute $attribute = new Attribute())
     {
         $this->element = new UssElement(UssElement::NODE_FORM);
+        $attribute->defineFormInstanceOnce($this);
         $this->addCollection("default", new Collection());
+    }
+
+    protected function bindAttribute(string $name, ?string $value): void
+    {
+        !empty($value) ? $this->element->setAttribute($name, $value) : null;
     }
 
     protected function swapCollection(UssElement $collection, ?UssElement $oldCollection): void

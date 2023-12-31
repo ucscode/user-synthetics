@@ -13,6 +13,7 @@ use Ucscode\UssForm\Widget\Widget;
 require_once 'autoload.php';
 
 $form = new Form();
+$form->getAttribute()->setAction('block');
 
 $collection = $form->getCollection('default');
 $collection->addField('main', new Field());
