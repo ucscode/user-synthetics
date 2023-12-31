@@ -4,12 +4,10 @@ namespace Ucscode\UssForm\Collection\Manifest;
 
 use Ucscode\UssForm\Collection\Foundation\ElementContext;
 use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Resource\Facade\PositionInterface;
 
-interface CollectionInterface
+interface CollectionInterface extends PositionInterface
 {
-    public const POSITION_BEFORE = 0;
-    public const POSITION_AFTER = 1;
-
     public function addField(string $name, Field $field): self;
     public function getField(string $name): ?Field;
     public function removeField(string|Field $context): ?Field;

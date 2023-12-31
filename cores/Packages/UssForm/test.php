@@ -87,4 +87,10 @@ $field->getGadget("mould")->label->setValue("Accounting");
 //$collection->removeField("user[name]");
 //$collection->setFieldPosition($collection->getField('main2'), Collection::POSITION_BEFORE, $field);
 
-var_dump($context->export());
+var_dump($form->export());
+
+/*
+
+{{ form.export() }}
+
+*/
