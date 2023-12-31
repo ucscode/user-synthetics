@@ -8,6 +8,6 @@ class InfoContext extends AbstractFieldContext
 {
     public function created(): void
     {
-        $this->element->setAttribute('class', 'field-info small');
+        $this->addClass('field-info small');
     }
 }

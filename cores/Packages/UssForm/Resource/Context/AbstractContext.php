@@ -73,9 +73,6 @@ abstract class AbstractContext
         return !!$this->value;
     }
 
-    /**
-     * Inform collection not to make changes to the context
-     */
     public function setFixed(bool $status): self
     {
         $this->fixed = $status;
@@ -85,6 +82,16 @@ abstract class AbstractContext
     public function isFixed(): bool
     {
         return $this->fixed;
+    }
+
+    public function addClass(?string $context): self
+    {
+        return $context !== null ? $this->setAttribute("class", $context, true) : $this;
+    }
+
+    public function removeClass(?string $context): self
+    {
+        return $context !== null ? $this->removeAttribute("class", $context) : $this;
     }
 
     public function getElement(): UssElement

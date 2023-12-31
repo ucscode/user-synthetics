@@ -8,6 +8,6 @@ class ValidationContext extends AbstractFieldContext
 {
     protected function created(): void
     {
-        $this->element->setAttribute('class', 'validation small');
+        $this->addClass('validation small');
     }
 }

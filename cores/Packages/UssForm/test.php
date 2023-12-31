@@ -3,7 +3,6 @@
 namespace Ucscode\UssForm;
 
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Collection\Collection;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssForm\Form\Form;
 
@@ -24,6 +23,10 @@ $context->container
     ->setAttribute('name', 'electoral', true)
     ->removeAttribute('name', 'true')
     ->setValue('name')
+;
+
+$context->instruction
+    ->setValue("Fill this form or else")
 ;
 
 $widget = $field->getElementContext()->widget;
@@ -57,6 +60,7 @@ $fieldContext->widget
     ->setValue("color")
     ->setDOMHidden(1)
     ->setAttribute("data-cold", "I'm not \"here\"")
+    ->addClass("model faster")
 ;
 
 $fieldContext->info

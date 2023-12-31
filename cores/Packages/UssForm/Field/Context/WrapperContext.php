@@ -9,7 +9,7 @@ class WrapperContext extends AbstractFieldContext
 {
     protected function created(): void
     {
-        $this->element->setAttribute('class', 'field-wrapper');
+        $this->addClass('field-wrapper');
     }
 
     public function setValue(string|UssElement|null $value): self

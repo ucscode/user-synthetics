@@ -10,7 +10,7 @@ class ContainerContext extends AbstractFieldContext
 {
     public function created(): void
     {
-        $this->element->setAttribute('class', $this->defineClass());
+        $this->addClass($this->defineClass());
     }
 
     public function setValue(string|UssElement|null $value): self

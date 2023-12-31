@@ -12,7 +12,7 @@ class PrefixContext extends AbstractFieldContext
 
     protected function created(): void
     {
-        $this->element->setAttribute('class', 'input-affix');
+        $this->addClass('input-affix');
         $this->store->prefixAppended = false;
     }
 
@@ -29,18 +29,15 @@ class PrefixContext extends AbstractFieldContext
     {
         $containerContext = $this->elementContext->container;
 
-        $containerContext
-            ->removeAttribute('class', 'input-single')
-            ->setAttribute('class', 'input-group', true);
+        $containerContext->removeClass('input-single')->addClass('input-group');
 
         $valueIsButton = (new FormUtils())->isButton($this->value);
 
         $classes = ['input-group-text', 'input-affix-custom'];
 
-        array_walk($classes, fn ($value) => $this->element->removeAttributeValue('class', $value));
+        array_walk($classes, fn ($value) => $this->removeClass($value));
 
-        $this->element->addAttributeValue(
-            'class',
+        $this->addClass(
             is_string($this->value) || !$valueIsButton ? $classes[0] : $classes[1]
         );
 
@@ -78,8 +75,8 @@ class PrefixContext extends AbstractFieldContext
     {
         if(!$this->store->prefixAppended && !$this->store->suffixAppended) {
             $this->elementContext->container
-                ->removeAttribute('class', 'input-group')
-                ->setAttribute('class', 'input-single', true);
+                ->removeClass('input-group')
+                ->addClass('input-single');
         }
     }
 }
