@@ -1,6 +1,6 @@
 <?php
 
-namespace Uss\Component\Kernel;
+namespace Uss\Component\Kernel\System;
 
 use mysqli;
 use mysqli_sql_exception;
@@ -8,9 +8,9 @@ use Ucscode\Pairs\Pairs;
 use Ucscode\UssElement\UssElement;
 use Uss\Component\Block\Block;
 use Uss\Component\Block\BlockManager;
-use Uss\Component\Block\BlockTemplate;
 use Uss\Component\Kernel\UssImmutable;
 use Uss\Component\Database;
+use Uss\Component\Kernel\Uss;
 
 final class Prime
 {

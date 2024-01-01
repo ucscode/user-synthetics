@@ -15,7 +15,8 @@ class FieldUtils extends AbstractFieldUtils
             // Update Widget Context
             if(!$gadget->widget->isFixed()) {
 
-                !$gadget->widget->hasAttribute('name') ?
+                !$gadget->widget->hasAttribute('name') && 
+                !$gadget->widget->hasAttribute('data-anonymous') ?
                     $gadget->widget->setAttribute('name', $name) : null;
 
                 !$gadget->widget->hasAttribute('id') ?

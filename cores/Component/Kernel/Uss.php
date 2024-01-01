@@ -2,6 +2,8 @@
 
 namespace Uss\Component\Kernel;
 
+use Uss\Component\Kernel\Abstract\AbstractUss;
+use Uss\Component\Kernel\System\Extension;
 use Uss\Component\Trait\SingletonTrait;
 
 final class Uss extends AbstractUss
@@ -96,4 +98,30 @@ final class Uss extends AbstractUss
         $explosion = array_filter(array_map('trim', explode("/", $path)));
         return implode("/", $explosion);
     }
+
+    /**
+    * Convert a namespace path to file system path or URL
+    */
+   public function getTemplateSchema(?string $templatePath = Uss::NAMESPACE, Enumerator $enum = Enumerator::FILE_SYSTEM, int $index = 0): string
+   {
+       $templatePath = $this->filterContext($templatePath);
+       if(!preg_match('/^@\w+/i', $templatePath)) {
+           $templatePath = '@' . Uss::NAMESPACE . '/' . $templatePath;
+       }
+
+       $context = explode("/", $templatePath);
+       $namespace = str_replace('@', '', array_shift($context));
+       $filesystem = $this->filesystemLoader->getPaths($namespace)[$index] ?? null;
+       $prefix = '';
+
+       if($filesystem) {
+           $prefix = match($enum) {
+               Enumerator::FILE_SYSTEM => $filesystem,
+               Enumerator::THEME => "@{$namespace}",
+               default => $this->pathToUrl($filesystem)
+           };
+       }
+
+       return $prefix . '/' . $this->filterContext(implode('/', $context));
+   }
 };

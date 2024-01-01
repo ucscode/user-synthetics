@@ -1,6 +1,6 @@
 <?php
 
-namespace Uss\Component\Kernel;
+namespace Uss\Component\Kernel\Abstract;
 
 use Ucscode\Pairs\Pairs;
 use Ucscode\SQuery\SQuery;
@@ -9,10 +9,13 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 use Ucscode\SQuery\Condition;
-use Uss\Component\Kernel\Prime as KernelPrime;
+use Uss\Component\Kernel\System\Prime as KernelPrime;
 use DateTime;
 use DateTimeInterface;
 use mysqli_result;
+use Uss\Component\Kernel\Interface\UssInterface;
+use Uss\Component\Kernel\Uss;
+use Uss\Component\Kernel\UssImmutable;
 
 abstract class AbstractUss implements UssInterface
 {
@@ -35,7 +38,7 @@ abstract class AbstractUss implements UssInterface
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
         $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, self::NAMESPACE);
         $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            'debug' => UssImmutable::DEBUG
+            'debug' => UssImmutable::DEBUG,
         ]);
         $this->twigEnvironment->addExtension(new DebugExtension());
 

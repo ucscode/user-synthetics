@@ -12,7 +12,7 @@ class Attribute
     protected ?string $charset = null;
     protected ?string $enctype = null;
     protected ?string $autoComplete = null;
-    protected ?string $method = 'GET';
+    protected ?string $method = 'post';
 
     public function __construct(protected ?string $name = null)
     {}

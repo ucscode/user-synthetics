@@ -16,15 +16,24 @@ abstract class AbstractElementContext
     protected function getContextElements(): array
     {
         $elements = [];
+        foreach($this->getAllContext() as $name => $context) {
+            $elements[$name] = $context->getElement();
+        }
+        return $elements;
+    }
+
+    protected function getAllContext(): array
+    {
+        $contexts = [];
         $properties = (new ReflectionClass($this))->getProperties(ReflectionProperty::IS_READONLY);
         foreach($properties as $property) {
             $name = $property->getName();
             $context = $this->{$name};
             if($context instanceof AbstractContext) {
-                $elements[$name] = $context->getElement();
+                $contexts[$name] = $context;
             }
         };
-        return $elements;
+        return $contexts;
     }
 
     public function setFixed(bool $status = true): self

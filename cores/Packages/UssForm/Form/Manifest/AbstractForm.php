@@ -9,6 +9,7 @@ use Ucscode\UssForm\Resource\Service\FieldUtils;
 
 abstract class AbstractForm implements FormInterface
 {
+    public const DEFAULT_COLLECTION = 'primary';
     protected readonly UssElement $element;
     protected array $collections = [];
 
@@ -16,7 +17,7 @@ abstract class AbstractForm implements FormInterface
     {
         $this->element = new UssElement(UssElement::NODE_FORM);
         $attribute->defineFormInstanceOnce($this);
-        $this->addCollection("default", new Collection());
+        $this->addCollection(self::DEFAULT_COLLECTION, new Collection());
     }
 
     protected function bindAttribute(string $name, ?string $value): void

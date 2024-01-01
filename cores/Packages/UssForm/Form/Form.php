@@ -70,6 +70,10 @@ class Form extends AbstractForm
 
     public function export(): string
     {
+        array_walk(
+            $this->collections, 
+            fn (Collection $collection) => $collection->getElementContext()->export()
+        );
         return $this->element->getHTML(true);
     }
 

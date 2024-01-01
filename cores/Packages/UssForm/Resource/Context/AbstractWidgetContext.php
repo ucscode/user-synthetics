@@ -2,11 +2,9 @@
 
 namespace Ucscode\UssForm\Resource\Context;
 
-use Exception;
 use Ucscode\UssForm\Resource\Service\FieldUtils;
 use Ucscode\UssForm\Field\Field;
 use Ucscode\UssElement\UssElement;
-use Ucscode\UssForm\Gadget\Context\WidgetContext;
 
 abstract class AbstractWidgetContext extends AbstractContext
 {

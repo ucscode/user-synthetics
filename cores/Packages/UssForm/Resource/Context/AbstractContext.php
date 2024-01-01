@@ -18,7 +18,7 @@ abstract class AbstractContext
         $this->created();
     }
 
-    public function setAttribute(string $name, ?string $value, bool $append = false): self
+    public function setAttribute(string $name, ?string $value = null, bool $append = false): self
     {
         $append ?
             $this->element->addAttributeValue($name, $value) :

@@ -10,6 +10,8 @@ use Ucscode\UssForm\Collection\Context\FieldsetContext;
 use Ucscode\UssForm\Collection\Context\InstructionContext;
 use Ucscode\UssForm\Collection\Context\SubtitleContext;
 use Ucscode\UssForm\Collection\Context\TitleContext;
+use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Resource\Context\AbstractContext;
 use Ucscode\UssForm\Resource\Context\AbstractElementContext;
 
 class ElementContext extends AbstractElementContext
@@ -65,6 +67,26 @@ class ElementContext extends AbstractElementContext
 
     public function export(): string
     {
+        $fields = $this->collection->getFields();
+
+        array_walk(
+            $fields,
+            fn (Field $field) => $field->getElementContext()->export()
+        );
+
+        $contexts = array_intersect_key(
+            $this->getAllContext(), 
+            array_flip([
+                'title', 
+                'subtitle', 
+                'instruction',
+            ])
+        );
+
+        array_walk($contexts, function(AbstractContext $context) {
+            !$context->hasValue() && !$context->isFixed() ? $context->addClass("d-none") : null;
+        });
+
         return $this->fieldset->getElement()->getHTML(true);
     }
 
@@ -76,12 +98,9 @@ class ElementContext extends AbstractElementContext
     protected function assembleContextElements(): void
     {
         $elements = $this->getContextElements();
-
         $elements['fieldset']->appendChild($elements['title']);
         $elements['fieldset']->appendChild($elements['subtitle']);
         $elements['fieldset']->appendChild($elements['instruction']);
         $elements['fieldset']->appendChild($elements['container']);
-
-
     }
 }
