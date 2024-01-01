@@ -61,7 +61,7 @@ new class () {
      */
     private function iterateModules(): void
     {
-        $iterator = new \FileSystemIterator(UssImmutable::MOD_DIR);
+        $iterator = new \FileSystemIterator(UssImmutable::MODULES_DIR);
 
         foreach($iterator as $system) {
             if($system->isDir()) {

@@ -24,10 +24,8 @@ final class UssImmutable
     public const MIN_PHP_VERSION = '8.1';
     public const VENDOR_DIR = ROOT_DIR . '/vendor';
     public const CORE_DIR = ROOT_DIR . "/cores";
-    public const MOD_DIR = ROOT_DIR . '/modules';
+    public const MODULES_DIR = ROOT_DIR . '/modules';
     public const ASSETS_DIR = self::CORE_DIR . '/assets';
     public const TEMPLATES_DIR = self::CORE_DIR . '/templates';
-    public const SRC_DIR = self::CORE_DIR . "/src";
-    public const CONFIG_DIR = self::CORE_DIR . "/config";
     public const JSON_DIR = self::ASSETS_DIR . '/JSON';
 }

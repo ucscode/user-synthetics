@@ -34,12 +34,12 @@
             "Ucscode\\Uss\\": "cores/",
             "Ucscode\\": "cores/Packages/",
             "Uss\\Component\\": "cores/Component/",
-            "Uss\\Module\\": "modules/"
+            "Module\\": "modules/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Uss\\Tests\\": "tests/files"
+            "Uss\\Tests\\": "tests/src"
         }
     }
 }
