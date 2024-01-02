@@ -266,7 +266,7 @@ abstract class AbstractUss implements UssInterface
             $last = array_pop($array);
             return implode(", ", $array) . " {$binder} " . $last;
         }
-        return array_pop($array);
+        return array_pop($array) ?? '';
     }
 
     /**
