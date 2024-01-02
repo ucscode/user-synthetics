@@ -258,6 +258,18 @@ abstract class AbstractUss implements UssInterface
     }
 
     /**
+     * Implode but use 'and' to join the last entity
+     */
+    public function implodeReadable(?array $array, ?string $binder = 'and'): string
+    {
+        if (count($array) > 1) {
+            $last = array_pop($array);
+            return implode(", ", $array) . " {$binder} " . $last;
+        }
+        return array_pop($array);
+    }
+
+    /**
      * Replaces backslashes with forward slashes in a given string.
      */
     protected function slash(?string $path): string
