@@ -27,7 +27,9 @@
         "symfony/uid": "^7.0",
         "ucscode/uss-element": "^2.0",
         "ucscode/uss-form": "^3.0",
-        "ucscode/squery": "^3.0"
+        "ucscode/squery": "^3.0",
+        "ucscode/pairs": "^3.0",
+        "ucscode/tree-node": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^10"
