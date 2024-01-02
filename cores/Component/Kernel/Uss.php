@@ -51,7 +51,7 @@ final class Uss extends AbstractUss
      */
     public function nonce($input = '1', ?string $receivedNonce = null): string|bool
     {
-        $secretKey = UssImmutable::SECRET_KEY . md5($_SESSION['USSID']);
+        $secretKey = UssImmutable::SECRET_KEY . md5($_SESSION[self::SESSION_KEY]);
         $algorithm = 'ripemd160';
         $salt = bin2hex(random_bytes(3));
         $dataToHash = $input . $salt . $secretKey;

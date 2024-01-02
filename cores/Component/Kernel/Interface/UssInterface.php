@@ -5,6 +5,8 @@ namespace Uss\Component\Kernel\Interface;
 interface UssInterface
 {
     public const NAMESPACE = 'Uss';
+    public const SESSION_KEY = 'UssId'; // (PHP Session)
+    public const CLIENT_KEY = 'uss_client_id'; // (Browser Cookie)
 
     public function terminate(bool|int|null $status, ?string $message, array $data = []): void;
     public function filterContext(string|array $path, string $divider = '/'): string;

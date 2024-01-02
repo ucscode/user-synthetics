@@ -47,7 +47,7 @@ abstract class AbstractUss implements UssInterface
         if($kernel) {
             $this->mysqli = $kernelPrime->getMysqliInstance();
             $this->options = $kernelPrime->getPairsInstance($this->mysqli);
-            $kernelPrime->createSession('USSID', 'USSCLIENTID');
+            $kernelPrime->createSession(self::SESSION_KEY, self::CLIENT_KEY);
             $kernelPrime->loadHTMLResource();
         }
     }

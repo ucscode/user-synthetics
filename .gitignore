@@ -1,7 +1,6 @@
 /uss-modules/*/
 /modules/*/
 /vendor/
-/composer.json
 /composer.lock
 /**/.git/
 /**/git/
