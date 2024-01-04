@@ -88,7 +88,7 @@ final class Prime
                 'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.min.css',
                 'animate' => 'css/animate.min.css',
                 'glightbox' => "vendor/glightbox/glightbox.min.css",
-                'izitoast' => 'vendor/izitoast/css/iziToast.min.css',
+                'toastify' => 'vendor/toastify/toastify.min.css',
                 'font-size' => "css/font-size.min.css",
                 'main-css' => 'css/main.css'
             ],
@@ -97,14 +97,14 @@ final class Prime
                 'bootstrap' => 'js/bootstrap.bundle.min.js',
                 'bootbox' => 'js/bootbox.all.min.js',
                 'glightbox' => "vendor/glightbox/glightbox.min.js",
-                'izitoast' => 'vendor/izitoast/js/iziToast.min.js',
+                'toastify' => 'vendor/toastify/toastify-js.js',
                 'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.6.min.js',
                 'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.6.min.js',
                 'main-js' => 'js/main.js'
             ]
         ];
 
-        array_walk($vendors, function($resource, $blockName) {
+        array_walk($vendors, function ($resource, $blockName) {
             $block = BlockManager::instance()->getBlock($blockName);
             foreach($resource as $name => $file) {
                 $link = $this->uss->pathToUrl(UssImmutable::ASSETS_DIR . '/' . $file);
@@ -126,7 +126,7 @@ final class Prime
     {
         $blocks = ["head_resource", "head_javascript", "body_javascript"];
         array_walk(
-            $blocks, 
+            $blocks,
             fn ($blockName) => BlockManager::instance()->addBlock($blockName, new Block(true))
         );
     }
