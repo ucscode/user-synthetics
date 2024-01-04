@@ -2,7 +2,7 @@
 
 namespace Uss\Component;
 
-if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
+if(in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1', '::1'], true)) {
 
     // Localhost Development Environment Only
 
