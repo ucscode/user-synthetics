@@ -20,7 +20,7 @@ new class () {
      * The name of the configuration file required for each modules
      * @var string
      */
-    private string $jsonFile = 'composer.json';
+    private string $jsonFile = 'config.json';
 
     /**
      * The base file required for each modules
