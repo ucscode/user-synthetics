@@ -2,13 +2,34 @@
 
 namespace Uss\Component\Kernel;
 
+use Ucscode\Pairs\Pairs;
 use Uss\Component\Kernel\Abstract\AbstractUss;
-use Uss\Component\Kernel\System\Extension;
 use Uss\Component\Trait\SingletonTrait;
+use Uss\Component\Kernel\System\Prime as KernelPrime;
+use Uss\Component\Kernel\Interface\UssInterface;
+use Ucscode\SQuery\SQuery;
+use Uss\Component\Database;
+use Ucscode\SQuery\Condition;
 
-final class Uss extends AbstractUss
+final class Uss extends AbstractUss implements UssInterface
 {
     use SingletonTrait;
+
+    public readonly ?Pairs $options;
+    public readonly ?\mysqli $mysqli;
+
+    protected function __construct(bool $kernel = false)
+    {
+        parent::__construct();
+
+        if($kernel) {
+            $kernelPrime = new KernelPrime($this);
+            $this->mysqli = $kernelPrime->getMysqliInstance();
+            $this->options = $kernelPrime->getPairsInstance($this->mysqli);
+            $kernelPrime->createSession(UssInterface::SESSION_KEY, UssInterface::CLIENT_KEY);
+            $kernelPrime->loadHTMLResource();
+        }
+    }
 
     /**
      * Render A Twig Template
@@ -19,7 +40,7 @@ final class Uss extends AbstractUss
      */
     public function render(string $templateFile, array $variables = [], bool $return = false): ?string
     {
-        $this->twigEnvironment->addGlobal(self::NAMESPACE, new Extension($this));
+        $this->extension->configureRenderContext();
         $variables += $this->twigContext;
         $result = $this->twigEnvironment->render($templateFile, $variables);
         return $return ? $result : call_user_func(function () use ($result) {
@@ -27,49 +48,7 @@ final class Uss extends AbstractUss
             die();
         });
     }
-
-    /**
-     * Retrieve URL request path segments.
-     *
-     * @param int|null $index - index of the segment to retrieve. If not provided, returns the entire array of segments.
-     * @return array|string|null
-     */
-    public function getUrlSegments(?int $index = null): array|string|null
-    {
-        $path = explode("?", $_SERVER['REQUEST_URI'])[0] ?? '';
-        $path = str_replace($this->slash(ROOT_DIR), '', $this->slash($_SERVER['DOCUMENT_ROOT']) . $path);
-        $request = array_values(array_filter(array_map('trim', explode("/", $path))));
-        return !is_null($index) ? ($request[$index] ?? null) : $request;
-    }
-
-    /**
-     * Generate a one-time security token.
-     *
-     * @param string $input The secret input used to generate the token. Defaults to '1' if not provided.
-     * @param string|null $token The token to verify. If not provided, a new token is generated.
-     * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
-     */
-    public function nonce($input = '1', ?string $receivedNonce = null): string|bool
-    {
-        $secretKey = UssImmutable::SECRET_KEY . md5($_SESSION[self::SESSION_KEY]);
-        $algorithm = 'ripemd160';
-        $salt = bin2hex(random_bytes(3));
-        $dataToHash = $input . $salt . $secretKey;
-        $nonce = hash_hmac($algorithm, $dataToHash, $secretKey);
-
-        if($receivedNonce !== null) {
-            $token = explode(':', $receivedNonce);
-            if(count($token) === 2) {
-                list($expectedNonce, $expectedSalt) = $token;
-                $computedNonce = hash_hmac($algorithm, $input . $expectedSalt . $secretKey, $secretKey);
-                return hash_equals($computedNonce, $expectedNonce);
-            }
-            return false;
-        }
-
-        return $nonce . ':' . $salt;
-    }
-
+    
     /**
      * Terminate the script and print a JSON response.
      *
@@ -88,40 +67,79 @@ final class Uss extends AbstractUss
     }
 
     /**
-     * Explode a content by a seperator and rejoin the filtered value
+     * Fetch a single row of item from the database using specified conditions
      */
-    public function filterContext(string|array $path, string $divider = '/'): string
+    public function fetchItem(string $table, string|array $value, $column = 'id'): ?array
     {
-        if(is_array($path)) {
-            $path = implode($divider, $path);
-        };
-        $explosion = array_filter(array_map('trim', explode("/", $path)));
-        return implode("/", $explosion);
+        $state = is_array($value) ? $value : [$column => $value];
+        $condition = new Condition();
+
+        foreach($state as $key => $input) {
+            $condition->add($key, $input);
+        }
+
+        $squery = (new SQuery())
+            ->select()
+            ->from($table)
+            ->where($condition);
+
+        $SQL = $squery->build();
+        $result = $this->mysqli->query($SQL);
+
+        return $result->fetch_assoc();
     }
 
     /**
-    * Convert a namespace path to file system path or URL
-    */
-   public function getTemplateSchema(?string $templatePath = Uss::NAMESPACE, Enumerator $enum = Enumerator::FILE_SYSTEM, int $index = 0): string
-   {
-       $templatePath = $this->filterContext($templatePath);
-       if(!preg_match('/^@\w+/i', $templatePath)) {
-           $templatePath = '@' . Uss::NAMESPACE . '/' . $templatePath;
-       }
+     * Escape SQL injection Queries or decode HTML Entities in a single data or an iteratable
+     */
+    public function sanitize(mixed $data, bool $sqlEscape = false): mixed
+    {
+        if(is_iterable($data)) {
+            foreach($data as $key => $value) {
+                $key = htmlentities($key);
+                $value = $this->sanitize($value, $sqlEscape);
+                is_object($data) ? $data->{$key} = $value : $data[$key] = $value;
+            }
+        } else {
+            $data = !$sqlEscape ?
+            htmlentities($data) :
+            ($this->mysqli ? $this->mysqli->real_escape_string($data) : addslashes($data));
+        };
+        return $data;
+    }
 
-       $context = explode("/", $templatePath);
-       $namespace = str_replace('@', '', array_shift($context));
-       $filesystem = $this->filesystemLoader->getPaths($namespace)[$index] ?? null;
-       $prefix = '';
+    /**
+     * Get the availabe columns of a table
+     *
+     * This method scans a table in the database schema and return all available columns associated with the table
+     *
+     * @param string $tableName: The name of the table to retrive the columns
+     * @return array: A list of all the columns
+     */
+    public function getTableColumns(string $tableName): array
+    {
+        $columns = [];
 
-       if($filesystem) {
-           $prefix = match($enum) {
-               Enumerator::FILE_SYSTEM => $filesystem,
-               Enumerator::THEME => "@{$namespace}",
-               default => $this->pathToUrl($filesystem)
-           };
-       }
+        $squery = (new SQuery())
+            ->select('COLUMN_NAME')
+            ->from('information_schema.COLUMNS')
+            ->where(
+                (new Condition())
+                    ->add('TABLE_SCHEMA', Database::NAME)
+                    ->and('TABLE_NAME', $tableName)
+            )
+            ->orderBy('ORDINAL_POSITION', null);
 
-       return $prefix . '/' . $this->filterContext(implode('/', $context));
-   }
+        $SQL = $squery->build();
+        $result = Uss::instance()->mysqli->query($SQL);
+
+        if($result->num_rows) {
+            while($column = $result->fetch_assoc()) {
+                $value = $column['column_name'] ?? $column['COLUMN_NAME'];
+                $columns[$value] = $value;
+            }
+        };
+
+        return $columns;
+    }
 };
