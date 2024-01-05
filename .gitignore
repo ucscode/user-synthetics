@@ -8,3 +8,4 @@
 /tests/test-results
 /tests/*/*
 !/tests/*/.gitkeep
+/git-modules/
