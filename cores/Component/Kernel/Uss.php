@@ -101,9 +101,12 @@ final class Uss extends AbstractUss implements UssInterface
                 is_object($data) ? $data->{$key} = $value : $data[$key] = $value;
             }
         } else {
-            $data = !$sqlEscape ?
-            htmlentities($data) :
-            ($this->mysqli ? $this->mysqli->real_escape_string($data) : addslashes($data));
+            $data = !$sqlEscape ? htmlentities($data) :
+                (
+                    $this->mysqli ? 
+                        $this->mysqli->real_escape_string($data) : 
+                        addslashes($data)
+                );
         };
         return $data;
     }
