@@ -27,7 +27,7 @@ final class Uss extends AbstractUss implements UssInterface
             $kernelPrime = new KernelPrime($this);
             $this->mysqli = $kernelPrime->getMysqliInstance();
             $this->options = $kernelPrime->getPairsInstance($this->mysqli);
-            $kernelPrime->createSession(UssInterface::SESSION_KEY, UssInterface::CLIENT_KEY);
+            $kernelPrime->createSession(UssImmutable::SESSION_KEY, UssImmutable::CLIENT_KEY);
             $kernelPrime->loadHTMLResource();
         }
     }

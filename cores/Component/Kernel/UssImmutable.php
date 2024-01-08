@@ -13,6 +13,9 @@ namespace Uss\Component\Kernel;
  */
 final class UssImmutable
 {
+    public const NAMESPACE = 'Uss';
+    public const SESSION_KEY = 'UssId'; // (PHP Session)
+    public const CLIENT_KEY = 'uss_client_id'; // (Browser Cookie)
     public const DEBUG = true;
     public const SECRET_KEY = 'any_secret_key';
     public const PROJECT_NAME = 'User Synthetics';

@@ -6,10 +6,6 @@ use mysqli_result;
 
 interface UssInterface
 {
-    public const NAMESPACE = 'Uss';
-    public const SESSION_KEY = 'UssId'; // (PHP Session)
-    public const CLIENT_KEY = 'uss_client_id'; // (Browser Cookie)
-
     /**
      * Converts a mysqli_result object to an associative array.
      *

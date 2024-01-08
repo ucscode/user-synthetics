@@ -7,7 +7,6 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
-use Uss\Component\Kernel\Interface\UssInterface;
 use Uss\Component\Kernel\System\Extension;
 
 abstract class AbstractUssEnvironment implements UssFrameworkInterface
@@ -22,12 +21,12 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     public function __construct()
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
-        $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssInterface::NAMESPACE);
+        $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::NAMESPACE);
         $this->twigEnvironment = new Environment($this->filesystemLoader, ['debug' => UssImmutable::DEBUG,]);
         $this->twigEnvironment->addExtension(new DebugExtension());
         $this->twigContext = $this->createSystemContext();
         $this->extension = new Extension($this);
-        $this->twigEnvironment->addGlobal(UssInterface::NAMESPACE, $this->extension);
+        $this->twigEnvironment->addGlobal(UssImmutable::NAMESPACE, $this->extension);
     }
 
     private function createSystemContext(): array
