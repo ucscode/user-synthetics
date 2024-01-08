@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% set ASSETS_DIR = constant('Uss\\Component\\Kernel\\UssImmutable::ASSETS_DIR') %}
-
 {% block body_main %}
 
 <div class="d-flex align-items-center min-vh-100 text-center {{ error_class|default('bg-light') }}">
@@ -38,7 +36,7 @@
 
 							{% if image is defined or ( subject is empty and message is empty ) %}
 								
-								{% set image404 = __uss.pathToUrl(ASSETS_DIR ~ '/images/errors/error-404.webp') %}
+								{% set image404 = __uss.meths.pathToUrl(__uss.immutable.ASSETS_DIR ~ '/images/errors/error-404.webp') %}
 
 								<img src="{{ image|default(image404) }}" 
 									class="img-fluid user-select-none error-image {{ image_class }}" 

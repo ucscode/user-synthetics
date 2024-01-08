@@ -1,8 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% set ASSETS_DIR = constant('Uss\\Component\\Kernel\\UssImmutable::ASSETS_DIR') %}
-{% set PROJECT_NAME = constant('Uss\\Component\\Kernel\\UssImmutable::PROJECT_NAME') %}
-{% set logo = __uss.pathToUrl(ASSETS_DIR ~ '/images/origin.png') %}
+{% set logo = __uss.meths.pathToUrl(__uss.immutable.ASSETS_DIR ~ '/images/origin.png') %}
 
 {% block body_main %}
 
@@ -44,7 +42,7 @@
 				<div class='mb-1'> 
 					Powered By 
 					<a href='{{ url }}' target='_blank'>
-						{{ PROJECT_NAME }}
+						{{ __uss.immutable.PROJECT_NAME }}
 					</a> 
 				</div> 
 				<div>&copy; 2022</div>

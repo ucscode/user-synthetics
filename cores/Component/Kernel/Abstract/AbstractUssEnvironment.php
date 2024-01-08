@@ -7,7 +7,7 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
-use Uss\Component\Kernel\System\Extension;
+use Uss\Component\Kernel\Extension\Extension;
 
 abstract class AbstractUssEnvironment implements UssFrameworkInterface
 {
@@ -26,7 +26,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
         $this->twigEnvironment->addExtension(new DebugExtension());
         $this->twigContext = $this->createSystemContext();
         $this->extension = new Extension($this);
-        $this->twigEnvironment->addGlobal(UssImmutable::NAMESPACE, $this->extension);
+        $this->twigEnvironment->addGlobal(UssImmutable::EXTENSION_KEY, $this->extension);
     }
 
     private function createSystemContext(): array
