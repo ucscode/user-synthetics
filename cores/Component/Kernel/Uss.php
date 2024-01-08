@@ -32,13 +32,6 @@ final class Uss extends AbstractUss implements UssInterface
         }
     }
 
-    /**
-     * Converts a mysqli_result object to an associative array.
-     *
-     * @param mysqli_result $result The mysqli_result object to convert.
-     * @param callable|null $mapper Optional. A callback function to apply to each row before adding it to the result. The callback should accept a value and a key as its arguments.
-     * @return array The resulting associative array.
-     */
     public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array
     {
         $data = [];
@@ -48,9 +41,6 @@ final class Uss extends AbstractUss implements UssInterface
         return $data;
     }
 
-    /**
-     * Fetch a single row of item from the database using specified conditions
-     */
     public function fetchItem(string $table, string|array $value, $column = 'id'): ?array
     {
         $state = is_array($value) ? $value : [$column => $value];
@@ -93,14 +83,6 @@ final class Uss extends AbstractUss implements UssInterface
         return $data;
     }
 
-    /**
-     * Get the availabe columns of a table
-     *
-     * This method scans a table in the database schema and return all available columns associated with the table
-     *
-     * @param string $tableName: The name of the table to retrive the columns
-     * @return array: A list of all the columns
-     */
     public function getTableColumns(string $tableName): array
     {
         $columns = [];
@@ -126,5 +108,14 @@ final class Uss extends AbstractUss implements UssInterface
         };
 
         return $columns;
+    }
+
+    public function implodeReadable(?array $array, ?string $binder = 'and'): string
+    {
+        if (count($array) > 1) {
+            $last = array_pop($array);
+            return implode(", ", $array) . " {$binder} " . $last;
+        }
+        return array_pop($array) ?? '';
     }
 };

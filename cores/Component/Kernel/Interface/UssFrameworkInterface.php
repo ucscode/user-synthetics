@@ -113,8 +113,4 @@ interface UssFrameworkInterface
      * @return bool
      */
     public function isAbsolutePath(string $path): bool;
-
-
-    public function fetchItem(string $table, string|array $value, $column = 'id'): ?array;
-    public function sanitize(mixed $data, bool $sqlEscape = false): mixed;
 }
