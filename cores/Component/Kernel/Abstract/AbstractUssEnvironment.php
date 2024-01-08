@@ -22,21 +22,21 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     public function __construct()
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
-
         $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssInterface::NAMESPACE);
-        $this->twigEnvironment = new Environment($this->filesystemLoader, [
-            'debug' => UssImmutable::DEBUG,
-        ]);
+        $this->twigEnvironment = new Environment($this->filesystemLoader, ['debug' => UssImmutable::DEBUG,]);
         $this->twigEnvironment->addExtension(new DebugExtension());
+        $this->twigContext = $this->createSystemContext();
+        $this->extension = new Extension($this);
+        $this->twigEnvironment->addGlobal(UssInterface::NAMESPACE, $this->extension);
+    }
 
-        $this->twigContext = [
+    private function createSystemContext(): array
+    {
+        return [
             'html_language' => 'en',
             'page_title' => UssImmutable::PROJECT_NAME,
             'page_icon' => $this->pathToUrl(UssImmutable::ASSETS_DIR . '/images/origin.png', false),
             'page_description' => "A Modular PHP Framework for Building Customized Web Applications",
         ];
-
-        $this->extension = new Extension($this);
-        $this->twigEnvironment->addGlobal(UssInterface::NAMESPACE, $this->extension);
     }
 }
