@@ -5,17 +5,34 @@ namespace Uss\Component\Kernel\Abstract;
 use DateTime;
 use DateTimeInterface;
 use mysqli_result;
+use Uss\Component\Kernel\Enumerator;
 use Uss\Component\Kernel\Interface\UssInterface;
 use Uss\Component\Kernel\UssImmutable;
 
-abstract class AbstractUss extends AbstractEnvironmentSystem
+abstract class AbstractUss extends AbstractUssEnvironment
 {
-    /**
-     * Retrieve URL request path segments.
-     *
-     * @param int|null $index - index of the segment to retrieve. If not provided, returns the entire array of segments.
-     * @return array|string|null
-     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
+    {
+        $this->extension->configureRenderContext();
+        $variables += $this->twigContext;
+        $result = $this->twigEnvironment->render($templateFile, $variables);
+        return $return ? $result : call_user_func(function () use ($result) {
+            print($result);
+            die();
+        });
+    }
+
+    public function terminate(bool|int|null $status, ?string $message = null, array $data = []): void
+    {
+        $response = ["status" => $status, "message" => $message, "data" => $data];
+        exit(json_encode($response, JSON_PRETTY_PRINT));
+    }
+
     public function getUrlSegments(?int $index = null): array|string|null
     {
         $path = explode("?", $_SERVER['REQUEST_URI'])[0] ?? '';
@@ -24,13 +41,6 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
         return !is_null($index) ? ($request[$index] ?? null) : $request;
     }
 
-    /**
-     * Generate a one-time security token.
-     *
-     * @param string $input The secret input used to generate the token. Defaults to '1' if not provided.
-     * @param string|null $token The token to verify. If not provided, a new token is generated.
-     * @return string|bool If no token is provided, returns a one-time security token. If a token is provided, returns a `boolean` indicating whether the token is valid.
-     */
     public function nonce($input = '1', ?string $receivedNonce = null): string|bool
     {
         $secretKey = UssImmutable::SECRET_KEY . md5($_SESSION[UssInterface::SESSION_KEY]);
@@ -52,13 +62,6 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
         return $nonce . ':' . $salt;
     }
 
-    /**
-     * Convert array to HTML Attributes
-     *
-     * @param array $array The array containing the key-value pairs to be converted.
-     * @param bool $singleQuote Whether to use single quotes for attribute values. Default is `false`.
-     * @return string The HTML attribute string
-     */
     public function arrayToHtmlAttrs(array $array, bool $singleQuote = false): string
     {
         return implode(" ", array_map(function ($key, $value) use ($singleQuote) {
@@ -71,14 +74,6 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
         }, array_keys($array), array_values($array)));
     }
 
-
-    /**
-     * Generate a Random Key
-     *
-     * @param int $length The length of the key to be generated. Default is 10.
-     * @param bool $use_spec_char Whether to include special characters in the key. Default is `false`.
-     * @return string The generated random key.
-     */
     public function keygen(int $length = 10, bool $use_special_char = false): string
     {
         $data = [...range(0, 9), ...range('a', 'z'), ...range('A', 'Z')];
@@ -94,13 +89,6 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
         return $key;
     }
 
-    /**
-     * Calculate Elapsed Time (E.g 3 days ago)
-     *
-     * @param DateTimeInterface|int|string $DateTime - A DateTimeInterface object, timestamp string, or Unix timestamp
-     * @param bool $verbose - Determines the level of detail in the time output.
-     * @return string The elapsed time in a human-readable format.
-     */
     public function relativeTime(DateTimeInterface|int|string $time, bool $verbose = false): string
     {
         if(!($time instanceof DateTimeInterface)) {
@@ -132,28 +120,6 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
         return $result;
     }
 
-    /**
-     * Converts a mysqli_result object to an associative array.
-     *
-     * @param mysqli_result $result The mysqli_result object to convert.
-     * @param callable|null $mapper Optional. A callback function to apply to each row before adding it to the result. The callback should accept a value and a key as its arguments.
-     * @return array The resulting associative array.
-     */
-    public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array
-    {
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $mapper ? array_combine(array_keys($row), array_map($mapper, $row, array_keys($row))) : $row;
-        }
-        return $data;
-    }
-
-    /**
-     * Check if the given path is an absolute path.
-     *
-     * @param string $path The path to check.
-     * @return bool
-     */
     public function isAbsolutePath(string $path): bool
     {
         return  preg_match('#^[a-z][a-z\d+.-]*://#i', $path) ||
@@ -171,5 +137,58 @@ abstract class AbstractUss extends AbstractEnvironmentSystem
             return implode(", ", $array) . " {$binder} " . $last;
         }
         return array_pop($array) ?? '';
+    }
+
+    public function pathToUrl(string $pathname, bool $hideProtocol = false): string
+    {
+        $pathname = $this->useForwardSlash($pathname); // Necessary in windows OS
+        $port = $_SERVER['SERVER_PORT'];
+        $scheme = ($_SERVER['REQUEST_SCHEME'] ?? ($port != 80 ? 'https' : 'http'));
+        $viewPort = !in_array($port, ['80', '443']) ? ":{$port}" : null;
+        $requestUri = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", '', $pathname);
+
+        return (!$hideProtocol || $viewPort) ?
+            $scheme . "://" . $_SERVER['SERVER_NAME'] . "{$viewPort}" . $requestUri :
+            $requestUri;
+    }
+
+    public function filterContext(string|array $path, string $divider = '/'): string
+    {
+        if(is_array($path)) {
+            $path = implode($divider, $path);
+        };
+        $explosion = array_filter(array_map('trim', explode("/", $path)));
+        return implode("/", $explosion);
+    }
+
+    public function getTemplateSchema(?string $templatePath = UssInterface::NAMESPACE, Enumerator $enum = Enumerator::FILE_SYSTEM, int $index = 0): string
+    {
+        $templatePath = $this->filterContext($templatePath);
+        if(!preg_match('/^@\w+/i', $templatePath)) {
+            $templatePath = '@' . UssInterface::NAMESPACE . '/' . $templatePath;
+        }
+
+        $context = explode("/", $templatePath);
+        $namespace = str_replace('@', '', array_shift($context));
+        $filesystem = $this->filesystemLoader->getPaths($namespace)[$index] ?? null;
+        $prefix = '';
+
+        if($filesystem) {
+            $prefix = match($enum) {
+                Enumerator::FILE_SYSTEM => $filesystem,
+                Enumerator::THEME => "@{$namespace}",
+                default => $this->pathToUrl($filesystem)
+            };
+        }
+
+        return $prefix . '/' . $this->filterContext(implode('/', $context));
+    }
+
+    /**
+     * Replaces backslashes with forward slashes in a given string.
+     */
+    protected function useForwardSlash(?string $path): string
+    {
+        return str_replace("\\", "/", $path);
     }
 }

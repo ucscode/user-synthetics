@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Kernel;
 
+use mysqli_result;
 use Ucscode\Pairs\Pairs;
 use Uss\Component\Kernel\Abstract\AbstractUss;
 use Uss\Component\Trait\SingletonTrait;
@@ -30,40 +31,21 @@ final class Uss extends AbstractUss implements UssInterface
             $kernelPrime->loadHTMLResource();
         }
     }
-    
+
     /**
-     * Render A Twig Template
+     * Converts a mysqli_result object to an associative array.
      *
-     * @param string $templateFile: Reference to the twig template.
-     * @param array $variables:     A list of variables that will be passed to the template
-     * @param bool $return          Whether to return or print the output
+     * @param mysqli_result $result The mysqli_result object to convert.
+     * @param callable|null $mapper Optional. A callback function to apply to each row before adding it to the result. The callback should accept a value and a key as its arguments.
+     * @return array The resulting associative array.
      */
-    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
+    public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array
     {
-        $this->extension->configureRenderContext();
-        $variables += $this->twigContext;
-        $result = $this->twigEnvironment->render($templateFile, $variables);
-        return $return ? $result : call_user_func(function () use ($result) {
-            print($result);
-            die();
-        });
-    }
-    
-    /**
-     * Terminate the script and print a JSON response.
-     *
-     * @param bool|int|null $status   The status of the response.
-     * @param string|null   $message  The optional message associated with the response.
-     * @param array         $data     Additional data to include in the response.
-     */
-    public function terminate(bool|int|null $status, ?string $message = null, array $data = []): void
-    {
-        $response = [
-            "status" => $status,
-            "message" => $message,
-            "data" => $data
-        ];
-        exit(json_encode($response, JSON_PRETTY_PRINT));
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $mapper ? array_combine(array_keys($row), array_map($mapper, $row, array_keys($row))) : $row;
+        }
+        return $data;
     }
 
     /**
@@ -103,8 +85,8 @@ final class Uss extends AbstractUss implements UssInterface
         } else {
             $data = !$sqlEscape ? htmlentities($data) :
                 (
-                    $this->mysqli ? 
-                        $this->mysqli->real_escape_string($data) : 
+                    $this->mysqli ?
+                        $this->mysqli->real_escape_string($data) :
                         addslashes($data)
                 );
         };

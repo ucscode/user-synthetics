@@ -6,7 +6,7 @@ use Exception;
 use Uss\Component\Block\BlockManager;
 use Uss\Component\Block\BlockTemplate;
 use Uss\Component\Kernel\Enumerator;
-use Uss\Component\Kernel\Uss;
+use Uss\Component\Kernel\Interface\UssFrameworkInterface;
 use Uss\Component\Kernel\UssImmutable;
 
 abstract class AbstractExtension
@@ -15,7 +15,7 @@ abstract class AbstractExtension
     public readonly array $ENUM;
     protected bool $configured = false;
 
-    public function __construct(protected Uss|AbstractEnvironmentSystem $system)
+    public function __construct(protected UssFrameworkInterface $system)
     {
         // Do nothing until ready
     }
@@ -24,7 +24,7 @@ abstract class AbstractExtension
     {
         if(!$this->configured) {
             $this->system->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
-            $this->system->jsCollection['url'] = $this->system->pathToUrl(ROOT_DIR);
+            $this->system->jsCollection['url'] = $this->system->pathToUrl(ROOT_DIR, false);
             $this->jsCollectionEncoded = base64_encode(json_encode($this->system->jsCollection));
             $this->system->twigContext['favicon'] ??= $this->system->twigContext['page_icon'];
             $this->ENUM = array_column(Enumerator::cases(), null, 'name');
@@ -41,12 +41,11 @@ abstract class AbstractExtension
     /**
      * Self Methods
      */
-    public function renderBlockContents(string $name): ?string
+    public function renderBlockElements(string $name): ?string
     {
         $outputs = [];
 
-        if($block = BlockManager::instance()->getBlock($name)) 
-        {
+        if($block = BlockManager::instance()->getBlock($name)) {
             // Render Templates First
             $templates = $block->getTemplates();
             usort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());

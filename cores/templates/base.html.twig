@@ -16,11 +16,11 @@
         {% endblock %}
 
         {% block head_resource %}
-            {{ Uss.renderBlockContents('head_resource')|raw }} 
+            {{ Uss.renderBlockElements('head_resource')|raw }} 
         {% endblock %}
 
         {% block head_javascript %}
-            {{ Uss.renderBlockContents('head_javascript')|raw }} 
+            {{ Uss.renderBlockElements('head_javascript')|raw }} 
         {% endblock %}
 
     {% endblock %}
@@ -31,11 +31,11 @@
     {% block body %}
         
         {% block body_main %}
-            {{ Uss.renderBlockContents('body_main')|raw }}
+            {{ Uss.renderBlockElements('body_main')|raw }}
         {% endblock %}
 
         {% block body_javascript %}
-            {{ Uss.renderBlockContents('body_javascript')|raw }}
+            {{ Uss.renderBlockElements('body_javascript')|raw }}
         {% endblock %}
         
     {% endblock body %}
