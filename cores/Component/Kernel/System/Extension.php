@@ -3,7 +3,7 @@
 namespace Uss\Component\Kernel\System;
 
 use Uss\Component\Kernel\Abstract\AbstractExtension;
-use Uss\Component\Kernel\Enumerator;
+use Uss\Component\Kernel\Resource\Enumerator;
 
 /**
  * This extension is a minified version of Uss class for twig

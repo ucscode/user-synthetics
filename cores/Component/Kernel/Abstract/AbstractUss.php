@@ -5,8 +5,7 @@ namespace Uss\Component\Kernel\Abstract;
 use DateTime;
 use DateTimeInterface;
 use mysqli_result;
-use Uss\Component\Kernel\Enumerator;
-use Uss\Component\Kernel\Interface\UssInterface;
+use Uss\Component\Kernel\Resource\Enumerator;
 use Uss\Component\Kernel\UssImmutable;
 
 abstract class AbstractUss extends AbstractUssEnvironment

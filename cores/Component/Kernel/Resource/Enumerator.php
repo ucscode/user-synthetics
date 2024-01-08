@@ -1,6 +1,6 @@
 <?php
 
-namespace Uss\Component\Kernel;
+namespace Uss\Component\Kernel\Resource;
 
 enum Enumerator
 {

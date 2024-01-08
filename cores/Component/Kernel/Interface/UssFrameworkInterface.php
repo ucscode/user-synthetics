@@ -3,7 +3,7 @@
 namespace Uss\Component\Kernel\Interface;
 
 use DateTimeInterface;
-use Uss\Component\Kernel\Enumerator;
+use Uss\Component\Kernel\Resource\Enumerator;
 
 interface UssFrameworkInterface
 {

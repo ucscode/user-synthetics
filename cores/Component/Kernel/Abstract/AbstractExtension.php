@@ -5,7 +5,7 @@ namespace Uss\Component\Kernel\Abstract;
 use Exception;
 use Uss\Component\Block\BlockManager;
 use Uss\Component\Block\BlockTemplate;
-use Uss\Component\Kernel\Enumerator;
+use Uss\Component\Kernel\Resource\Enumerator;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
 use Uss\Component\Kernel\UssImmutable;
 
