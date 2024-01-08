@@ -4,5 +4,5 @@ namespace Uss\Component\Route;
 
 interface RouteInterface
 {
-    public function onload(array $matches);
+    public function onload(array $context): void;
 }
