@@ -4,28 +4,37 @@ namespace Uss\Component\Kernel\Resource;
 
 class AccessibleProperties
 {
-    protected array $properties;
-    protected array $entityProperties;
-
-    public function __construct(protected object $entity, array $properties)
+    public function __construct(protected object $entity, protected array $properties)
     {
-        $this->entityProperties = array_keys(get_object_vars($this->entity));
-        $this->properties = array_filter($properties, fn ($property) => is_string($property));
-        $this->properties = array_intersect($this->entityProperties, $this->properties);
     }
 
     public function __call(string $property, mixed $args): mixed
     {
-        if(in_array($property, $this->properties)) {
+        $entityProperties = array_keys(get_object_vars($this->entity));
+
+        $properties = array_intersect(
+            $entityProperties, 
+            array_filter($this->properties, fn ($property) => is_string($property))
+        );
+
+        if(in_array($property, $properties)) {
             return $this->entity->{$property};
         }
-        
-        if(in_array($property, $this->entityProperties)) {
+
+        if(in_array($property, $entityProperties)) {
             throw new \RuntimeException(
-                "Access to `{$property}` property is not allowed within twig templates."
+                sprintf(
+                    "Access to `%s` property is not allowed within twig templates.",
+                    $property
+                )
             );
         }
 
-        return null;
+        throw new \RuntimeException(
+            sprintf(
+                "Trying to access undefined extension property `%s`.", 
+                $property
+            )
+        );
     }
 }

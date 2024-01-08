@@ -27,11 +27,19 @@ class AccessibleMethods
 
         if(method_exists($this->entity, $originalMethod)) {
             throw new \RuntimeException(
-                "Call to method `{$originalMethod}()` is not allowed within twig templates."
+                sprintf(
+                    "Call to extension method `%s()` is not allowed within twig templates.",
+                    $originalMethod
+                )
             );
         }
 
-        return null;
+        throw new \RuntimeException(
+            sprintf(
+                "Call to undefined extension method `%s()`.", 
+                $originalMethod
+            )
+        );
     }
 
     protected function composeMethodConvention(string $method): array
