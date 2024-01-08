@@ -68,7 +68,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     /**
      * Self Methods
      */
-    public function renderBlockElements(string $name): ?string
+    public function renderBlockElements(string $name, array &$_context): ?string
     {
         $outputs = [];
         
@@ -77,10 +77,10 @@ final class Extension extends AbstractExtension implements ExtensionInterface
             $templates = $block->getTemplates();
             usort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
 
-            array_walk($templates, function (BlockTemplate $blockTemplate) use (&$outputs) {
+            array_walk($templates, function (BlockTemplate $blockTemplate) use (&$outputs, &$_context) {
                 $outputs[] = $this->uss->twigEnvironment
                     ->resolveTemplate($blockTemplate->getTemplate())
-                    ->render($blockTemplate->getContext());
+                    ->render($blockTemplate->getContext() + $_context);
             });
 
             // Render Contents Next;
