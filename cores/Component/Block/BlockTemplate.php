@@ -4,12 +4,14 @@ namespace Uss\Component\Block;
 
 class BlockTemplate
 {
+    protected bool $rendered = false;
+
     public function __construct(
         protected string $template,
         protected array $context = [],
         protected int $priority = 0
-    )
-    {}
+    ) {
+    }
 
     public function setTemplate(string $template): self
     {
@@ -42,5 +44,15 @@ class BlockTemplate
     public function getPriority(): int
     {
         return $this->priority;
+    }
+
+    public function fulfilled(): void
+    {
+        $this->rendered = true;
+    }
+
+    public function isRendered(): bool
+    {
+        return $this->rendered;
     }
 }

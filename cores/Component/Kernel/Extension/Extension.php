@@ -24,6 +24,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     protected bool $configured = false;
     protected AccessibleProperties $accessibleProperties;
     protected AccessibleMethods $accessibleMethods;
+    protected static array $sandbox;
 
     public function __construct(protected UssFrameworkInterface $uss)
     {
@@ -35,12 +36,11 @@ final class Extension extends AbstractExtension implements ExtensionInterface
 
     public function configureRenderContext(): void
     {
-        if(!$this->configured) 
-        {
+        if(!$this->configured) {
             $this->uss->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
             $this->uss->jsCollection['url'] = $this->uss->pathToUrl(ROOT_DIR, false);
             $this->uss->twigContext['favicon'] ??= $this->uss->twigContext['page_icon'];
-            
+
             $this->jsCollectionEncoded = base64_encode(
                 json_encode($this->uss->jsCollection)
             );
@@ -68,25 +68,25 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     /**
      * Self Methods
      */
-    public function renderBlockElements(string $name, array &$_context): ?string
+    public function renderBlockElements(string $blockName, array $_context): ?string
     {
         $outputs = [];
-        
-        if($block = BlockManager::instance()->getBlock($name)) {
+
+        if($block = BlockManager::instance()->getBlock($blockName)) {
             // Render Templates First
             $templates = $block->getTemplates();
-            usort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
-
-            array_walk($templates, function (BlockTemplate $blockTemplate) use (&$outputs, &$_context) {
-                $outputs[] = $this->uss->twigEnvironment
-                    ->resolveTemplate($blockTemplate->getTemplate())
-                    ->render($blockTemplate->getContext() + $_context);
+            uasort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
+            array_walk($templates, function (BlockTemplate $blockTemplate) use (&$outputs, $_context) {
+                if(!$blockTemplate->isRendered()) {
+                    $blockTemplate->fulfilled();
+                    $outputs[] = $this->uss->twigEnvironment
+                        ->resolveTemplate($blockTemplate->getTemplate())
+                        ->render($blockTemplate->getContext() + $_context);
+                }
             });
 
-            // Render Contents Next;
-            $contents = $block->getContents();
-            usort($contents, fn ($a, $b) => $a['priority'] <=> $b['priority']);
-
+            $contents = $block->getContents(); // Render Contents;
+            uasort($contents, fn ($a, $b) => $a['priority'] <=> $b['priority']);
             array_walk($contents, function (array $content) use (&$outputs) {
                 $outputs[] = $content['content'];
             });
