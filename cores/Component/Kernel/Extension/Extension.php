@@ -76,13 +76,15 @@ final class Extension extends AbstractExtension implements ExtensionInterface
             // Render Templates First
             $templates = $block->getTemplates();
             uasort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
-            array_walk($templates, function (BlockTemplate $blockTemplate) use (&$outputs, $_context) {
+            array_walk($templates, function (BlockTemplate $blockTemplate, $name) use (&$outputs, $_context, $blockName) {
                 if(!$blockTemplate->isRendered()) {
                     $blockTemplate->fulfilled();
                     $outputs[] = $this->uss->twigEnvironment
                         ->resolveTemplate($blockTemplate->getTemplate())
                         ->render($blockTemplate->getContext() + $_context);
+                    return;
                 }
+                $outputs[] = sprintf("<!-- * WARNING: Isolated template already fulfilled => [%s].%s -->", $blockName, $name);
             });
 
             $contents = $block->getContents(); // Render Contents;
@@ -108,7 +110,8 @@ final class Extension extends AbstractExtension implements ExtensionInterface
             'pathToUrl',
             'keygen',
             'getTemplateSchema',
-            'relativeTime'
+            'relativeTime',
+            'arrayToHtmlAttrs'
         ]);
     }
 }
