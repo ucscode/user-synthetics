@@ -1,15 +1,14 @@
 {
     "name": "ucscode/user-synthetics",
     "type": "project",
-    "description": "The User Synthetics open-source PHP web application framework used for developing robust and scalable web applications.",
+    "description": "User Synthetics: An open-source PHP framework used for developing robust and scalable web applications.",
     "keywords": ["user-synthetics", "cms", "open-source", "framework"],
     "homepage": "http://ucscode.me/",
     "license": "MIT",
     "authors": [
         {
             "name": "Uchenna Ajah",
-            "email": "uche23mail@gmail.com",
-            "role": "Senior Developer"
+            "email": "uche23mail@gmail.com"
         }
     ],
     "support": {
