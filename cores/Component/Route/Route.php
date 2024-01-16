@@ -20,8 +20,9 @@ class Route
     public function __construct(string $route, RouteInterface $controller, array $methods = ['GET', 'POST']) 
     {
         $this->controller = $controller;
-        $this->bootstrap($route);
         $this->normalizeRequestMethods($methods);
+        $this->bootstrap($route);
+        $this->authorization();
         $this->processRouter();
     }
 
@@ -39,8 +40,6 @@ class Route
         $this->path = $uss->filterContext($uss->getUrlSegments());
         $this->query = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY) ?? '';
         $this->request = $this->path . '?' . $this->query;
-        $this->isAuthorized = (bool)preg_match('#^' . $this->route . '$#i', $this->path, $matches);
-        $this->regexMatches = $matches;
     }
 
     protected function normalizeRequestMethods(array $methods): void
@@ -50,6 +49,14 @@ class Route
             $standardMethods,
             array_map(fn ($value) => is_string($value) ? strtoupper(trim($value)) : null, $methods)
         );
+    }
+
+    protected function authorization(): void
+    {
+        $this->isAuthorized = 
+            !!preg_match('#^' . $this->route . '$#i', $this->path, $matches) &&
+            in_array($_SERVER['REQUEST_METHOD'], $this->methods, true);
+        $this->regexMatches = $matches;
     }
 
     protected function processRouter(): void

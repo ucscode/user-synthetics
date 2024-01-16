@@ -21,9 +21,9 @@ interface UssFrameworkInterface
     *
     * @param bool|int|null $status   The status of the response.
     * @param string|null   $message  The optional message associated with the response.
-    * @param array         $data     Additional data to include in the response.
+    * @param mixed         $data     Additional data to include in the response.
     */
-    public function terminate(bool|int|null $status, ?string $message, array $data = []): void;
+    public function terminate(bool|int|null $status, ?string $message, mixed $data = []): void;
 
     /**
      * Retrieve URL request path segments.

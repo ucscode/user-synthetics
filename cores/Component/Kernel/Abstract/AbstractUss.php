@@ -26,7 +26,7 @@ abstract class AbstractUss extends AbstractUssEnvironment
         });
     }
 
-    public function terminate(bool|int|null $status, ?string $message = null, array $data = []): void
+    public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
     {
         $response = ["status" => $status, "message" => $message, "data" => $data];
         exit(json_encode($response, JSON_PRETTY_PRINT));
