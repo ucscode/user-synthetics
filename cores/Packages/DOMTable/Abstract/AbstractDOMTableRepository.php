@@ -58,13 +58,10 @@ abstract class AbstractDOMTableRepository extends AbstractDOMTableFoundation
     {
         $keys = [];
         foreach($columns as $key => $value) {
-            if(is_numeric($key)) {
-                $key = $value;
-            };
+            is_numeric($key) ? $key = $value : null;
             $keys[] = $key;
         };
-        $columns = array_combine($keys, $columns);
-        $this->columns = $columns;
+        $this->columns = array_combine($keys, $columns);
         return $this;
     }
 
@@ -75,9 +72,7 @@ abstract class AbstractDOMTableRepository extends AbstractDOMTableFoundation
 
     public function setColumn(string $key, ?string $displayText = null): self
     {
-        if(is_null($displayText)) {
-            $displayText = $key;
-        };
+        $displayText ??= $key;
         $this->columns[$key] = $displayText;
         return $this;
     }

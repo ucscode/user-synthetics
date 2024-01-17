@@ -3,10 +3,10 @@
 namespace Ucscode\DOMTable\Abstract;
 
 use mysqli_result;
-use Ucscode\DOMTable\Interface\DOMTableRepositoryInterface;
+use Ucscode\DOMTable\Interface\DOMTableKernelInterface;
 use Ucscode\UssElement\UssElement;
 
-abstract class AbstractDOMTableFoundation implements DOMTableRepositoryInterface
+abstract class AbstractDOMTableFoundation implements DOMTableKernelInterface
 {
     protected int $totalItems = 0;
     protected int $totalPages = 0;
