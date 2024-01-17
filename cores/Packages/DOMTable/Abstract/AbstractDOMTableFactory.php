@@ -29,8 +29,8 @@ abstract class AbstractDOMTableFactory extends AbstractDOMTableRepository
     protected function createElement(string $nodeName, ?string $className = null, ?string $content = null): UssElement
     {
         $element = new UssElement($nodeName);
-        $className ?? $element->setAttribute('class', $className);
-        $content ?? $element->setContent($content);
+        $className ? $element->setAttribute('class', $className) : null;
+        $content ? $element->setContent($content) : null;
         return $element;
     }
 }
