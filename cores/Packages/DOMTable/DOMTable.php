@@ -4,25 +4,16 @@ namespace Ucscode\DOMTable;
 
 use Generator;
 use mysqli_result;
+use Ucscode\DOMTable\Abstract\AbstractDOMTable;
+use Ucscode\DOMTable\Interface\DOMTableIteratorInterface;
 use Ucscode\UssElement\UssElement;
 
 class DOMTable extends AbstractDOMTable
 {
-    public readonly string $tablename;
-    protected ?DOMTableInterface $fabricator;
-    protected array $result;
-
-    public function __construct(?string $tablename = null)
-    {
-        $tablename = $tablename ?: uniqid('_');
-        $this->tablename = $tablename;
-        $this->developeTableNodes();
-    }
-
     /**
      * @method setData
      */
-    public function setData(array|mysqli_result $iterable, ?DOMTableInterface $fabricator = null): self
+    public function setData(array|mysqli_result $iterable, ?DOMTableIteratorInterface $fabricator = null): self
     {
         $this->data = $iterable;
         $this->fabricator = $fabricator;
@@ -112,7 +103,7 @@ class DOMTable extends AbstractDOMTable
     /**
      * @method fabricateItem
      */
-    protected function fabricateItem(array $item, ?DOMTableInterface $fabricator): ?array
+    protected function fabricateItem(array $item, ?DOMTableIteratorInterface $fabricator): ?array
     {
         $extraColunms = array_diff(array_keys($this->columns), array_keys($item));
         if(!empty($extraColunms)) {
@@ -166,31 +157,6 @@ class DOMTable extends AbstractDOMTable
             $this->tbody->appendChild($tr);
         };
         $this->table->appendChild($this->tbody);
-    }
-
-    /**
-     * @method createTableNodes
-     */
-    protected function developeTableNodes(): void
-    {
-        $this->tableWrapper = new UssElement(UssElement::NODE_DIV);
-        $this->tableWrapper->setAttribute('class', 'table-wrapper');
-
-        $this->tableContainer = new UssElement(UssElement::NODE_DIV);
-        $this->tableContainer->setAttribute('class', 'table-responsive table-container');
-
-        $this->table = new UssElement(UssElement::NODE_TABLE);
-        $this->table->setAttribute('class', 'table');
-
-        $this->thead = new UssElement(UssElement::NODE_THEAD);
-        $this->tbody = new UssElement(UssElement::NODE_TBODY);
-        $this->tfoot = new UssElement(UssElement::NODE_TFOOT);
-
-        if(empty($this->emptinessElement)) {
-            $this->emptinessElement = new UssElement(UssElement::NODE_DIV);
-            $this->emptinessElement->setAttribute('class', 'border p-4 text-center');
-            $this->emptinessElement->setContent("No Item Found");
-        }
     }
 
     /**
