@@ -52,7 +52,7 @@ abstract class AbstractDOMTable extends AbstractDOMTableFactory
 
     protected function buildInternal(): UssElement
     {
-        $this->createPagination();
+        $this->createPaginationUnits();
         $this->createTableCaptions($this->thead);
         $this->enlistTableContents();
         $this->displayFooter ? $this->createTableCaptions($this->tfoot) : null;
@@ -60,7 +60,7 @@ abstract class AbstractDOMTable extends AbstractDOMTableFactory
         return $this->tableWrapper;
     }
 
-    protected function createPagination(): void
+    protected function createPaginationUnits(): void
     {
         $this->totalPages = ceil($this->totalItems / $this->itemsPerPage);
         $this->nextPage = $this->currentPage + 1;
