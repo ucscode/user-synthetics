@@ -113,4 +113,21 @@ interface UssFrameworkInterface
      * @return bool
      */
     public function isAbsolutePath(string $path): bool;
+
+    /**
+     * Get server info available in $_SERVER variable
+     * 
+     * @return array
+     */
+    public function getServerInfo(): array;
+
+    /**
+     * rewrite the query string of the current request or a different request
+     * 
+     * @param array $queryParams    The query string parameters
+     * @param ?string $urlPath      The path of the url (current will be used if not given)
+     * 
+     * @return string
+     */
+    public function replaceUrlQuery(array $queryParams, ?string $urlPath): string;
 }
