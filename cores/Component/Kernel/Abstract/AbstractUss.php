@@ -183,7 +183,7 @@ abstract class AbstractUss extends AbstractUssEnvironment
         $serverInfo['host_name'] .= !in_array($serverInfo['port'], [80, 443], true) ? ":{$_SERVER['SERVER_PORT']}" : null;
         $serverInfo['scheme'] = $_SERVER['REQUEST_SCHEME'] ?? ($serverInfo['port'] === 80 ? 'http' : 'https');
         $serverInfo += parse_url($serverInfo['request']);
-
+        $serverInfo['query'] ??= '';
         parse_str($serverInfo['query'], $serverInfo['query_params']);
         return $serverInfo;
     }
