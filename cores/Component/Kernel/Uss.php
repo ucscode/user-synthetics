@@ -88,7 +88,7 @@ final class Uss extends AbstractUss implements UssInterface
         $columns = [];
 
         $squery = (new SQuery())
-            ->select(['COLUMN_NAME', 'DATA_TYPE'])
+            ->select(['COLUMN_NAME', 'DATA_TYPE', 'IS_NULLABLE'])
             ->from('information_schema.COLUMNS')
             ->where(
                 (new Condition())
@@ -104,7 +104,11 @@ final class Uss extends AbstractUss implements UssInterface
             while($column = $result->fetch_assoc()) {
                 $key = $column['column_name'] ?? $column['COLUMN_NAME'];
                 $value = $column['data_type'] ?? $column['DATA_TYPE'];
-                $columns[$key] = strtoupper($value);
+                $nullable = $column['is_nullable'] ?? $column['IS_NULLABLE'];
+                $columns[$key] = [
+                    'datatype' => strtoupper($value),
+                    'nullable' => $nullable != 'NO'
+                ];
             }
         };
         
