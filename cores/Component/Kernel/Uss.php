@@ -88,7 +88,7 @@ final class Uss extends AbstractUss implements UssInterface
         $columns = [];
 
         $squery = (new SQuery())
-            ->select('COLUMN_NAME')
+            ->select(['COLUMN_NAME', 'DATA_TYPE'])
             ->from('information_schema.COLUMNS')
             ->where(
                 (new Condition())
@@ -102,11 +102,12 @@ final class Uss extends AbstractUss implements UssInterface
 
         if($result->num_rows) {
             while($column = $result->fetch_assoc()) {
-                $value = $column['column_name'] ?? $column['COLUMN_NAME'];
-                $columns[$value] = $value;
+                $key = $column['column_name'] ?? $column['COLUMN_NAME'];
+                $value = $column['data_type'] ?? $column['DATA_TYPE'];
+                $columns[$key] = strtoupper($value);
             }
         };
-
+        
         return $columns;
     }
 
