@@ -26,7 +26,7 @@ final class Uss extends AbstractUss implements UssInterface
         parent::__construct();
         
         $this->extension = new Extension($this);
-        $this->twigEnvironment->addGlobal(UssImmutable::EXTENSION_KEY, $this->extension);
+        $this->twigEnvironment->addExtension($this->extension);
 
         if($kernel) {
             $kernelPrime = new KernelPrime($this);

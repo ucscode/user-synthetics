@@ -4,10 +4,11 @@ namespace Uss\Component\Kernel\Extension;
 
 use ReflectionClass;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\GlobalsInterface;
 use Uss\Component\Kernel\Resource\Enumerator;
 use Uss\Component\Block\BlockManager;
 use Uss\Component\Kernel\Resource\AccessibleMethods;
-use Uss\Component\Kernel\Interface\UssFrameworkInterface;
+use Uss\Component\Kernel\Interface\UssInterface;
 use Uss\Component\Kernel\Resource\AccessibleProperties;
 use Uss\Component\Kernel\UssImmutable;
 
@@ -15,7 +16,7 @@ use Uss\Component\Kernel\UssImmutable;
  * This extension is a minified version of Uss class for twig
  * It provides only limited properties and methods from the Uss class to the twig template
  */
-final class Extension extends AbstractExtension implements ExtensionInterface
+final class Extension extends AbstractExtension implements ExtensionInterface, GlobalsInterface
 {
     public readonly string $jsCollectionEncoded;
     public readonly array $ENUM;
@@ -24,7 +25,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     protected AccessibleProperties $accessibleProperties;
     protected AccessibleMethods $accessibleMethods;
 
-    public function __construct(protected UssFrameworkInterface $uss)
+    public function __construct(protected UssInterface $framework)
     {
         $this->ENUM = array_column(Enumerator::cases(), null, 'name');
         $this->immutable = (new ReflectionClass(UssImmutable::class))->getConstants();
@@ -32,13 +33,20 @@ final class Extension extends AbstractExtension implements ExtensionInterface
         $this->initializeAccessibleMethods();
     }
 
+    public function getGlobals(): array
+    {
+        return [
+            UssImmutable::EXTENSION_KEY => $this,
+        ];
+    }
+
     public function configureRenderContext(): void
     {
         if(!$this->configured) {
-            $this->uss->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
-            $this->uss->jsCollection['url'] = $this->uss->pathToUrl(ROOT_DIR, false);
-            $this->uss->twigContext['favicon'] ??= $this->uss->twigContext['page_icon'];
-            $this->jsCollectionEncoded = base64_encode(json_encode($this->uss->jsCollection));
+            $this->framework->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
+            $this->framework->jsCollection['url'] = $this->framework->pathToUrl(ROOT_DIR, false);
+            $this->framework->twigContext['favicon'] ??= $this->framework->twigContext['page_icon'];
+            $this->jsCollectionEncoded = base64_encode(json_encode($this->framework->jsCollection));
             $this->configured = true;
         }
     }
@@ -56,7 +64,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     # Get an option
     public function getOption(string $name): mixed
     {
-        return $this->uss->options->get($name);
+        return $this->framework->options->get($name);
     }
 
     /**
@@ -74,7 +82,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
             foreach($templates as $name => $blockTemplate) {
                 if(!$blockTemplate->isRendered()) {
                     $blockTemplate->fulfilled();
-                    $outputs[] = $this->uss->twigEnvironment
+                    $outputs[] = $this->framework->twigEnvironment
                         ->resolveTemplate($blockTemplate->getTemplate())
                         ->render($blockTemplate->getContext() + $_context);
                     continue;
@@ -95,12 +103,12 @@ final class Extension extends AbstractExtension implements ExtensionInterface
 
     protected function initializeAccessibleProperties(): void
     {
-        $this->accessibleProperties = new AccessibleProperties($this->uss, []);
+        $this->accessibleProperties = new AccessibleProperties($this->framework, []);
     }
 
     protected function initializeAccessibleMethods(): void
     {
-        $this->accessibleMethods = new AccessibleMethods($this->uss, [
+        $this->accessibleMethods = new AccessibleMethods($this->framework, [
             'pathToUrl',
             'keygen',
             'getTemplateSchema',

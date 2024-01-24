@@ -4,7 +4,7 @@ namespace Uss\Component\Kernel\Interface;
 
 use mysqli_result;
 
-interface UssInterface
+interface UssInterface extends UssFrameworkInterface
 {
     /**
      * Render A Twig Template
