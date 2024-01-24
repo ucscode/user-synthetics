@@ -2,12 +2,11 @@
 
 namespace Uss\Component\Kernel\Abstract;
 
-use Uss\Component\Kernel\UssImmutable;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
-use Uss\Component\Kernel\Extension\Extension;
+use Uss\Component\Kernel\UssImmutable;
 
 abstract class AbstractUssEnvironment implements UssFrameworkInterface
 {
@@ -15,18 +14,18 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     public readonly Environment $twigEnvironment;
     public array $twigContext;
     public array $jsCollection = [];
-    protected array $properties = [];
-    protected Extension $extension;
+    
+    protected const ENV_CONFIG = [
+        'debug' => UssImmutable::DEBUG,
+    ];
 
     public function __construct()
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
         $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::NAMESPACE);
-        $this->twigEnvironment = new Environment($this->filesystemLoader, ['debug' => UssImmutable::DEBUG,]);
+        $this->twigEnvironment = new Environment($this->filesystemLoader, self::ENV_CONFIG);
         $this->twigEnvironment->addExtension(new DebugExtension());
         $this->twigContext = $this->createSystemContext();
-        $this->extension = new Extension($this);
-        $this->twigEnvironment->addGlobal(UssImmutable::EXTENSION_KEY, $this->extension);
     }
 
     private function createSystemContext(): array

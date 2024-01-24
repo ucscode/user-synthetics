@@ -7,6 +7,24 @@ use mysqli_result;
 interface UssInterface
 {
     /**
+     * Render A Twig Template
+     *
+     * @param string    $templateFile   Reference to the twig template.
+     * @param array     $variables:     A list of variables that will be passed to the template
+     * @param bool      $return         Whether to return or print the output
+     */
+    public function render(string $templatePath, array $variables, bool $return = false): ?string;
+
+    /**
+    * Terminate the script and print a JSON response.
+    *
+    * @param bool|int|null $status   The status of the response.
+    * @param string|null   $message  The optional message associated with the response.
+    * @param mixed         $data     Additional data to include in the response.
+    */
+    public function terminate(bool|int|null $status, ?string $message, mixed $data = []): void;
+
+    /**
      * Converts a mysqli_result object to an associative array.
      *
      * @param mysqli_result     $result     The mysqli_result object to convert.

@@ -4,7 +4,6 @@ namespace Uss\Component\Kernel\Abstract;
 
 use DateTime;
 use DateTimeInterface;
-use mysqli_result;
 use Uss\Component\Kernel\Resource\Enumerator;
 use Uss\Component\Kernel\UssImmutable;
 
@@ -13,23 +12,6 @@ abstract class AbstractUss extends AbstractUssEnvironment
     public function __construct()
     {
         parent::__construct();
-    }
-
-    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
-    {
-        $this->extension->configureRenderContext();
-        $variables += $this->twigContext;
-        $result = $this->twigEnvironment->render($templateFile, $variables);
-        return $return ? $result : call_user_func(function () use ($result) {
-            print($result);
-            die();
-        });
-    }
-
-    public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
-    {
-        $response = ["status" => $status, "message" => $message, "data" => $data];
-        exit(json_encode($response, JSON_PRETTY_PRINT));
     }
 
     public function getUrlSegments(?int $index = null): array|string|null

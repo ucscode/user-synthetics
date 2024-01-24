@@ -11,17 +11,22 @@ use Uss\Component\Kernel\Interface\UssInterface;
 use Ucscode\SQuery\SQuery;
 use Uss\Component\Database;
 use Ucscode\SQuery\Condition;
+use Uss\Component\Kernel\Extension\Extension;
 
 final class Uss extends AbstractUss implements UssInterface
 {
     use SingletonTrait;
 
+    protected Extension $extension;
     public readonly ?Pairs $options;
     public readonly ?\mysqli $mysqli;
 
     protected function __construct(bool $kernel = false)
     {
         parent::__construct();
+        
+        $this->extension = new Extension($this);
+        $this->twigEnvironment->addGlobal(UssImmutable::EXTENSION_KEY, $this->extension);
 
         if($kernel) {
             $kernelPrime = new KernelPrime($this);
@@ -30,6 +35,23 @@ final class Uss extends AbstractUss implements UssInterface
             $this->options = $kernelPrime->getPairsInstance($this->mysqli);
             $kernelPrime->createSession(UssImmutable::SESSION_KEY, UssImmutable::CLIENT_KEY);
         }
+    }
+
+    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
+    {
+        $this->extension->configureRenderContext();
+        $variables += $this->twigContext;
+        $result = $this->twigEnvironment->render($templateFile, $variables);
+        return $return ? $result : call_user_func(function () use ($result) {
+            print($result);
+            die();
+        });
+    }
+
+    public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
+    {
+        $response = ["status" => $status, "message" => $message, "data" => $data];
+        exit(json_encode($response, JSON_PRETTY_PRINT));
     }
 
     public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array

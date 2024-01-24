@@ -24,7 +24,6 @@ final class Extension extends AbstractExtension implements ExtensionInterface
     protected bool $configured = false;
     protected AccessibleProperties $accessibleProperties;
     protected AccessibleMethods $accessibleMethods;
-    protected static array $sandbox;
 
     public function __construct(protected UssFrameworkInterface $uss)
     {
@@ -40,11 +39,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
             $this->uss->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
             $this->uss->jsCollection['url'] = $this->uss->pathToUrl(ROOT_DIR, false);
             $this->uss->twigContext['favicon'] ??= $this->uss->twigContext['page_icon'];
-
-            $this->jsCollectionEncoded = base64_encode(
-                json_encode($this->uss->jsCollection)
-            );
-
+            $this->jsCollectionEncoded = base64_encode(json_encode($this->uss->jsCollection));
             $this->configured = true;
         }
     }
@@ -99,9 +94,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface
 
     protected function initializeAccessibleProperties(): void
     {
-        $this->accessibleProperties = new AccessibleProperties($this->uss, [
-
-        ]);
+        $this->accessibleProperties = new AccessibleProperties($this->uss, []);
     }
 
     protected function initializeAccessibleMethods(): void
