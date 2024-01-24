@@ -6,7 +6,6 @@ use ReflectionClass;
 use Twig\Extension\AbstractExtension;
 use Uss\Component\Kernel\Resource\Enumerator;
 use Uss\Component\Block\BlockManager;
-use Uss\Component\Block\BlockTemplate;
 use Uss\Component\Kernel\Resource\AccessibleMethods;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
 use Uss\Component\Kernel\Resource\AccessibleProperties;
@@ -68,25 +67,27 @@ final class Extension extends AbstractExtension implements ExtensionInterface
         $outputs = [];
 
         if($block = BlockManager::instance()->getBlock($blockName)) {
-            // Render Templates First
+            
             $templates = $block->getTemplates();
             uasort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
-            array_walk($templates, function (BlockTemplate $blockTemplate, $name) use (&$outputs, $_context, $blockName) {
+
+            foreach($templates as $name => $blockTemplate) {
                 if(!$blockTemplate->isRendered()) {
                     $blockTemplate->fulfilled();
                     $outputs[] = $this->uss->twigEnvironment
                         ->resolveTemplate($blockTemplate->getTemplate())
                         ->render($blockTemplate->getContext() + $_context);
-                    return;
+                    continue;
                 }
                 $outputs[] = sprintf("<!-- * WARNING: Isolated template already fulfilled => [%s].%s -->", $blockName, $name);
-            });
+            }
 
-            $contents = $block->getContents(); // Render Contents;
+            $contents = $block->getContents(); 
             uasort($contents, fn ($a, $b) => $a['priority'] <=> $b['priority']);
-            array_walk($contents, function (array $content) use (&$outputs) {
+
+            foreach($contents as $content) {
                 $outputs[] = $content['content'];
-            });
+            }
         }
 
         return implode("\n", $outputs);
