@@ -50,7 +50,11 @@ final class Uss extends AbstractUss implements UssInterface
 
     public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
     {
-        $response = ["status" => $status, "message" => $message, "data" => $data];
+        $response = [
+            "status" => $status, 
+            "message" => $message, 
+            "data" => $data
+        ];
         exit(json_encode($response, JSON_PRETTY_PRINT));
     }
 
@@ -58,7 +62,10 @@ final class Uss extends AbstractUss implements UssInterface
     {
         $data = [];
         while ($row = $result->fetch_assoc()) {
-            $data[] = $mapper ? array_combine(array_keys($row), array_map($mapper, $row, array_keys($row))) : $row;
+            $data[] = $mapper ? array_combine(
+                array_keys($row), 
+                array_map($mapper, $row, array_keys($row))
+            ) : $row;
         }
         return $data;
     }
@@ -144,5 +151,15 @@ final class Uss extends AbstractUss implements UssInterface
             return implode(", ", $array) . " {$binder} " . $last;
         }
         return array_pop($array) ?? '';
+    }
+
+    public function array_map_recursive(callable $callback, array $array): array
+    {
+        return array_map(
+            fn ($item) => is_array($item) ? 
+                $this->array_map_recursive($callback, $item) : 
+                call_user_func($callback, $item),
+            $array
+        );
     }
 };

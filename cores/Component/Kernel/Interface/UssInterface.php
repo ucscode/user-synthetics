@@ -77,4 +77,15 @@ interface UssInterface extends UssFrameworkInterface
      * @return mixed    The sanitized data.
      */
     public function sanitize(mixed $data, bool $sqlEscape = false): mixed;
+
+    /**
+     * Applies a callback recursively to all elements of the given array.
+     *
+     * @param callable $callback The callback function to apply to each element.
+     *                           The callback should accept a single parameter and return the modified value.
+     * @param array    $array    The input array to be mapped recursively.
+     *
+     * @return array    The resulting array after applying the callback to each element recursively.
+     */
+    public function array_map_recursive(callable $callback, array $array): array;
 }
