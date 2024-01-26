@@ -34,7 +34,8 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
             'html_language' => 'en',
             'page_title' => UssImmutable::PROJECT_NAME,
             'page_icon' => $this->pathToUrl(UssImmutable::ASSETS_DIR . '/images/origin.png', false),
-            'page_description' => "A Modular PHP Framework for Building Customized Web Applications",
+            'page_slogan' => 'A Modular PHP Framework for Building Customized Web Applications',
+            'page_description' => "User Synthetics is a powerful and versatile PHP framework designed to simplify the development of customizable and extensible web applications.",
         ];
     }
 }
