@@ -35,10 +35,27 @@ This is a screenshot of [Uss Dashboard Module](https://github.com/ucscode/uss-da
 
 Follow these steps to get started with User Synthetics:
 
+### Using Composer
+
+Use the following command to create a new project:
+
+```bash
+composer create-project ucscode/user-synthetics my_directory
+```
+
+This will create a new directory named `my_directory` and install `User Synthetics` and all its dependencies into it.
+
+### Without Composer
+
 1. Clone the repository: `git clone https://github.com/ucscode/user-synthetics.git`.
-2. Set up your web server to serve the cloned directory as the document root.
-3. Customize the framework and modules to suit your project's requirements.
-4. Refer to the [User Synthetics documentation](docs/) for detailed usage instructions and guides.
+2. Extract the clone repository into your server directory.
+3. Open your terminal to the server directory and run the following command
+
+```bash
+composer install
+```
+
+Refer to the [User Synthetics documentation](docs/) for detailed usage instructions and guides.
 
 ## Documentation
 
