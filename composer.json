@@ -30,12 +30,11 @@
         "ucscode/pairs": "^3.0",
         "ucscode/tree-node": "^3.0",
         "ucscode/local-storage": "^2.0",
-        "ucscode/promise": "^1.0"
+        "ucscode/promise": "^1.0",
+        "ucscode/domtable": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "Ucscode\\Uss\\": "cores/",
-            "Ucscode\\": "cores/Packages/",
             "Uss\\Component\\": "cores/Component/",
             "Module\\": "modules/"
         }
