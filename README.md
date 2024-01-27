@@ -57,6 +57,14 @@ composer install
 
 Refer to the [User Synthetics documentation](docs/) for detailed usage instructions and guides.
 
+## Updating User Synthetics
+
+After installation, you can update to the latest version of user synthetics using the following command
+
+```bash
+composer update
+```
+
 ## Documentation
 
 Comprehensive documentation is available for User Synthetics to assist you in using and extending the framework effectively. The documentation covers various topics, including installation, module development, API references, and best practices. Visit the [User Synthetics Documentation](docs/) to explore the resources.
