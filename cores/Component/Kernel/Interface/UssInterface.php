@@ -88,4 +88,17 @@ interface UssInterface extends UssFrameworkInterface
      * @return array    The resulting array after applying the callback to each element recursively.
      */
     public function array_map_recursive(callable $callback, array $array): array;
+
+    /**
+     * Replace Variables in a String
+     *
+     * Replaces variables in the given string with corresponding values from the data array.
+     * The variables in the string must be in the format **%\\{variable_name}**.
+     *
+     * @param string $string The string containing variables to replace.
+     * @param array $data An associative array with variable-value pairs.
+     *
+     * @return string The modified string with variables replaced by their values.
+     */
+    public function replaceVars(string $data, array $vars): string;
 }

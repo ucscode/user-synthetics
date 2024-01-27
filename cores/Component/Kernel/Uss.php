@@ -162,4 +162,17 @@ final class Uss extends AbstractUss implements UssInterface
             $array
         );
     }
+
+    public function replaceVars(string $string, array $data): string
+    {
+        $chars = 'a-z0-9_\-\.\$\(\)\[\]:;@#';
+        $new_string = preg_replace_callback("~%(?:\\\\)*\{([$chars]+)\}~i", function ($match) use ($data) {
+            if(substr($match[0], 0, 2) != '%{') {
+                return ('%' . substr($match[0], 2));
+            }
+            $key = $match[1];
+            return $data[$key] ?? null;
+        }, $string);
+        return $new_string;
+    }
 };
