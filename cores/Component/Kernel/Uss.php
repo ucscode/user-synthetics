@@ -58,18 +58,6 @@ final class Uss extends AbstractUss implements UssInterface
         exit(json_encode($response, JSON_PRETTY_PRINT));
     }
 
-    public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array
-    {
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $mapper ? array_combine(
-                array_keys($row), 
-                array_map($mapper, $row, array_keys($row))
-            ) : $row;
-        }
-        return $data;
-    }
-
     public function fetchItem(string $table, string|array $value, $column = 'id'): ?array
     {
         $state = is_array($value) ? $value : [$column => $value];

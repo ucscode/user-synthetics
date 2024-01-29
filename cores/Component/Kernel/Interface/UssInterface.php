@@ -23,18 +23,7 @@ interface UssInterface extends UssFrameworkInterface
     * @param mixed         $data     Additional data to include in the response.
     */
     public function terminate(bool|int|null $status, ?string $message, mixed $data = []): void;
-
-    /**
-     * Converts a mysqli_result object to an associative array.
-     *
-     * @param mysqli_result     $result     The mysqli_result object to convert.
-     * @param callable|null     $mapper     An optional callback function to apply to each row before adding it to the result.
-     *                                      The callback should accept a value and a key as its arguments.
-     *
-     * @return array The resulting associative array.
-     */
-    public function mysqliResultToArray(mysqli_result $result, ?callable $mapper = null): array;
-
+    
     /**
      * Get the availabe columns of a table
      *
