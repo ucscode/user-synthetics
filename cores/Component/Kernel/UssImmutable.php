@@ -20,11 +20,11 @@ final class UssImmutable
     public const DEBUG = true;
     public const SECRET_KEY = 'any_secret_key';
     public const PROJECT_NAME = 'User Synthetics';
-    public const PROJECT_WEBSITE = 'https://usersynthetics.com';
+    public const PROJECT_WEBSITE = 'https://example.com';
     public const GITHUB_REPO = 'https://github.com/ucscode/user-synthetics';
     public const AUTHOR = 'Ucscode';
     public const AUTHOR_EMAIL = 'uche23mail@gmail.com';
-    public const AUTHOR_WEBSITE = 'https://ucscode.me';
+    public const AUTHOR_WEBSITE = 'http://ucscode.com';
     public const MIN_PHP_VERSION = '8.1';
     public const VENDOR_DIR = ROOT_DIR . '/vendor';
     public const CORE_DIR = ROOT_DIR . "/cores";
