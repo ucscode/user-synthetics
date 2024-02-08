@@ -6,7 +6,7 @@ use Uss\Component\Kernel\Uss;
 use Uss\Component\Kernel\UssImmutable;
 
 define('ROOT_DIR', __DIR__);
-define('INSTALLATION_PATH', str_replace($_SERVER['DOCUMENT_ROOT'], '', ROOT_DIR));
+define('INSTALLATION_PATH', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace(DIRECTORY_SEPARATOR, '/', ROOT_DIR)));
 var_dump($_SERVER['DOCUMENT_ROOT'], ROOT_DIR, INSTALLATION_PATH);
 call_user_func(function () {
     $autoloader = __DIR__ . "/vendor/autoload.php";
