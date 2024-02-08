@@ -23,7 +23,6 @@
         "jasongrimes/paginator": "^1.0",
         "phpmailer/phpmailer": "^6.8",
         "fakerphp/faker": "^1.23",
-        "symfony/uid": "^7.0",
         "ucscode/uss-element": "^2.0",
         "ucscode/uss-form": "^3.0",
         "ucscode/squery": "^3.0",
