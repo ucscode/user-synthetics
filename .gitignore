@@ -9,3 +9,4 @@
 /tests/*/*
 !/tests/*/.gitkeep
 /git-modules/
+/cores/Component/Database.php
