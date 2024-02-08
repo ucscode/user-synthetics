@@ -77,6 +77,7 @@ class UrlGenerator
         if(!empty($this->query)) {
             $result .= "?" . http_build_query($this->query);
         };
+        var_dump($result);
         return $result;
     }
 

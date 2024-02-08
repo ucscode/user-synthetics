@@ -116,7 +116,6 @@ abstract class AbstractUss extends AbstractUssEnvironment
         $viewPort = !in_array($port, ['80', '443']) ? ":{$port}" : null;
         $requestUri = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", '', $pathname);
 
-        var_dump($_SERVER['DOCUMENT_ROOT'], $pathname, $requestUri);
         return (!$hideProtocol || $viewPort) ?
             $scheme . "://" . $_SERVER['SERVER_NAME'] . "{$viewPort}" . $requestUri :
             $requestUri;
