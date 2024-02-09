@@ -16,7 +16,7 @@
 </IfModule>
     
 # Deny access to sensitive files
-<FilesMatch "(?i)^(?:composer\.(?:json|lock))|\.">
+<FilesMatch "(?i)^(?:(?:composer\.(?:json|lock))|\.)">
     Order allow,deny
     Deny from all
 </FilesMatch>

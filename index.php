@@ -2,6 +2,7 @@
 
 namespace Ucscode\Uss;
 
+use Dotenv\Dotenv;
 use Uss\Component\Kernel\Uss;
 use Uss\Component\Kernel\UssImmutable;
 
@@ -16,9 +17,16 @@ call_user_func(function () {
     require_once $autoloader;
 });
 
-/**
- * Instantiate First Time With Database & Other Properties;
- */
+# Load environmental variable
+$dotenv = Dotenv::createMutable(ROOT_DIR);
+$dotenv->load();
+
+if(file_exists(ROOT_DIR .'/.env.local')) {
+    $dotenv = Dotenv::createMutable(ROOT_DIR, '.env.local');
+    $dotenv->load(); // load .env.local and override existing variables
+}
+
+# Instantiate First Time With Database & Other Properties;
 Uss::instance(TRUE);
 
 require_once UssImmutable::CORE_DIR . '/Modules.php';

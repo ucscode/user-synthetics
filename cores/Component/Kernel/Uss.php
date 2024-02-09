@@ -109,7 +109,7 @@ final class Uss extends AbstractUss implements UssInterface
             ->from('information_schema.COLUMNS')
             ->where(
                 (new Condition())
-                    ->add('TABLE_SCHEMA', Database::NAME)
+                    ->add('TABLE_SCHEMA', $_ENV['DB_NAME'])
                     ->and('TABLE_NAME', $tableName)
             )
             ->orderBy('ORDINAL_POSITION', null);

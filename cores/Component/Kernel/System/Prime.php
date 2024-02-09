@@ -22,14 +22,14 @@ final class Prime
     public function getMysqliInstance(): ?mysqli
     {
         $mysqli = null;
-        if(Database::ENABLED) {
+        if(filter_var($_ENV['DB_ENABLED'], FILTER_VALIDATE_BOOLEAN)) {
             try {
                 $mysqli = @new mysqli(
-                    Database::HOST,
-                    Database::USERNAME,
-                    Database::PASSWORD,
-                    Database::NAME,
-                    Database::PORT
+                    $_ENV['DB_HOST'],
+                    $_ENV['DB_USERNAME'],
+                    $_ENV['DB_PASSWORD'],
+                    $_ENV['DB_NAME'],
+                    $_ENV['DB_PORT']
                 );
             } catch(mysqli_sql_exception $e) {
                 $this->uss->render('@Uss/db.error.html.twig', [
@@ -48,7 +48,7 @@ final class Prime
         $options = null;
         if($mysqli) {
             try {
-                $options = new Pairs($mysqli, Database::PREFIX . "options");
+                $options = new Pairs($mysqli, $_ENV['DB_PREFIX'] . "options");
             } catch(\Exception $e) {
                 $this->uss->render('@Uss/error.html.twig', [
                     'subject' => "Library Error",
