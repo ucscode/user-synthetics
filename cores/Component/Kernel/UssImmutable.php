@@ -17,8 +17,6 @@ final class UssImmutable
     public const EXTENSION_KEY = '__uss';
     public const SESSION_KEY = 'UssId'; // (PHP Session)
     public const CLIENT_KEY = 'uss_client_id'; // (Browser Cookie)
-    public const DEBUG = true;
-    public const SECRET_KEY = 'any_secret_key';
     public const PROJECT_NAME = 'User Synthetics';
     public const PROJECT_WEBSITE = 'https://example.com';
     public const GITHUB_REPO = 'https://github.com/ucscode/user-synthetics';

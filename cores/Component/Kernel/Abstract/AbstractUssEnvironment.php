@@ -14,9 +14,9 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     public readonly Environment $twigEnvironment;
     public array $twigContext;
     public array $jsCollection = [];
-    
+
     protected const ENV_CONFIG = [
-        'debug' => UssImmutable::DEBUG,
+        'debug' => true,
     ];
 
     public function __construct()
