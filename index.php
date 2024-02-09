@@ -19,12 +19,15 @@ call_user_func(function () {
 
 # Load environmental variable
 $dotenv = Dotenv::createMutable(ROOT_DIR);
-$dotenv->load();
 
 if(file_exists(ROOT_DIR .'/.env.local')) {
+    file_exists(ROOT_DIR . '/.env') ? $dotenv->load() : null; // load .env
     $dotenv = Dotenv::createMutable(ROOT_DIR, '.env.local');
-    $dotenv->load(); // load .env.local and override existing variables
 }
+
+# load .env or override with .env.local
+$dotenv->load(); 
+
 
 # Instantiate First Time With Database & Other Properties;
 Uss::instance(TRUE);

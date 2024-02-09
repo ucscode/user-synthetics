@@ -6,7 +6,6 @@
 
 # Ignore Files
 
-/.env
 /.env.local
 /composer.lock
 /tests/test-results
