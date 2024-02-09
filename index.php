@@ -6,8 +6,7 @@ use Dotenv\Dotenv;
 use Uss\Component\Kernel\Uss;
 use Uss\Component\Kernel\UssImmutable;
 
-define('ROOT_DIR', __DIR__);
-define('INSTALLATION_PATH', str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace(DIRECTORY_SEPARATOR, '/', ROOT_DIR)));
+defined('ROOT_DIR') ?: define('ROOT_DIR', __DIR__);
 
 call_user_func(function () {
     $autoloader = __DIR__ . "/vendor/autoload.php";
@@ -25,11 +24,19 @@ if(file_exists(ROOT_DIR .'/.env.local')) {
     $dotenv = Dotenv::createMutable(ROOT_DIR, '.env.local');
 }
 
-# load .env or override with .env.local
+# load .env or override with .env.local 
 $dotenv->load(); 
 
+# Define global constants
+defined('ENV_DB_PREFIX') ?: define('ENV_DB_PREFIX', $_ENV['DB_PREFIX']);
+
+defined('INSTALLATION_PATH') ?: define(
+    'INSTALLATION_PATH', 
+    str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace(DIRECTORY_SEPARATOR, '/', ROOT_DIR))
+);
 
 # Instantiate First Time With Database & Other Properties;
 Uss::instance(TRUE);
 
+# Load Modules
 require_once UssImmutable::CORE_DIR . '/Modules.php';
