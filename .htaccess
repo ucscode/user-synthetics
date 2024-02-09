@@ -1,17 +1,24 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     Options -Indexes
-    
-    # Dynamically set the RewriteBase
-    RewriteCond %{REQUEST_URI}::$1 ^(.*?/)(.*)::\2$
-    RewriteRule ^ - [E=BASE:%1]
-    
-    RewriteCond %{REQUEST_URI} !^%{ENV:BASE}/(?:index\.php)?$
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.+)$ %{ENV:BASE}index.php [B,QSA,L]
 
-    RewriteRule ^$ %{ENV:BASE}index.php [B,QSA,L]
+    # Define variable for cores directory
+    RewriteRule ^ - [E=PUBLIC_DIR:./]
+
+    # Dynamically set the RewriteBase
+    RewriteCond %{REQUEST_URI}::%{HTTP_HOST} ^(\/[^/]+)(?::\d+)?::(?:www\.)?([^:]+)$
+    RewriteRule ^ - [E=BASE:%1]
+
+    # Redirect requests to /%{PUBLIC_DIR}/index.php
+    RewriteCond %{REQUEST_URI} !^%{ENV:BASE}%{ENV:PUBLIC_DIR}(?:index\.php)?$
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ %{ENV:BASE}%{ENV:PUBLIC_DIR}index.php [B,QSA,L]
 </IfModule>
+
+# Deny access to hidden files (files starting with a dot)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
 

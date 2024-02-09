@@ -1,11 +1,13 @@
-/uss-modules/*/
+# Ignore Directories
+
 /modules/*/
 /vendor/
-/composer.lock
 /**/.git/
-/**/git/
-/docs/
+
+# Ignore Files
+
+/.env.local
+/composer.lock
 /tests/test-results
 /tests/*/*
 !/tests/*/.gitkeep
-/git-modules/
