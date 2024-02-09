@@ -14,11 +14,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^(.*)$ %{ENV:BASE}%{ENV:PUBLIC_DIR}index.php [B,QSA,L]
 </IfModule>
-
-# Deny access to hidden files (files starting with a dot)
-<FilesMatch "^\.">
+    
+# Deny access to sensitive files
+<FilesMatch "(?i)^(?:composer\.(?:json|lock))|\.">
     Order allow,deny
     Deny from all
 </FilesMatch>
-
-
