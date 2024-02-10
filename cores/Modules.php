@@ -15,6 +15,7 @@ new class ()
     private array $activeModules = [];
     private array $pendingModules = [];
     private array $loadedModules = [];
+    private array $psr4 = [];
 
     public function __construct()
     {
@@ -37,6 +38,7 @@ new class ()
     
     private function loadActiveModules(): void
     {
+        $this->autoloadPSR4();
         foreach($this->activeModules as $path => $config) {
             $this->processModule($path, $config);
         }
@@ -74,7 +76,24 @@ new class ()
 
         $path = $system->getPathname();
         $baseFile = $path . "/" . $this->baseFile;
-        is_file($baseFile) ? $this->activeModules[$path] = $config : null;
+
+        if(is_file($baseFile)) {
+
+            if(is_array($config['autoload'] ?? null)) {
+
+                $namespaces = array_map(function($value) {
+                    substr($value, -1) === '\\' ?: $value .= '\\';
+                    return $value;
+                }, array_keys($config['autoload']));
+
+                $this->psr4 = array_merge(
+                    $this->psr4, 
+                    array_combine($namespaces, $config['autoload'])
+                );
+            }
+            
+            $this->activeModules[$path] = $config;
+        }
     }
 
     private function processModule(string $path, array $config): void
@@ -109,7 +128,6 @@ new class ()
     private function loadOnce(string $path, array $config): void
     {
         if(!$this->isLoaded($path)) {
-            $this->autoloadPSR4($config['autoload'] ?? []);
             $this->loadedModules[] = $path;
             require_once $path . "/" . $this->baseFile;
         };
@@ -147,13 +165,14 @@ new class ()
         }
     }
 
-    private function autoloadPSR4(array $autoload): void
+    private function autoloadPSR4(): void
     {
-        foreach($autoload as $namespacePrefix => $directory) {
-            spl_autoload_register(function(string $fqcn) use ($namespacePrefix, $directory) {
-                $baseDirectory = UssImmutable::MODULES_DIR . DIRECTORY_SEPARATOR . $directory;
-                $len = strlen($namespacePrefix);
-                if(strncmp($namespacePrefix, $fqcn, $len) === 0) {
+        foreach($this->psr4 as $namespace => $directory) {
+            spl_autoload_register(function(string $fqcn) use ($namespace, $directory) {
+                $baseDirectory = UssImmutable::MODULES_DIR . DIRECTORY_SEPARATOR . trim($directory);
+                substr($baseDirectory, -1) === '/' ?: $baseDirectory .= '/';
+                $len = strlen($namespace);
+                if(strncmp($namespace, $fqcn, $len) === 0) {
                     $relativeClass = substr($fqcn, $len);
                     $file = $baseDirectory . str_replace('\\', '/', $relativeClass) . '.php';
                     !is_file($file) ?: require_once($file);
