@@ -46,6 +46,8 @@ new class ()
 
     private function processJSON(string $configFile, \SplFileInfo $system): void
     {
+        $path = $system->getPathname();
+        $baseFile = $path . "/" . $this->baseFile;
         $config = json_decode(file_get_contents($configFile), true);
 
         if(json_last_error()) {
@@ -59,40 +61,40 @@ new class ()
             );
             return;
         }
-
-        array_walk_recursive($config, fn(&$value) => $value = trim($value));
-
-        if(empty($config['name'])) {
-            trigger_error(
-                sprintf(
-                    'Unable to load module located in "%s"; <b>%s</b> context requires "name" attribute',
-                    pathinfo($configFile, PATHINFO_DIRNAME),
-                    $this->jsonFile
-                ),
-                E_USER_WARNING
-            );
-            return;
-        } 
-
-        $path = $system->getPathname();
-        $baseFile = $path . "/" . $this->baseFile;
         
         if(is_file($baseFile)) {
 
-            if(is_array($config['autoload'] ?? null)) {
+            array_walk_recursive($config, fn(&$value) => $value = trim($value));
+            $config = $this->mergeComposerJson($path . "/composer.json", $config);
+            
+            if(empty($config['name'])) {
+                trigger_error(
+                    sprintf(
+                        'Unable to load module located in "%s"; <b>%s</b> context requires "name" attribute',
+                        pathinfo($configFile, PATHINFO_DIRNAME),
+                        $this->jsonFile
+                    ),
+                    E_USER_WARNING
+                );
+                return;
+            } 
+
+            $psr4 = is_array($config['autoload']) ? ($config['autoload']['psr-4'] ?? []) : null;
+            
+            if(!empty($psr4)) {
 
                 $namespaces = array_map(function($value) {
                     substr($value, -1) === '\\' ?: $value .= '\\';
                     return $value;
-                }, array_keys($config['autoload']));
+                }, array_keys($psr4));
 
                 $this->psr4 = array_merge(
                     $this->psr4, 
-                    array_combine($namespaces, $config['autoload'])
+                    array_combine($namespaces, $psr4)
                 );
             }
             
-            $this->activeModules[$path] = $this->mergeComposerJson($path . "/composer.json", $config);
+            $this->activeModules[$path] = $config;
         }
     }
 
@@ -183,7 +185,7 @@ new class ()
 
     private function mergeComposerJson(string $composerFile, array $config): array
     {
-        if(!empty($config['composer-merge']) && is_file($composerFile)) {
+        if(is_file($composerFile)) {
             $context = json_decode(file_get_contents($composerFile), true);
             $config = array_merge($context, $config);
         }

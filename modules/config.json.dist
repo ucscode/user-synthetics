@@ -26,10 +26,11 @@
         "email": "support@email.com"
     },
     "autoload": {
-        "Module\\App\\": "directory/",
-        "Module\\App\\Logs": "directory/Logs/"
+        "psr-4": {
+            "Module\\App\\": "directory/",
+            "Module\\App\\Logs": "directory/Logs/"
+        }
     },
-    "composer-merge": true,
     "dependencies": [
         "another-module-name",
         "a-different-module-name"
