@@ -35,8 +35,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Uss\\Component\\": "cores/Component/",
-            "Module\\": "modules/"
+            "Uss\\Component\\": "cores/Component/"
         }
     },
     "autoload-dev": {

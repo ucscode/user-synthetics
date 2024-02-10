@@ -45,9 +45,6 @@ new class()
 
     protected function defineGlobalConstants(): void
     {
-        # Define global constants
-        defined('ENV_DB_PREFIX') ?: define('ENV_DB_PREFIX', $_ENV['DB_PREFIX'] ?? '');
-
         defined('INSTALLATION_PATH') ?: define(
             'INSTALLATION_PATH', 
             str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace(DIRECTORY_SEPARATOR, '/', ROOT_DIR))

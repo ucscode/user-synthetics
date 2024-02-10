@@ -1,11 +1,11 @@
 {
     "name": "module-name",
     "version": "1.0.0",
+    "license": "MIT",
     "meta": {
         "title": "Your advanced module title",
         "description": "A detailed and comprehensive description of your module.",
         "image": "screenshot.png",
-        "language": "en",
         "keywords": ["module", "advanced", "tasks", "..."]
     },
     "social": {
@@ -25,7 +25,10 @@
         "docs": "https://example.com/documentation",
         "email": "support@email.com"
     },
-    "license": "MIT",
+    "autoload": {
+        "Module\\App\\": "directory/",
+        "Module\\App\\Logs": "directory/Logs/"
+    },
     "dependencies": [
         "another-module-name",
         "a-different-module-name"
