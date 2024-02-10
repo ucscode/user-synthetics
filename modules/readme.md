@@ -4,9 +4,9 @@ To create a module for your application, follow these steps:
 
 1. **Create Module Directory**: Start by creating a new folder inside the `modules` directory.
 
-2. **Copy Configuration File**: Copy the `config.json.dist` file as `config.json` into the newly created directory. 
+2. **Copy Configuration File**: Copy the `config.json.dist` file as `config.json` into the newly created folder. 
 
-    - Make sure to edit the JSON file according to your module's requirements.
+    - Make sure to edit the `config.json` file according to your module's requirements.
 
 3. **Add Index File**: Inside the module folder, add an `index.php` file. 
 

@@ -29,6 +29,7 @@
         "Module\\App\\": "directory/",
         "Module\\App\\Logs": "directory/Logs/"
     },
+    "composer-merge": true,
     "dependencies": [
         "another-module-name",
         "a-different-module-name"

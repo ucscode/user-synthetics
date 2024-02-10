@@ -76,7 +76,7 @@ new class ()
 
         $path = $system->getPathname();
         $baseFile = $path . "/" . $this->baseFile;
-
+        
         if(is_file($baseFile)) {
 
             if(is_array($config['autoload'] ?? null)) {
@@ -92,7 +92,7 @@ new class ()
                 );
             }
             
-            $this->activeModules[$path] = $config;
+            $this->activeModules[$path] = $this->mergeComposerJson($path . "/composer.json", $config);
         }
     }
 
@@ -179,5 +179,14 @@ new class ()
                 }
             });
         };
+    }
+
+    private function mergeComposerJson(string $composerFile, array $config): array
+    {
+        if(!empty($config['composer-merge']) && is_file($composerFile)) {
+            $context = json_decode(file_get_contents($composerFile), true);
+            $config = array_merge($context, $config);
+        }
+        return $config;
     }
 };
