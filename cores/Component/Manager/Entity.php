@@ -35,4 +35,10 @@ class Entity
     {
         return $this->properties;
     }
+
+    public function overwrite(array $properties): self
+    {
+        $this->properties = $properties;
+        return $this;
+    }
 }
