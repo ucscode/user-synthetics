@@ -2,14 +2,12 @@
 
 namespace Uss\Component\Kernel;
 
-use mysqli_result;
 use Ucscode\Pairs\Pairs;
 use Uss\Component\Kernel\Abstract\AbstractUss;
 use Uss\Component\Trait\SingletonTrait;
 use Uss\Component\Kernel\System\Prime as KernelPrime;
 use Uss\Component\Kernel\Interface\UssInterface;
 use Ucscode\SQuery\SQuery;
-use Uss\Component\Database;
 use Ucscode\SQuery\Condition;
 use Uss\Component\Kernel\Extension\Extension;
 
@@ -33,7 +31,7 @@ final class Uss extends AbstractUss implements UssInterface
             $kernelPrime->loadHTMLResource();
             $this->mysqli = $kernelPrime->getMysqliInstance();
             $this->options = $kernelPrime->getPairsInstance($this->mysqli);
-            $kernelPrime->createSession(UssImmutable::SESSION_KEY, UssImmutable::CLIENT_KEY);
+            $kernelPrime->createSession(UssImmutable::APP_SESSION_KEY, UssImmutable::APP_CLIENT_KEY);
         }
     }
 

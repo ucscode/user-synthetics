@@ -24,7 +24,7 @@ abstract class AbstractUss extends AbstractUssEnvironment
 
     public function nonce($input = '1', ?string $receivedNonce = null): string|bool
     {
-        $secretKey = $_ENV['APP_SECRET'] . md5($_SESSION[UssImmutable::SESSION_KEY]);
+        $secretKey = $_ENV['APP_SECRET'] . md5($_SESSION[UssImmutable::APP_SESSION_KEY]);
         $algorithm = 'ripemd160';
         $salt = bin2hex(random_bytes(3));
         $dataToHash = $input . $salt . $secretKey;
@@ -130,11 +130,11 @@ abstract class AbstractUss extends AbstractUssEnvironment
         return implode("/", $explosion);
     }
 
-    public function getTemplateSchema(?string $templatePath = UssImmutable::NAMESPACE, Enumerator $enum = Enumerator::FILE_SYSTEM, int $index = 0): string
+    public function getTemplateSchema(?string $templatePath = UssImmutable::APP_NAMESPACE, Enumerator $enum = Enumerator::FILE_SYSTEM, int $index = 0): string
     {
         $templatePath = $this->filterContext($templatePath);
         if(!preg_match('/^@\w+/i', $templatePath)) {
-            $templatePath = '@' . UssImmutable::NAMESPACE . '/' . $templatePath;
+            $templatePath = '@' . UssImmutable::APP_NAMESPACE . '/' . $templatePath;
         }
 
         $context = explode("/", $templatePath);

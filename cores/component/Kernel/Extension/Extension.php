@@ -36,7 +36,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
     public function getGlobals(): array
     {
         return [
-            UssImmutable::EXTENSION_KEY => $this,
+            UssImmutable::APP_EXTENSION_KEY => $this,
         ];
     }
 

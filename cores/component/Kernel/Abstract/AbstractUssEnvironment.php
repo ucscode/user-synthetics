@@ -22,7 +22,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     public function __construct()
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
-        $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::NAMESPACE);
+        $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::APP_NAMESPACE);
         $this->twigEnvironment = new Environment($this->filesystemLoader, self::ENV_CONFIG);
         $this->twigEnvironment->addExtension(new DebugExtension());
         $this->twigContext = $this->createSystemContext();

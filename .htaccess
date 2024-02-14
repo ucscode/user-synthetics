@@ -2,7 +2,7 @@
     RewriteEngine On
     Options -Indexes
 
-    # Define variable for cores directory
+    # Define variable for source directory
     RewriteRule ^ - [E=PUBLIC_DIR:./]
 
     # Dynamically set the RewriteBase
