@@ -5,13 +5,12 @@ namespace Uss\Component\Kernel\Resource;
 class AccessibleMethods
 {
 
-    public function __construct(protected object $entity, protected array $accessibleMethods)
-    {
-    }
+    public function __construct(protected array $accessibleMethods, protected object $classInstance)
+    {}
 
     public function __call(string $originalMethod, mixed $args): mixed
     {
-        $convention = $this->composeMethodConvention($originalMethod);
+        $convention = $this->generateMethodConventions($originalMethod);
         
         foreach($convention as $method) {
 
@@ -20,34 +19,33 @@ class AccessibleMethods
                 array_map('strtolower', $this->accessibleMethods)
             );
 
-            if ($isAccessible && method_exists($this->entity, $method)) {
-                return call_user_func_array([$this->entity, $method], $args);
+            if ($isAccessible && method_exists($this->classInstance, $method)) {
+                return call_user_func_array([$this->classInstance, $method], $args);
             }
         }
 
-        if(method_exists($this->entity, $originalMethod)) {
+        if(method_exists($this->classInstance, $originalMethod)) {
             throw new \RuntimeException(
-                sprintf(
-                    "Call to extension method `%s()` is not allowed within twig templates.",
-                    $originalMethod
-                )
+                sprintf("Call to extension method `%s()` is not allowed within twig templates.", $originalMethod)
             );
         }
 
         throw new \RuntimeException(
-            sprintf(
-                "Call to undefined extension method `%s()`.", 
-                $originalMethod
-            )
+            sprintf("Call to undefined extension method `%s()`.", $originalMethod)
         );
     }
 
-    protected function composeMethodConvention(string $method): array
+    protected function generateMethodConventions(string $method): array
     {
         $convention = [null, 'get', 'is', 'has'];
         array_walk($convention, function(&$value) use ($method) {
             $value = $value === null ? $method : $value . ucfirst($method);
         });
         return $convention;
+    }
+
+    public function __debugInfo()
+    {
+        return $this->accessibleMethods;
     }
 }

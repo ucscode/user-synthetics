@@ -1,6 +1,6 @@
 <?php
 
-namespace Uss\Component\Manager;
+namespace Uss\Component\Common;
 
 use Uss\Component\Kernel\UssImmutable;
 

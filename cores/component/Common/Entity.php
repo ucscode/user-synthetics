@@ -1,6 +1,6 @@
 <?php
 
-namespace Uss\Component\Manager;
+namespace Uss\Component\Common;
 
 class Entity
 {

@@ -24,7 +24,7 @@ final class Uss extends AbstractUss implements UssInterface
         parent::__construct();
         
         $this->extension = new Extension($this);
-        $this->twigEnvironment->addExtension($this->extension);
+        $this->twig->addExtension($this->extension);
 
         if($kernel) {
             $kernelPrime = new KernelPrime($this);
@@ -38,8 +38,8 @@ final class Uss extends AbstractUss implements UssInterface
     public function render(string $templateFile, array $variables = [], bool $return = false): ?string
     {
         $this->extension->configureRenderContext();
-        $variables += $this->twigContext;
-        $result = $this->twigEnvironment->render($templateFile, $variables);
+        $variables += $this->templateContext;
+        $result = $this->twig->render($templateFile, $variables);
         return $return ? $result : call_user_func(function () use ($result) {
             print($result);
             die();

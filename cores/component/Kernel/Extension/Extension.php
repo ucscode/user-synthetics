@@ -6,7 +6,6 @@ use ReflectionClass;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Uss\Component\Kernel\Resource\Enumerator;
-use Uss\Component\Block\BlockManager;
 use Uss\Component\Kernel\Resource\AccessibleMethods;
 use Uss\Component\Kernel\Interface\UssInterface;
 use Uss\Component\Kernel\Resource\AccessibleProperties;
@@ -18,12 +17,14 @@ use Uss\Component\Kernel\UssImmutable;
  */
 final class Extension extends AbstractExtension implements ExtensionInterface, GlobalsInterface
 {
-    public readonly string $jsCollectionEncoded;
     public readonly array $ENUM;
     public readonly array $immutable;
+    public readonly string $jsCollectionEncoded;
+
     protected bool $configured = false;
     protected AccessibleProperties $accessibleProperties;
     protected AccessibleMethods $accessibleMethods;
+    protected ExtensionAppObject $extensionAppObject;
 
     public function __construct(protected UssInterface $framework)
     {
@@ -31,6 +32,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
         $this->immutable = (new ReflectionClass(UssImmutable::class))->getConstants();
         $this->initializeAccessibleProperties();
         $this->initializeAccessibleMethods();
+        $this->extensionAppObject = new ExtensionAppObject($this->framework);
     }
 
     public function getGlobals(): array
@@ -45,7 +47,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
         if(!$this->configured) {
             $this->framework->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
             $this->framework->jsCollection['url'] = $this->framework->pathToUrl(ROOT_DIR, false);
-            $this->framework->twigContext['favicon'] ??= $this->framework->twigContext['page_icon'];
+            $this->framework->templateContext['favicon'] ??= $this->framework->templateContext['page_icon'];
             $this->jsCollectionEncoded = base64_encode(json_encode($this->framework->jsCollection));
             $this->configured = true;
         }
@@ -61,59 +63,26 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
         return $this->accessibleMethods;
     }
 
-    # Get an option
-    public function getOption(string $name): mixed
+    public function app(): ExtensionAppObject
     {
-        return $this->framework->options->get($name);
-    }
-
-    /**
-     * Self Methods
-     */
-    public function renderBlockElements(string $blockName, array $_context): ?string
-    {
-        $outputs = [];
-
-        if($block = BlockManager::instance()->getBlock($blockName)) {
-            
-            $templates = $block->getTemplates();
-            uasort($templates, fn ($a, $b) => $a->getPriority() <=> $b->getPriority());
-
-            foreach($templates as $name => $blockTemplate) {
-                if(!$blockTemplate->isRendered()) {
-                    $blockTemplate->fulfilled();
-                    $outputs[] = $this->framework->twigEnvironment
-                        ->resolveTemplate($blockTemplate->getTemplate())
-                        ->render($blockTemplate->getContext() + $_context);
-                    continue;
-                }
-                $outputs[] = sprintf("<!-- * WARNING: Isolated template already fulfilled => [%s].%s -->", $blockName, $name);
-            }
-
-            $contents = $block->getContents(); 
-            uasort($contents, fn ($a, $b) => $a['priority'] <=> $b['priority']);
-
-            foreach($contents as $content) {
-                $outputs[] = $content['content'];
-            }
-        }
-
-        return implode("\n", $outputs);
+        return $this->extensionAppObject;
     }
 
     protected function initializeAccessibleProperties(): void
     {
-        $this->accessibleProperties = new AccessibleProperties($this->framework, []);
+        $this->accessibleProperties = new AccessibleProperties([], $this->framework);
     }
 
     protected function initializeAccessibleMethods(): void
     {
-        $this->accessibleMethods = new AccessibleMethods($this->framework, [
-            'pathToUrl',
-            'keygen',
-            'getTemplateSchema',
-            'relativeTime',
-            'arrayToHtmlAttrs'
-        ]);
+        $this->accessibleMethods = new AccessibleMethods([
+                'pathToUrl',
+                'keygen',
+                'getTemplateSchema',
+                'relativeTime',
+                'arrayToHtmlAttrs',
+            ],
+            $this->framework
+        );
     }
 }

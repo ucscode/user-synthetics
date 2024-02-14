@@ -11,8 +11,8 @@ use Uss\Component\Kernel\UssImmutable;
 abstract class AbstractUssEnvironment implements UssFrameworkInterface
 {
     public readonly FilesystemLoader $filesystemLoader;
-    public readonly Environment $twigEnvironment;
-    public array $twigContext;
+    public readonly Environment $twig;
+    public array $templateContext;
     public array $jsCollection = [];
 
     protected const ENV_CONFIG = [
@@ -23,9 +23,9 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     {
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
         $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::APP_NAMESPACE);
-        $this->twigEnvironment = new Environment($this->filesystemLoader, self::ENV_CONFIG);
-        $this->twigEnvironment->addExtension(new DebugExtension());
-        $this->twigContext = $this->createSystemContext();
+        $this->twig = new Environment($this->filesystemLoader, self::ENV_CONFIG);
+        $this->twig->addExtension(new DebugExtension());
+        $this->templateContext = $this->createSystemContext();
     }
 
     private function createSystemContext(): array
