@@ -19,12 +19,12 @@ class AppStore
 
     public function add(string $name, mixed $value, ?string $key = null): static
     {
-        $entity = $this->get($name) ?? [];
-        if(is_array($entity)) {
+        $context = $this->get($name) ?? [];
+        if(is_array($context)) {
             $key !== null ?
-                $entity[$key] = $value :
-                (!in_array($value, $entity, true) ? $entity[] = $value : null);
-            $this->set($name, $entity);
+                $context[$key] = $value :
+                (in_array($value, $context, true) ?: $context[] = $value);
+            $this->set($name, $context);
         }
         return $this;
     }
