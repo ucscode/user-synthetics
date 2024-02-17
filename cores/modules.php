@@ -169,18 +169,21 @@ new class ()
 
     private function autoloadPSR4(): void
     {
-        foreach($this->psr4 as $namespace => $directory) {
-            spl_autoload_register(function(string $fqcn) use ($namespace, $directory) {
+        spl_autoload_register(function(string $fqcn): void {
+            foreach($this->psr4 as $namespace => $directory) {
                 $baseDirectory = UssImmutable::MODULES_DIR . DIRECTORY_SEPARATOR . trim($directory);
                 substr($baseDirectory, -1) === '/' ?: $baseDirectory .= '/';
                 $len = strlen($namespace);
                 if(strncmp($namespace, $fqcn, $len) === 0) {
                     $relativeClass = substr($fqcn, $len);
                     $file = $baseDirectory . str_replace('\\', '/', $relativeClass) . '.php';
-                    !is_file($file) ?: require_once($file);
+                    if(is_file($file)) {
+                        require_once($file);
+                        break;
+                    }
                 }
-            });
-        };
+            };
+        });
     }
 
     private function mergeComposerJson(string $composerFile, array $config): array
