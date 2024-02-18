@@ -1,5 +1,7 @@
 <!doctype html>
 <html lang="{{ html_language }}">
+
+{% block head_origin %}
 <head>
     
     <script>const Uss = JSON.parse(atob('{{ __uss.jsCollectionEncoded }}'));</script>
@@ -26,7 +28,11 @@
     {% endblock %}
 
 </head>
-<body>
+{% endblock %}
+
+{% block body_origin %}
+
+<body {% for name, value in (body_attributes ?? []) %} {{ name }}="{{ value }}"{% endfor %}>
 
     {% block body %}
         
@@ -41,4 +47,6 @@
     {% endblock body %}
 
 </body>
+{% endblock %}
+
 </html>
