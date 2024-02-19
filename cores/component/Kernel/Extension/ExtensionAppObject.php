@@ -6,7 +6,7 @@ use Uss\Component\Block\BlockManager;
 use Uss\Component\Kernel\Interface\UssInterface;
 use Uss\Component\Kernel\System\ResourcePathMapper;
 
-class ExtensionAppObject
+class ExtensionAppObject implements AppObjectInterface
 {
     public function __construct(protected UssInterface $framework)
     {}
@@ -65,6 +65,28 @@ class ExtensionAppObject
         $blockList = array_keys(ResourcePathMapper::BLOCK_VENDORS);
         !in_array($blockName, $blockList) ?:
         BlockManager::instance()->getBlock($blockName)?->removeContent($resourceName);
+    }
+
+    # Json Encode
+    public function jsonEncode(mixed $context): ?string
+    {
+        return json_encode($context);
+    }
+
+    public function jsonDecode(string $json): ?array
+    {
+        return json_decode($json, true);
+    }
+
+    # Base64 Encode
+    public function base64Encode(string $string): string
+    {
+        return base64_encode($string);
+    }
+
+    public function base64Decode(string $string, bool $strict = false): mixed
+    {
+        return base64_decode($string, $strict);
     }
 
     public function __debugInfo()

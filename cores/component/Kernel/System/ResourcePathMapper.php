@@ -21,7 +21,7 @@ class ResourcePathMapper
         ],
 
         self::BODY_JAVASCRIPT => [
-            'vue' => 'js/vue.global.js',
+            'vue' => 'js/vue.global.prod.min.js',
             'jquery' => 'js/jquery-3.7.1.min.js',
             'bootstrap-bundle' => 'js/bootstrap.bundle.min.js',
             'bootbox' => 'js/bootbox.all.min.js',
