@@ -100,10 +100,17 @@ final class Uss extends AbstractUss implements UssInterface
 
     public function getTableColumns(string $tableName): array
     {
-        $columns = [];
+        $fieldset = [
+            'COLUMN_NAME', 
+            'DATA_TYPE', 
+            'IS_NULLABLE',
+            'COLUMN_DEFAULT',
+            'CHARACTER_MAXIMUM_LENGTH',
+            'COLLATION_NAME',
+        ];
 
         $squery = (new SQuery())
-            ->select(['COLUMN_NAME', 'DATA_TYPE', 'IS_NULLABLE'])
+            ->select($fieldset)
             ->from('information_schema.COLUMNS')
             ->where(
                 (new Condition())
@@ -115,15 +122,26 @@ final class Uss extends AbstractUss implements UssInterface
         $SQL = $squery->build();
         $result = Uss::instance()->mysqli->query($SQL);
 
+        $columns = [];
+
         if($result->num_rows) {
             while($column = $result->fetch_assoc()) {
-                $key = $column['column_name'] ?? $column['COLUMN_NAME'];
-                $value = $column['data_type'] ?? $column['DATA_TYPE'];
-                $nullable = $column['is_nullable'] ?? $column['IS_NULLABLE'];
-                $columns[$key] = [
-                    'datatype' => strtoupper($value),
-                    'nullable' => $nullable != 'NO'
-                ];
+                $key = $column['COLUMN_NAME'];
+                foreach($column as $offset => $value) {
+                    switch($offset) {
+                        case 'DATA_TYPE':
+                            $value = strtoupper($value);
+                            break;
+                        case 'IS_NULLABLE':
+                            $value = $value === 'YES';
+                            break;
+                        case 'COLUMN_DEFAULT':
+                            $value = $this->processDefaultTableColumn($value);
+                            break;
+                    }
+                    $column[$offset] = $value;
+                }
+                $columns[$key] = $column;
             }
         };
         
@@ -160,5 +178,22 @@ final class Uss extends AbstractUss implements UssInterface
             return $data[$key] ?? null;
         }, $string);
         return $new_string;
+    }
+
+    private function processDefaultTableColumn(?string $defaultValue): mixed
+    {
+        if($defaultValue !== null) {
+            if ($defaultValue === "NULL") {
+                $defaultValue = null;
+            } elseif (preg_match("/'(.*)'/", $defaultValue, $matches)) {
+                $defaultValue = $matches[1];
+            } else {
+                $defaultValue = strtoupper($defaultValue);
+                if(strpos($defaultValue, 'CURRENT_TIMESTAMP') === 0) {
+                    $defaultValue = date('Y-m-d H:i:s');
+                }
+            }
+        }
+        return $defaultValue;
     }
 };
