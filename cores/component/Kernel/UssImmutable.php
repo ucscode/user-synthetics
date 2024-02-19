@@ -13,7 +13,7 @@ final class UssImmutable
 
     public const PROJECT_WEBSITE = 'https://example.com';
 
-    public const PROJECT_REPOSITORY = 'https://github.com/ucscode/user-synthetics';
+    public const PROJECT_GITHUB_REPOSITORY = 'https://github.com/ucscode/user-synthetics';
 
     public const APP_NAMESPACE = 'Uss';
 

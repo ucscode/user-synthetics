@@ -4,6 +4,7 @@ namespace Uss\Component\Kernel\Extension;
 
 use Uss\Component\Block\BlockManager;
 use Uss\Component\Kernel\Interface\UssInterface;
+use Uss\Component\Kernel\System\ResourcePathMapper;
 
 class ExtensionAppObject
 {
@@ -52,6 +53,18 @@ class ExtensionAppObject
         }
 
         return implode("\n", $outputs);
+    }
+
+    /**
+     * Remove a resource added by Uss System
+     * 
+     * Usage: {% do __uss.app.removeResource('head_resource', 'bootstrap') %}
+     */
+    public function removeSystemBlockContent(string $blockName, string $resourceName): void
+    {
+        $blockList = array_keys(ResourcePathMapper::BLOCK_VENDORS);
+        !in_array($blockName, $blockList) ?:
+        BlockManager::instance()->getBlock($blockName)?->removeContent($resourceName);
     }
 
     public function __debugInfo()

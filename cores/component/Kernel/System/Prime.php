@@ -9,7 +9,6 @@ use Ucscode\UssElement\UssElement;
 use Uss\Component\Block\Block;
 use Uss\Component\Block\BlockManager;
 use Uss\Component\Kernel\UssImmutable;
-use Uss\Component\Database;
 use Uss\Component\Kernel\Uss;
 
 final class Prime
@@ -22,6 +21,7 @@ final class Prime
     public function getMysqliInstance(): ?mysqli
     {
         $mysqli = null;
+
         if(filter_var($_ENV['DB_ENABLED'], FILTER_VALIDATE_BOOLEAN)) {
             try {
                 $mysqli = @new mysqli(
@@ -34,18 +34,20 @@ final class Prime
             } catch(mysqli_sql_exception $e) {
                 $this->uss->render('@Uss/db.error.html.twig', [
                     'error' => $e->getMessage(),
-                    'url' => UssImmutable::GITHUB_REPO,
+                    'url' => UssImmutable::PROJECT_GITHUB_REPOSITORY,
                     'mail' => UssImmutable::AUTHOR_EMAIL
                 ]);
                 exit();
             };
         };
+
         return $mysqli;
     }
 
     public function getPairsInstance(?mysqli $mysqli = null): ?Pairs
     {
         $options = null;
+
         if($mysqli) {
             try {
                 $options = new Pairs($mysqli, $_ENV['DB_PREFIX'] . "options");
@@ -57,6 +59,7 @@ final class Prime
                 exit();
             }
         }
+
         return $options;
     }
 
@@ -82,52 +85,42 @@ final class Prime
     */
     public function loadHTMLResource(): void
     {
-        $vendors = [
-            'head_resource' => [
-                'bootstrap' => 'css/bootstrap.min.css',
-                'bs-icon' => 'vendor/bootstrap-icons/bootstrap-icons.min.css',
-                'animate' => 'css/animate.min.css',
-                'glightbox' => "vendor/glightbox/glightbox.min.css",
-                'toastify' => 'vendor/toastify/toastify.min.css',
-                'font-size' => "css/font-size.min.css",
-                'main-css' => 'css/main.css'
-            ],
-            'body_javascript' => [
-                'jquery' => 'js/jquery-3.7.1.min.js',
-                'bootstrap' => 'js/bootstrap.bundle.min.js',
-                'bootbox' => 'js/bootbox.all.min.js',
-                'glightbox' => "vendor/glightbox/glightbox.min.js",
-                'toastify' => 'vendor/toastify/toastify-js.js',
-                'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.6.min.js',
-                'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.6.min.js',
-                'main-js' => 'js/main.js'
-            ]
-        ];
+        foreach(ResourcePathMapper::BLOCK_VENDORS as $blockName => $resource) {
 
-        array_walk($vendors, function ($resource, $blockName) {
             $block = BlockManager::instance()->getBlock($blockName);
+
             foreach($resource as $name => $file) {
+
                 $link = $this->uss->pathToUrl(UssImmutable::ASSETS_DIR . '/' . $file);
-                if($blockName === 'head_resource') {
-                    $node = new UssElement(UssElement::NODE_LINK);
-                    $node->setAttribute("rel", "stylesheet");
-                    $node->setAttribute("href", $link);
-                } else {
-                    $node = new UssElement(UssElement::NODE_SCRIPT);
-                    $node->setAttribute("type", "text/javascript");
-                    $node->setAttribute("src", $link);
+
+                switch($blockName) {
+                    case ResourcePathMapper::HEAD_RESOURCE:
+                        $node = new UssElement(UssElement::NODE_LINK);
+                        $node->setAttribute("rel", "stylesheet");
+                        $node->setAttribute("href", $link);
+                        break;
+                    default:
+                        $node = new UssElement(UssElement::NODE_SCRIPT);
+                        $node->setAttribute("type", "text/javascript");
+                        $node->setAttribute("src", $link);
                 }
+
+                $node->setAttribute('data-name', $name);
                 $block->addContent($name, $node->getHTML(true));
             }
-        });
+        };
     }
 
     protected function registerSystemUnitBlocks(): void
     {
-        $blocks = ["head_resource", "head_javascript", "body_javascript"];
-        array_walk(
-            $blocks,
-            fn ($blockName) => BlockManager::instance()->addBlock($blockName, new Block(true))
-        );
+        $blocks = [
+            ResourcePathMapper::HEAD_RESOURCE,
+            ResourcePathMapper::HEAD_JAVASCRIPT,
+            ResourcePathMapper::BODY_JAVASCRIPT, 
+        ];
+
+        foreach($blocks as $blockName) {
+            BlockManager::instance()->addBlock($blockName, new Block(true));
+        };
     }
 };
