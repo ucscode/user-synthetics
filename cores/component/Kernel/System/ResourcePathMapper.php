@@ -22,7 +22,7 @@ class ResourcePathMapper
 
         self::BODY_JAVASCRIPT => [
             'jquery' => 'js/jquery-3.7.1.min.js',
-            'bootstrap' => 'js/bootstrap.bundle.min.js',
+            'bootstrap-bundle' => 'js/bootstrap.bundle.min.js',
             'bootbox' => 'js/bootbox.all.min.js',
             'glightbox' => "vendor/glightbox/glightbox.min.js",
             'toastify' => 'vendor/toastify/toastify-js.js',
