@@ -81,6 +81,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
                 'getTemplateSchema',
                 'relativeTime',
                 'arrayToHtmlAttrs',
+                'replaceUrlQuery'
             ],
             $this->framework
         );
