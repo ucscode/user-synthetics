@@ -26,6 +26,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
         $this->twig = new Environment($this->filesystemLoader, self::ENV_CONFIG);
         $this->twig->addExtension(new DebugExtension());
         $this->templateContext = $this->createSystemContext();
+        $this->setGlobals();
     }
 
     private function createSystemContext(): array
@@ -37,5 +38,17 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
             'page_slogan' => 'A Modular PHP Framework for Building Customized Web Applications',
             'page_description' => "User Synthetics is a powerful and versatile PHP framework designed to simplify the development of customizable and extensible web applications.",
         ];
+    }
+
+    private function setGlobals(): void
+    {
+        !empty(session_id()) ?: session_start();
+        
+        $this->twig->addGlobal('_request', [
+            'post' => $_POST,
+            'get' => $_GET,
+            'session' => $_SESSION,
+            'server' => $_SERVER,
+        ]);
     }
 }

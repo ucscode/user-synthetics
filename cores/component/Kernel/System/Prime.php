@@ -65,10 +65,6 @@ final class Prime
 
     public function createSession(string $sessionIndex, string $cookieIndex): void
     {
-        if(empty(session_id())) {
-            session_start();
-        }
-
         if(empty($_SESSION[$sessionIndex])) {
             $_SESSION[$sessionIndex] = $this->uss->keygen(40, true);
         };
