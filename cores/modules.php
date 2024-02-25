@@ -49,7 +49,7 @@ new class ()
         $path = $system->getPathname();
         $baseFile = $path . "/" . $this->baseFile;
         $config = json_decode(file_get_contents($configFile), true);
-
+        
         if(json_last_error()) {
             trigger_error(
                 sprintf(
@@ -62,9 +62,9 @@ new class ()
             return;
         }
         
-        if(is_file($baseFile)) {
+        if(is_file($baseFile) && !empty($config['enabled'] ?? true)) {
 
-            array_walk_recursive($config, fn(&$value) => $value = trim($value));
+            array_walk_recursive($config, fn(&$value) => !is_string($value) ?: $value = trim($value));
             $config = $this->mergeComposerJson($path . "/composer.json", $config);
             
             if(empty($config['name'])) {
