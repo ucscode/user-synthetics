@@ -19,7 +19,7 @@ new class()
         $dotenv = Dotenv::createMutable(ROOT_DIR);
 
         if(file_exists(ROOT_DIR .'/.env.local')) {
-            file_exists(ROOT_DIR . '/.env') ? $dotenv->load() : null; // load .env
+            !file_exists(ROOT_DIR . '/.env') ?: $dotenv->load(); // load .env
             $dotenv = Dotenv::createMutable(ROOT_DIR, '.env.local');
         }
 
