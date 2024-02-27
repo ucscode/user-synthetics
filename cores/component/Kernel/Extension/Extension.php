@@ -47,7 +47,7 @@ final class Extension extends AbstractExtension implements ExtensionInterface, G
         if(!$this->configured) {
             $this->framework->jsCollection['platform'] = UssImmutable::PROJECT_NAME;
             $this->framework->jsCollection['url'] = $this->framework->pathToUrl(ROOT_DIR, false);
-            $this->framework->templateContext['favicon'] ??= $this->framework->templateContext['page_icon'];
+            $this->framework->templateContext['favicon'] ??= $this->framework->templateContext['page_logo'];
             $this->jsCollectionEncoded = base64_encode(json_encode($this->framework->jsCollection));
             $this->configured = true;
         }
