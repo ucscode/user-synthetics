@@ -27,8 +27,8 @@ class ResourcePathMapper
             'bootbox' => 'js/bootbox.all.min.js',
             'glightbox' => "vendor/glightbox/glightbox.min.js",
             'toastify' => 'vendor/toastify/toastify-js.js',
-            'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.6.min.js',
-            'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.6.min.js',
+            'notiflix-loading' => 'vendor/notiflix/notiflix-loading-aio-3.2.7.min.js',
+            'notiflix-block' => 'vendor/notiflix/notiflix-block-aio-3.2.7.min.js',
             'main-js' => 'js/main.js'
         ]
 
