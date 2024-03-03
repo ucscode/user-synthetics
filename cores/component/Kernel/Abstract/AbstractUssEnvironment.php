@@ -6,6 +6,7 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
 use Twig\Extension\StringLoaderExtension;
+use Twig\Extra\Html\HtmlExtension;
 use Uss\Component\Kernel\Interface\UssFrameworkInterface;
 use Uss\Component\Kernel\UssImmutable;
 
@@ -27,6 +28,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
         $this->twig = new Environment($this->filesystemLoader, self::ENV_CONFIG);
         $this->twig->addExtension(new DebugExtension());
         $this->twig->addExtension(new StringLoaderExtension());
+        $this->twig->addExtension(new HtmlExtension());
         $this->templateContext = $this->createSystemContext();
         $this->setGlobals();
     }
