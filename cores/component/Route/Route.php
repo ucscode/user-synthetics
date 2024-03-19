@@ -17,7 +17,7 @@ class Route
     protected RouteInterface $controller;
     private static array $inventories = [];
 
-    public function __construct(string $route, RouteInterface $controller, array $methods = ['GET', 'POST']) 
+    public function __construct(string $route, RouteInterface $controller, string|array $methods = ['GET', 'POST']) 
     {
         $this->controller = $controller;
         $this->normalizeRequestMethods($methods);
@@ -42,8 +42,9 @@ class Route
         $this->request = $this->path . '?' . $this->query;
     }
 
-    protected function normalizeRequestMethods(array $methods): void
+    protected function normalizeRequestMethods(string|array $methods): void
     {
+        !is_string($methods) ?: $methods = [trim($methods)];
         $standardMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
         $this->methods = array_intersect(
             $standardMethods,
