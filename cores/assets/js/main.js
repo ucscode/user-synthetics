@@ -5,43 +5,83 @@
  */
 "use strict";
 	
-(new class {
+new class {
 	
 	bootstrapEnabled = null;
 	
-	constructor() {
+	constructor($) {
 		this.bootstrapEnabled = (typeof bootstrap !== 'undefined') && (typeof bootstrap.Tooltip !== 'undefined');
+		this.#extendJQuery($);
+		this.#reactiveComponents($, this);
 	}
 
-	react($) {
+	#extendJQuery($) {
+
+		$.extend({
+
+			validateObject: function(objectInterface, originalObject) {
+
+				for (let key in objectInterface) {
+
+					let propertyInterface = objectInterface[key];
+
+					if (typeof propertyInterface === 'string') {
+						propertyInterface = { 
+							type: propertyInterface, 
+							required: true 
+						};
+					}
+
+					if (propertyInterface.required && !originalObject.hasOwnProperty(key)) {
+						if(propertyInterface.hasOwnProperty('default')) {
+							originalObject[key] = propertyInterface.default;
+						} else {
+							throw new Error(`Property '${key}' is required`);
+						}
+					}
+
+					if (originalObject.hasOwnProperty(key) && typeof originalObject[key] !== propertyInterface.type) {
+						throw new Error(`Property '${key}' must be of type ${propertyInterface.type}, ${typeof originalObject[key]} given instead`);
+					}
+				}
+
+				return originalObject;
+			},
+
+		});
+
+	}
+
+	#reactiveComponents($, _self) {
+
+		const reaction = {
+
+			toolTip: function() {
+				
+				if( !_self.bootstrapEnabled ) return console.log('No Bootstrap');
+
+				var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+
+				tooltipTriggerList.map(function (tooltipTriggerEl) {
+					return new bootstrap.Tooltip(tooltipTriggerEl);
+				});
+
+			},
+
+			autoSelect: function() {
+				$('select[value]').each(function() {
+					let value = this.getAttribute('value');
+					if(value !== '') this.value = value;
+				});
+			}
+
+		}
+
 		$(function() {
-			this.toolTip();
-			this.autoSelect();
-			this.otherCheat();
-		}.bind(this));
-	}
-	
-	toolTip() {
-		if( !this.bootstrapEnabled ) return console.log('No Bootstrap');
-		var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-		tooltipTriggerList.map(function (tooltipTriggerEl) {
-			return new bootstrap.Tooltip(tooltipTriggerEl);
+			for(let key in reaction) {
+				reaction[key]();
+			}
 		});
 	}
 	
-	autoSelect() {
-		$('select[value]').each(function() {
-			let value = this.getAttribute('value');
-			if(value !== '') this.value = value;
-		});
-	}
-	
-	otherCheat() {
-		if(Uss['@RE-POST'] === false) {
-			if (window.history.replaceState) {
-				window.history.replaceState(null, null, window.location.href);
-			};
-		};
-	}
-	
-}).react(window.jQuery);
+}(window.jQuery);
