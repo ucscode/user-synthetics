@@ -45,7 +45,19 @@ class Route
     protected function normalizeRequestMethods(string|array $methods): void
     {
         !is_string($methods) ?: $methods = [trim($methods)];
-        $standardMethods = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
+
+        $standardMethods = [
+            'CONNECT',
+            'DELETE',
+            'GET', 
+            'HEAD',
+            'OPTIONS',
+            'PATCH',
+            'POST',
+            'PUT',
+            'TRACE',
+        ];
+
         $this->methods = array_intersect(
             $standardMethods,
             array_map(fn ($value) => is_string($value) ? strtoupper(trim($value)) : null, $methods)
