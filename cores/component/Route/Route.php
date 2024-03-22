@@ -6,15 +6,17 @@ use Uss\Component\Kernel\Uss;
 
 class Route
 {
-    protected readonly string $route;
-    protected readonly string $request;
-    protected readonly string $path;
-    protected readonly string $query;
-    protected readonly array $methods;
-    protected readonly array $regexMatches;
-    protected readonly bool $isAuthorized;
+    public readonly string $route;
+    public readonly string $request;
+    public readonly string $path;
+    public readonly string $query;
+    public readonly array $methods;
+    public readonly array $regexMatches;
+    public readonly bool $isAuthorized;
+
     protected ?array $backtrace;
     protected RouteInterface $controller;
+
     private static array $inventories = [];
 
     public function __construct(string $route, RouteInterface $controller, string|array $methods = ['GET', 'POST']) 
@@ -68,6 +70,7 @@ class Route
     {
         $this->isAuthorized = 
             !!preg_match('#^' . $this->route . '$#i', $this->path, $matches) &&
+            !empty($this->methods) &&
             in_array($_SERVER['REQUEST_METHOD'], $this->methods, true);
         $this->regexMatches = $matches;
     }
@@ -76,9 +79,10 @@ class Route
     {
         $this->backtraceRouterSource();
         self::$inventories[] = $this;
-        if(!empty($this->methods) && $this->isAuthorized) {
+        if($this->isAuthorized) {
             $this->controller->onload([
-                'matches' => $this->regexMatches
+                'matches' => $this->regexMatches,
+                'route' => $this,
             ]);
         }
     }

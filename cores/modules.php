@@ -78,7 +78,8 @@ new class ()
                 );
                 return;
             } 
-
+            
+            $config['autoload'] ??= [];
             $psr4 = is_array($config['autoload']) ? ($config['autoload']['psr-4'] ?? []) : null;
             
             if(!empty($psr4)) {
