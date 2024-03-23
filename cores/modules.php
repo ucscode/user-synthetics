@@ -21,7 +21,7 @@ new class ()
     {
         $this->iterateModules();
         $this->loadActiveModules();
-        Event::emit("modules:loaded");
+        Event::instance()->dispatch("modules:loaded");
         $this->render404();
     }
 

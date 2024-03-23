@@ -2,41 +2,46 @@
 
 namespace Uss\Component\Event;
 
-final class Event
+use Uss\Component\Trait\SingletonTrait;
+
+class Event
 {
-    private static $eventList = [];
+    use SingletonTrait;
 
-    public static function emit(string $name, array|object $data = [])
-    {
-        self::execAll(self::$eventList[$name] ?? [], $data);
-    }
-
+    private $listeners = [];
+    
     public function addListener(string $name, EventInterface|callable $action, float $order = 0): self
     {
-        $eventList = &self::$eventList;
-        if(!array_key_exists($name, $eventList)) {
-            $eventList[$name] = [];
-        };
-        $eventList[$name][] = [
+        $this->listeners[$name] ??= [];
+        $this->listeners[$name][] = [
             'action' => $action,
             'order' => $order
         ];
         return $this;
     }
 
-    private static function execAll(array $list, array|object $data)
+    public function removeListener(string $name, EventInterface|callable $action): self
     {
-        usort($list, function ($a, $b) {
-            return $a['order'] <=> $b['order'];
-        });
-        foreach($list as $event) {
-            $action = $event['action'];
-            if($action instanceof EventInterface) {
-                $action->eventAction($data);
-            } else {
-                call_user_func($action, $data);
+        if (isset($this->listeners[$name])) {
+            foreach ($this->listeners[$name] as $key => $listener) {
+                if ($listener['action'] === $action) {
+                    unset($this->listeners[$name][$key]);
+                }
             }
-        };
+        }
+        return $this;
+    }
+    
+    public function dispatch(string $name, mixed $data = null): self
+    {
+        if(array_key_exists($name, $this->listeners)) {
+            usort($this->listeners[$name], fn ($a, $b) => $a['order'] <=> $b['order']);
+            foreach($this->listeners[$name] as $event) {
+                $action = $event['action'];
+                $action instanceof EventInterface ? $action->eventAction($data) : call_user_func($action, $data);
+            };
+        }
+        return $this;
     }
 
 }

@@ -32,7 +32,7 @@ The Event Class is a powerful tool that enables efficient event handling and exe
 #### Using Callable
 
 ```php
-(new Event())->addListener('myEvent', function(array $data) {
+Event::instance()->addListener('myEvent', function(array $data) {
 
     // Handle myEvent
 
@@ -42,7 +42,7 @@ The Event Class is a powerful tool that enables efficient event handling and exe
 #### Using Class
 
 ```php
-(new Event())->addListener('myEvent', new class implements EventInterface {
+Event::instance()->addListener('myEvent', new class implements EventInterface {
 
     public function eventAction(array $data): void 
     {
@@ -55,7 +55,7 @@ The Event Class is a powerful tool that enables efficient event handling and exe
 #### Dispatching Events
 
 ```php
-(new Event())->emit('myEvent');
+Event::instance()->emit('myEvent');
 ```
 
 In the above example, two event listeners are registered for the event named `myEvent`. <br>
@@ -84,7 +84,7 @@ use Ucscode\Event\Event;
 
 $order = -10;
 
-(new Event())->addListener('user.registered', function(array $data) {
+Event::instance()->addListener('user.registered', function(array $data) {
 
     // Perform validation on the form data
     foreach($data as $key => $value) {
@@ -96,7 +96,7 @@ $order = -10;
 /**
  * This class based Event will run before the one above
  */
-(new Event())->addListener('user.registered', new class implemenets EventInterface {
+Event::instance()->addListener('user.registered', new class implemenets EventInterface {
 
     private $storage;
 
