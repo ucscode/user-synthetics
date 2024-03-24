@@ -112,13 +112,11 @@ abstract class AbstractUss extends AbstractUssEnvironment
     {
         $pathname = $this->useForwardSlash($pathname); // Necessary in windows OS
         $port = $_SERVER['SERVER_PORT'];
-        $scheme = ($_SERVER['REQUEST_SCHEME'] ?? ($port != 80 ? 'https' : 'http'));
-        $viewPort = !in_array($port, ['80', '443']) ? ":{$port}" : null;
-        $requestUri = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", '', $pathname);
-
-        return (!$hideProtocol || $viewPort) ?
-            $scheme . "://" . $_SERVER['SERVER_NAME'] . "{$viewPort}" . $requestUri :
-            $requestUri;
+        $scheme = ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? $_SERVER['REQUEST_SCHEME']) ?? ($port != 80 ? 'https' : 'http');
+        $visiblePort = !in_array($port, ['80', '443']) ? ":{$port}" : null;
+        $requestURI = preg_replace("~^{$_SERVER['DOCUMENT_ROOT']}~i", '', $pathname);
+        $fullRequestURI = $scheme . "://" . $_SERVER['SERVER_NAME'] . "{$visiblePort}" . $requestURI;
+        return (!$hideProtocol || $visiblePort) ? $fullRequestURI : $requestURI;
     }
 
     public function filterContext(null|string|array $path, string $divider = '/'): string
