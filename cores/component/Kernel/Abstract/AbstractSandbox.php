@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Kernel\Abstract;
 
+use Twig\TemplateWrapper;
 use Uss\Component\Kernel\Abstract\AbstractUss;
 use Uss\Component\Kernel\Extension\Extension;
 use Uss\Component\Kernel\Uss;
@@ -20,7 +21,7 @@ abstract class AbstractSandbox extends AbstractUss
         $this->isLocalhost = in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1', '::1'], true);
     }
     
-    public function render(string $template, array $context = []): string
+    public function render(string|TemplateWrapper $template, array $context = []): string
     {
         $this->borrowedExtension->configureRenderContext();
         $context += Uss::instance()->templateContext;
