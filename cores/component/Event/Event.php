@@ -8,7 +8,7 @@ class Event
 {
     use SingletonTrait;
 
-    private $listeners = [];
+    protected array $listeners = [];
     
     public function addListener(string $name, EventInterface|callable $action, float $order = 0): self
     {

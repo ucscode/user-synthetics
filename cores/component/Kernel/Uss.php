@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Kernel;
 
+use Twig\TemplateWrapper;
 use Ucscode\Pairs\Pairs;
 use Uss\Component\Kernel\Abstract\AbstractUss;
 use Uss\Component\Trait\SingletonTrait;
@@ -35,15 +36,12 @@ final class Uss extends AbstractUss implements UssInterface
         }
     }
 
-    public function render(string $templateFile, array $variables = [], bool $return = false): ?string
+    public function render(string|TemplateWrapper $template, array $variables = [], bool $await = false): ?string
     {
         $this->extension->configureRenderContext();
         $variables += $this->templateContext;
-        $result = $this->twig->render($templateFile, $variables);
-        return $return ? $result : call_user_func(function () use ($result) {
-            print($result);
-            die();
-        });
+        $result = $this->twig->render($template, $variables);
+        return $await ? $result : die($result);
     }
 
     public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
