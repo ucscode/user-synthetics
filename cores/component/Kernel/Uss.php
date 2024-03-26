@@ -45,17 +45,7 @@ final class Uss extends AbstractUss implements UssInterface
         $renderView = $this->twig->render($template, $variables);
         return new Response($renderView);
     }
-
-    public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void
-    {
-        $response = [
-            "status" => $status, 
-            "message" => $message, 
-            "data" => $data
-        ];
-        exit(json_encode($response, JSON_PRETTY_PRINT));
-    }
-
+    
     public function fetchItem(string $table, string|array $value, $column = 'id'): ?array
     {
         $state = is_array($value) ? $value : [$column => $value];

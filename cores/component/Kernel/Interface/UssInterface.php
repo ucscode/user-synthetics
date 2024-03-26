@@ -15,15 +15,6 @@ interface UssInterface extends UssFrameworkInterface
      * @param bool      $return         Whether to return or print the output
      */
     public function render(string $templatePath, array $variables): Response;
-
-    /**
-    * Terminate the script and print a JSON response.
-    *
-    * @param bool|int|null $status   The status of the response.
-    * @param string|null   $message  The optional message associated with the response.
-    * @param mixed         $data     Additional data to include in the response.
-    */
-    public function terminate(bool|int|null $status, ?string $message, mixed $data = []): void;
     
     /**
      * Get the availabe columns of a table
