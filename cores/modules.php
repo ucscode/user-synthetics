@@ -5,7 +5,7 @@ namespace Ucscode\Uss;
 use Uss\Component\Event\Event;
 use Uss\Component\Kernel\UssImmutable;
 use Uss\Component\Kernel\Uss;
-use Uss\Component\Route\Route;
+use Uss\Component\Route\RouteRegistry;
 
 new class () 
 {
@@ -18,14 +18,18 @@ new class ()
     private array $psr4 = [];
 
     public function __construct()
-    {
-        $this->iterateModules();
-        $this->loadActiveModules();
+    { 
+        $this->getModulesFromFilesystem();
+        
+        $attributes = RouteRegistry::instance()->getUrlMatcher()->match(Uss::instance()->request->getPathInfo());
+        $controller = RouteRegistry::instance()->getController($attributes['_route']);
+        $controller->onload(Uss::instance()->request);
+
         Event::instance()->dispatch("modules:loaded");
         $this->render404();
     }
 
-    private function iterateModules(): void
+    private function getModulesFromFilesystem(): void
     {
         $iterator = new \FileSystemIterator(UssImmutable::MODULES_DIR);
         foreach($iterator as $system) {
@@ -34,9 +38,10 @@ new class ()
                 !is_file($configFile) ?: $this->processJSON($configFile, $system);
             }
         }
+        $this->loadOnlyEnabledModules();
     }
     
-    private function loadActiveModules(): void
+    private function loadOnlyEnabledModules(): void
     {
         $this->autoloadPSR4();
         foreach($this->activeModules as $path => $config) {
@@ -161,11 +166,11 @@ new class ()
 
     private function render404(): void
     {
-        $matchingRoutes = Route::getInventories(true);
-        $isGetRequest = $_SERVER['REQUEST_METHOD'] === 'GET';
-        if(empty($matchingRoutes) && $isGetRequest) {
-            Uss::instance()->render('@Uss/error.html.twig');
-        }
+        // $matchingRoutes = Route::getInventories(true);
+        // $isGetRequest = $_SERVER['REQUEST_METHOD'] === 'GET';
+        // if(empty($matchingRoutes) && $isGetRequest) {
+        //     Uss::instance()->render('@Uss/error.html.twig');
+        // }
     }
 
     private function autoloadPSR4(): void

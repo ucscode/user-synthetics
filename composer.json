@@ -34,7 +34,10 @@
         "vlucas/phpdotenv": "^5.6",
         "symfony/yaml": "^6.4",
         "webuni/front-matter": "^2.0",
-        "twig/html-extra": "^3.8"
+        "twig/html-extra": "^3.8",
+        "symfony/http-foundation": "^6.4",
+        "symfony/routing": "^6.4",
+        "symfony/uid": "^6.4"
     },
     "autoload": {
         "psr-4": {

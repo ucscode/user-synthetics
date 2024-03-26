@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Kernel\Abstract;
 
+use Symfony\Component\HttpFoundation\Request;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Extension\DebugExtension;
@@ -14,6 +15,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
 {
     public readonly FilesystemLoader $filesystemLoader;
     public readonly Environment $twig;
+    public readonly Request $request;
     public array $templateContext;
     public array $jsCollection = [];
 
@@ -23,6 +25,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
 
     public function __construct()
     {
+        !empty(session_id()) ?: session_start();
         $this->filesystemLoader = new FilesystemLoader([UssImmutable::TEMPLATES_DIR]);
         $this->filesystemLoader->addPath(UssImmutable::TEMPLATES_DIR, UssImmutable::APP_NAMESPACE);
         $this->twig = new Environment($this->filesystemLoader, self::ENV_CONFIG);
@@ -30,6 +33,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
         $this->twig->addExtension(new StringLoaderExtension());
         $this->twig->addExtension(new HtmlExtension());
         $this->templateContext = $this->createSystemContext();
+        $this->request = Request::createFromGlobals();
         $this->setGlobals();
     }
 
@@ -45,9 +49,7 @@ abstract class AbstractUssEnvironment implements UssFrameworkInterface
     }
 
     private function setGlobals(): void
-    {
-        !empty(session_id()) ?: session_start();
-        
+    {        
         $this->twig->addGlobal('_request', [
             'post' => $_POST,
             'get' => $_GET,

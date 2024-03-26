@@ -32,7 +32,7 @@ use Uss\Component\Route\RouteInterface;
 
 new Route('/about', new class () implements RouteInterface 
 {
-    public function onload(array $context): void
+    public function onload(Request $request, DataContainer $container): Response
     {
         // Render Twig Template
         Uss::instance()->render('@MyTemplate/base.html.twig', [

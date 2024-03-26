@@ -121,10 +121,8 @@ abstract class AbstractUss extends AbstractUssEnvironment
 
     public function filterContext(null|string|array $path, string $divider = '/'): string
     {
-        if(is_array($path)) {
-            $path = implode($divider, $path);
-        };
-        $explosion = array_filter(array_map('trim', explode("/", $path)));
+        !is_array($path) ?: $path = implode($divider, $path);
+        $explosion = array_filter(array_map('trim', explode($divider, $path)));
         return implode("/", $explosion);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Kernel;
 
+use Symfony\Component\HttpFoundation\Response;
 use Twig\TemplateWrapper;
 use Ucscode\Pairs\Pairs;
 use Uss\Component\Kernel\Abstract\AbstractUss;
@@ -19,6 +20,7 @@ final class Uss extends AbstractUss implements UssInterface
     protected Extension $extension;
     public readonly ?Pairs $options;
     public readonly ?\mysqli $mysqli;
+    private bool $rendered = false;
 
     protected function __construct(bool $kernel = false)
     {
@@ -36,12 +38,12 @@ final class Uss extends AbstractUss implements UssInterface
         }
     }
 
-    public function render(string|TemplateWrapper $template, array $variables = [], bool $await = false): ?string
+    public function render(string|TemplateWrapper $template, array $variables = [], bool $await = false): Response
     {
         $this->extension->configureRenderContext();
         $variables += $this->templateContext;
-        $result = $this->twig->render($template, $variables);
-        return $await ? $result : die($result);
+        $renderView = $this->twig->render($template, $variables);
+        return new Response($renderView);
     }
 
     public function terminate(bool|int|null $status, ?string $message = null, mixed $data = []): void

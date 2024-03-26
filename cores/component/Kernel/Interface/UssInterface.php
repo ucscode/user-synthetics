@@ -3,6 +3,7 @@
 namespace Uss\Component\Kernel\Interface;
 
 use mysqli_result;
+use Symfony\Component\HttpFoundation\Response;
 
 interface UssInterface extends UssFrameworkInterface
 {
@@ -13,7 +14,7 @@ interface UssInterface extends UssFrameworkInterface
      * @param array     $variables:     A list of variables that will be passed to the template
      * @param bool      $return         Whether to return or print the output
      */
-    public function render(string $templatePath, array $variables, bool $return = false): ?string;
+    public function render(string $templatePath, array $variables, bool $return = false): Response;
 
     /**
     * Terminate the script and print a JSON response.
