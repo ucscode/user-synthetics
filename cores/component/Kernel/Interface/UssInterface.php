@@ -14,7 +14,7 @@ interface UssInterface extends UssFrameworkInterface
      * @param array     $variables:     A list of variables that will be passed to the template
      * @param bool      $return         Whether to return or print the output
      */
-    public function render(string $templatePath, array $variables, bool $return = false): Response;
+    public function render(string $templatePath, array $variables): Response;
 
     /**
     * Terminate the script and print a JSON response.

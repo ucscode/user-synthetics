@@ -7,26 +7,41 @@ use Symfony\Component\Uid\Uuid;
 
 class Route
 {
-    protected readonly string $id;
+    protected string $uuid;
 
-    public function __construct(string $route, RouteInterface $controller, string|array $methods = ['GET', 'POST']) 
+    protected SymfonyRoute $symfonyRoute;
+
+    public function __construct(string $route, RouteInterface $controller, string|array $methods = [], protected int $priority = 0) 
     {
-        $this->id = Uuid::v3(Uuid::v4(), md5(spl_object_id($this))); 
+        $this->uuid = Uuid::v3(Uuid::v4(), md5(spl_object_id($this))); 
 
-        RouteRegistry::instance()->getRouteCollection()->add(
-            $this->id, 
-            new SymfonyRoute(
-                $route,
-                [], // defaults
-                [], // requirements
-                [], // options
-                '', // host
-                [], // schemes
-                $methods,
-                '', // conditions
-            ),
+        $this->symfonyRoute = new SymfonyRoute(
+            $route,
+            [], // defaults
+            [], // requirements
+            [], // options
+            '', // host
+            [], // schemes
+            $methods,
+            '', // conditions
         );
+        
+        $this->registerRoute($controller);
+    }
 
-        RouteRegistry::instance()->setController($this->id, $controller);
+    public function getUuidString(): string
+    {
+        return $this->uuid;
+    }
+
+    public function getSource(): SymfonyRoute
+    {
+        return $this->symfonyRoute;
+    }
+
+    private function registerRoute(RouteInterface $controller): void
+    {
+        RouteRegistry::instance()->getRouteCollection()->add($this->uuid, $this->symfonyRoute, $this->priority);
+        RouteRegistry::instance()->setController($this->uuid, $controller);
     }
 }

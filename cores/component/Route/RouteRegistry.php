@@ -2,13 +2,14 @@
 
 namespace Uss\Component\Route;
 
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Uss\Component\Kernel\Uss;
 use Uss\Component\Trait\SingletonTrait;
 
-final class RouteRegistry
+final class RouteRegistry implements RouteRegistryInterface
 {
     use SingletonTrait;
 
@@ -17,6 +18,10 @@ final class RouteRegistry
     private UrlMatcher $urlMatcher;
 
     private array $controllers = [];
+
+    private array $statusCodeTemplate = [
+        Response::HTTP_NOT_FOUND => '@Uss/errors/layout.html.twig',
+    ];
 
     public function __construct()
     {
@@ -41,12 +46,13 @@ final class RouteRegistry
         return $this->urlMatcher;
     }
 
-    public function setController(string $name, RouteInterface $controllers): self
+    public function setController(string $name, RouteInterface $controllers): bool
     {
         if($this->hasSymfonyRoute($name)) {
             $this->controllers[$name] = $controllers;
+            return true;
         }
-        return $this;
+        return false;
     }
 
     public function getController(string $name): ?RouteInterface
@@ -56,13 +62,24 @@ final class RouteRegistry
 
     public function removeController(string $name): bool
     {
-        if($this->hasSymfonyRoute($name)) {
-            return false;
+        if(!$this->hasSymfonyRoute($name)) {
+            if(array_key_exists($name, $this->controllers)) {
+                unset($this->controllers[$name]);
+            }
+            return true;
         }
+        return false;
+    }
 
-        if(array_key_exists($name, $this->controllers)) {
-            unset($this->controllers[$name]);
-        }
+    public function setResponseStatusTemplate(int $statusCode, string $template): self
+    {
+        $this->statusCodeTemplate[$statusCode] = $template;
+        return $this;
+    }
+
+    public function getResponseStatusTemplate(int $statusCode): ?string
+    {
+        return $this->statusCodeTemplate[$statusCode] ?? null;
     }
 
     private function hasSymfonyRoute(string $name): bool

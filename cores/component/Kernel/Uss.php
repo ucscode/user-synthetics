@@ -38,7 +38,7 @@ final class Uss extends AbstractUss implements UssInterface
         }
     }
 
-    public function render(string|TemplateWrapper $template, array $variables = [], bool $await = false): Response
+    public function render(string|TemplateWrapper $template, array $variables = []): Response
     {
         $this->extension->configureRenderContext();
         $variables += $this->templateContext;

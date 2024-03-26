@@ -2,6 +2,11 @@
 
 namespace Ucscode\Uss;
 
+use RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\MethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Uss\Component\Event\Event;
 use Uss\Component\Kernel\UssImmutable;
 use Uss\Component\Kernel\Uss;
@@ -21,24 +26,41 @@ new class ()
     { 
         $this->getModulesFromFilesystem();
         
-        $attributes = RouteRegistry::instance()->getUrlMatcher()->match(Uss::instance()->request->getPathInfo());
-        $controller = RouteRegistry::instance()->getController($attributes['_route']);
-        $controller->onload(Uss::instance()->request);
+        try {
 
-        Event::instance()->dispatch("modules:loaded");
-        $this->render404();
+            $attributes = RouteRegistry::instance()->getUrlMatcher()->match(Uss::instance()->request->getPathInfo());
+            $controller = RouteRegistry::instance()->getController($attributes['_route']);
+            $response = $controller->onload(Uss::instance()->request);
+
+        } catch(RuntimeException $exception) {
+
+            if($exception instanceof ResourceNotFoundException) {
+                $response = $this->resourceNotFoundResponse($exception, Response::HTTP_NOT_FOUND);
+            }
+            
+            if($exception instanceof MethodNotAllowedException) {
+                $response = $this->resourceNotFoundResponse($exception, Response::HTTP_METHOD_NOT_ALLOWED);
+            }
+
+        }
+        
+        $response->send();
     }
 
     private function getModulesFromFilesystem(): void
     {
         $iterator = new \FileSystemIterator(UssImmutable::MODULES_DIR);
+
         foreach($iterator as $system) {
             if($system->isDir()) {
                 $configFile = $system->getPathname() . "/" . $this->jsonFile;
                 !is_file($configFile) ?: $this->processJSON($configFile, $system);
             }
         }
+
         $this->loadOnlyEnabledModules();
+        
+        Event::instance()->dispatch("modules:loaded");
     }
     
     private function loadOnlyEnabledModules(): void
@@ -164,13 +186,17 @@ new class ()
         return in_array($path, $this->pendingModules);
     }
 
-    private function render404(): void
+    private function resourceNotFoundResponse(RuntimeException $exception, int $statusCode): Response
     {
-        // $matchingRoutes = Route::getInventories(true);
-        // $isGetRequest = $_SERVER['REQUEST_METHOD'] === 'GET';
-        // if(empty($matchingRoutes) && $isGetRequest) {
-        //     Uss::instance()->render('@Uss/error.html.twig');
-        // }
+        $template = '@Uss/exception.html.twig';
+
+        if(Uss::instance()->request->getMethod() === 'GET') {
+            $template = RouteRegistry::instance()->getResponseStatusTemplate($statusCode) ?? $template;
+        }
+
+        return Uss::instance()->render($template, [
+            '_exception' => $exception,
+        ]);
     }
 
     private function autoloadPSR4(): void
