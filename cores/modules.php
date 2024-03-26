@@ -2,8 +2,7 @@
 
 namespace Ucscode\Uss;
 
-use RuntimeException;
-use Symfony\Component\HttpFoundation\Request;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -32,15 +31,32 @@ new class ()
             $controller = RouteRegistry::instance()->getController($attributes['_route']);
             $response = $controller->onload(Uss::instance()->request);
 
-        } catch(RuntimeException $exception) {
+        } catch(ResourceNotFoundException $exception) {
 
-            if($exception instanceof ResourceNotFoundException) {
-                $response = $this->resourceNotFoundResponse($exception, Response::HTTP_NOT_FOUND);
-            }
+            $response = $this->routeExceptionResponse(
+                new ResourceNotFoundException(
+                    Response::$statusTexts[Response::HTTP_NOT_FOUND],
+                    Response::HTTP_NOT_FOUND
+                )
+            );
             
-            if($exception instanceof MethodNotAllowedException) {
-                $response = $this->resourceNotFoundResponse($exception, Response::HTTP_METHOD_NOT_ALLOWED);
-            }
+        } catch(MethodNotAllowedException $exception) {
+            
+            $response = $this->routeExceptionResponse(
+                new MethodNotAllowedException(
+                    $exception->getAllowedMethods(),
+                    sprintf(
+                        '%s - %s',
+                        Uss::instance()->request->getMethod(),
+                        Response::$statusTexts[Response::HTTP_METHOD_NOT_ALLOWED],
+                    ),
+                    Response::HTTP_METHOD_NOT_ALLOWED
+                )
+            );
+
+        } catch(Exception $exception) {
+
+            $response = $this->routeExceptionResponse($exception);
 
         }
         
@@ -186,17 +202,27 @@ new class ()
         return in_array($path, $this->pendingModules);
     }
 
-    private function resourceNotFoundResponse(RuntimeException $exception, int $statusCode): Response
+    private function routeExceptionResponse(Exception $exception): Response
     {
-        $template = '@Uss/exception.html.twig';
-
         if(Uss::instance()->request->getMethod() === 'GET') {
-            $template = RouteRegistry::instance()->getResponseStatusTemplate($statusCode) ?? $template;
+            $template = RouteRegistry::instance()->getResponseStatusTemplate($exception->getCode());
         }
 
-        return Uss::instance()->render($template, [
-            '_exception' => $exception,
+        $template ??= '@Uss/errors/exception.html.twig';
+        $statusText = Response::$statusTexts[$exception->getCode()];
+        
+        $response = Uss::instance()->render($template, [
+            '_exception' => [
+                'instance' => $exception,
+                'statusText' => $statusText,
+                'FQCN' => $exception::class,
+                'PHP' => file_get_contents($exception->getTrace()[0]['file']),
+            ],
         ]);
+
+        $response->setStatusCode($exception->getCode(), $statusText);
+
+        return $response;
     }
 
     private function autoloadPSR4(): void
