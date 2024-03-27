@@ -3,6 +3,7 @@
 namespace Ucscode\Uss;
 
 use Exception;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -29,7 +30,12 @@ new class ()
 
             $attributes = RouteRegistry::instance()->getUrlMatcher()->match(Uss::instance()->request->getPathInfo());
             $controller = RouteRegistry::instance()->getController($attributes['_route']);
-            $response = $controller->onload(Uss::instance()->request);
+
+            $container = new ParameterBag([
+                'request' => Uss::instance()->request,
+            ]);
+
+            $response = $controller->onload($container);
 
         } catch(ResourceNotFoundException $exception) {
 
