@@ -30,7 +30,7 @@
                     <div class="col">
                         <span class='text-muted me-1 small'>HTTP</span>
                         <span class="display-6 text-danger fw-bold m-0">
-                            {{ _exception.instance.code }}
+                            {{ _exception.instance.code ?: 500 }}
                         </span>
                     </div>
                     <div class="col text-end small">

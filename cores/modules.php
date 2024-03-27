@@ -61,7 +61,7 @@ new class ()
             );
 
         } catch(Exception $exception) {
-
+            
             $response = $this->routeExceptionResponse($exception);
 
         }
@@ -215,7 +215,8 @@ new class ()
         }
 
         $template ??= '@Uss/errors/exception.html.twig';
-        $statusText = Response::$statusTexts[$exception->getCode()];
+        $statusCode = $exception->getCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR;
+        $statusText = Response::$statusTexts[$statusCode];
         
         $response = Uss::instance()->render($template, [
             '_exception' => [
@@ -226,7 +227,7 @@ new class ()
             ],
         ]);
 
-        $response->setStatusCode($exception->getCode(), $statusText);
+        $response->setStatusCode($statusCode, $statusText);
 
         return $response;
     }
