@@ -2,6 +2,7 @@
 
 namespace Uss\Component\Route;
 
+use Uss\Component\Event\Event;
 use Uss\Component\Kernel\Uss;
 
 class Route
@@ -13,9 +14,9 @@ class Route
     public readonly array $methods;
     public readonly array $regexMatches;
     public readonly bool $isAuthorized;
+    public readonly RouteInterface $controller;
 
     protected ?array $backtrace;
-    protected RouteInterface $controller;
 
     private static array $inventories = [];
 
@@ -33,6 +34,13 @@ class Route
         return $authentic ?
             array_filter(self::$inventories, fn ($route) => $route->isAuthorized) :
             self::$inventories;
+    }
+
+    public function __debugInfo()
+    {
+        $objects = get_object_vars($this);
+        unset($objects['controller']);
+        return $objects;
     }
 
     protected function bootstrap(string $route): void
@@ -80,10 +88,15 @@ class Route
         $this->backtraceRouterSource();
         self::$inventories[] = $this;
         if($this->isAuthorized) {
+            /* Dispatch Event Before Loading */
+            Event::instance()->dispatch('onload:before', $this);
+            // Load Controller Action
             $this->controller->onload([
                 'matches' => $this->regexMatches,
                 'route' => $this,
             ]);
+            /* Dispatch Event After Loading */
+            Event::instance()->dispatch('onload:after', $this);
         }
     }
 
