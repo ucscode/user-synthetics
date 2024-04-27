@@ -38,6 +38,12 @@ class Block
         return $this->templates;
     }
 
+    public function clearTemplates(): self
+    {
+        $this->templates = [];
+        return $this;
+    }
+
     public function addContent(string $name, ?string $content, int $proprity = 0): self
     {
         $this->contents[$name] = [
@@ -63,5 +69,11 @@ class Block
     public function getContents(): array
     {
         return $this->contents;
+    }
+
+    public function clearContents(): self
+    {
+        $this->contents = [];
+        return $this;
     }
 }
