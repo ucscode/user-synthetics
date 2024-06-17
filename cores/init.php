@@ -26,7 +26,7 @@ new class()
         # load .env or override with .env.local 
         $dotenv->load(); 
         
-        $dotenv->required('APP_NAME')->notEmpty();
+        // $dotenv->required('APP_NAME')->notEmpty();
         $dotenv->required('APP_SECRET')->notEmpty();
         $dotenv->ifPresent('APP_DEBUG')->isBoolean();
         $dotenv->required('DB_ENABLED')->isBoolean();
