@@ -9,7 +9,6 @@ use Uss\Component\Kernel\Uss;
 
 abstract class AbstractSandbox extends AbstractUss
 {
-    public readonly bool $isLocalhost;
     protected Extension $borrowedExtension;
 
     public function __construct()
@@ -18,7 +17,6 @@ abstract class AbstractSandbox extends AbstractUss
         $this->inheritUssFilesystemPaths();
         $this->borrowedExtension = new Extension(Uss::instance());
         $this->twig->addExtension($this->borrowedExtension);
-        $this->isLocalhost = in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1', '::1'], true);
     }
     
     public function render(string|TemplateWrapper $template, array $context = []): string

@@ -2,7 +2,9 @@
 
 namespace Uss\Component\Common;
 
-class Entity
+use ArrayAccess;
+
+class Entity implements ArrayAccess
 {
     public function __construct(protected ?string $name = null, protected array $properties = [])
     {}
@@ -15,6 +17,7 @@ class Entity
     public function set(string $key, mixed $value): self
     {
         $this->properties[$key] = $value;
+
         return $this;
     }
 
@@ -28,6 +31,7 @@ class Entity
         if(array_key_exists($key, $this->properties)) {
             unset($this->properties[$key]);
         }
+
         return $this;
     }
 
@@ -39,6 +43,29 @@ class Entity
     public function overwrite(array $properties): self
     {
         $this->properties = $properties;
+
         return $this;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        $this->properties[$offset] = $value;
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return $this->properties[$offset] ?? null;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if(array_key_exists($offset, $this->properties)) {
+            unset($this->properties[$offset]);
+        }
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return !empty($this->properties[$offset]);
     }
 }

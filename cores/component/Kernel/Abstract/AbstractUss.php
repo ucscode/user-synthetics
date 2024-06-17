@@ -14,6 +14,11 @@ abstract class AbstractUss extends AbstractUssEnvironment
         parent::__construct();
     }
 
+    public function isLocalhost(): bool
+    {
+        return in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1', '::1'], true);
+    }
+
     public function getUrlSegments(?int $index = null): array|string|null
     {
         $path = explode("?", $_SERVER['REQUEST_URI'])[0] ?? '';
