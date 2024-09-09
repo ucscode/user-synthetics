@@ -1,3 +1,5 @@
+# NOT MAINTAINED!
+
 <div align="center">
 	<img src="uss-core/assets/images/origin.png" alt="User Synthetics Logo" width="90">
 	<h1>User Synthetics</h1>
