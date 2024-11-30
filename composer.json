@@ -28,13 +28,13 @@
         "ucscode/squery": "^3.0",
         "ucscode/pairs": "^3.0",
         "ucscode/tree-node": "^3.0",
-        "ucscode/local-storage": "^2.0",
         "ucscode/promise": "^1.0",
         "ucscode/domtable": "^2.0",
         "vlucas/phpdotenv": "^5.6",
         "symfony/yaml": "^6.4",
         "webuni/front-matter": "^2.0",
-        "twig/html-extra": "^3.8"
+        "twig/html-extra": "^3.8",
+        "ucscode/local-storage": "^2.0"
     },
     "autoload": {
         "psr-4": {
